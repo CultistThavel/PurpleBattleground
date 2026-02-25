@@ -3,362 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - Final Edition</title>
+    <title>Purple Battleground - Step 1</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #3d4147; font-family: 'Arial Black', sans-serif; user-select: none; }
-        #game-stage { position: relative; width: 100vw; height: 100vh; background: #3d4147; }
+        #game-box { position: relative; width: 100vw; height: 100vh; background: #3d4147; }
 
-        /* ИНТЕРФЕЙС ПО ЧЕРТЕЖАМ */
-        .ui-top-left { position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; gap: 12px; z-index: 100; }
-        #game-label { background: #fff; color: #000; padding: 8px 15px; border: 4px solid #000; border-radius: 12px; font-size: 24px; font-weight: 900; width: fit-content; }
-        #player-hp-label { background: #ccff00; color: #000; padding: 6px 15px; border: 3px solid #000; border-radius: 10px; font-size: 20px; font-weight: bold; }
+        /* ВЕРХНИЙ ЛЕВЫЙ УГОЛ */
+        .ui-top-left { position: absolute; top: 20px; left: 20px; z-index: 100; }
+        #game-title { background: #fff; color: #000; padding: 10px 25px; border: 5px solid #000; border-radius: 15px; font-size: 28px; font-weight: 900; margin-bottom: 12px; display: inline-block; box-shadow: 5px 5px 0 #000; }
+        #player-hp-box { background: #ccff00; color: #000; padding: 10px 20px; border: 4px solid #000; border-radius: 12px; font-size: 22px; font-weight: 900; box-shadow: 4px 4px 0 #000; }
 
-        .ui-top-right { position: absolute; top: 10px; right: 20px; text-align: right; color: #fff; z-index: 100; }
-        #wave-count { font-size: 75px; margin: 0; line-height: 0.9; text-shadow: 4px 4px 0 #000; }
-        #enemies-left-txt { font-size: 22px; margin: 0; font-weight: bold; }
+        /* ВЕРХНИЙ ПРАВЫЙ УГОЛ (ВОЛНА) */
+        .ui-top-right { position: absolute; top: 15px; right: 30px; text-align: right; color: #fff; z-index: 100; }
+        #wave-num { font-size: 85px; margin: 0; line-height: 0.8; font-weight: 900; -webkit-text-stroke: 3px #000; }
+        #enemies-count { font-size: 24px; margin: 0; font-weight: bold; }
 
-        /* ЛЕВОЕ МЕНЮ */
-        .ui-side-left { position: absolute; top: 160px; left: 15px; display: flex; flex-direction: column; gap: 25px; z-index: 100; }
-        #shop-btn { 
-            width: 110px; height: 110px; background: #fff; border: 5px solid #000; border-radius: 18px; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 6px 6px 0 #000;
+        /* ЛЕВАЯ ПАНЕЛЬ (МАГАЗИН И ДЕНЬГИ) */
+        .ui-side-left { position: absolute; top: 180px; left: 20px; display: flex; flex-direction: column; gap: 35px; z-index: 100; }
+        #btn-open-shop { 
+            width: 130px; height: 130px; background: #fff; border: 6px solid #000; border-radius: 20px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 8px 8px 0 #000; 
         }
-        .house-icon { width: 80px; height: 80px; }
+        .draw-house { width: 80px; height: 60px; border: 8px solid #000; border-top: none; position: relative; }
+        .draw-house::after { content: ''; position: absolute; top: -35px; left: -10px; width: 90px; height: 35px; border-top: 8px solid #000; border-left: 8px solid #000; transform: skewY(-15deg); }
 
-        .money-display { display: flex; align-items: center; gap: 12px; }
-        .coin-icon { width: 85px; height: 85px; background: #fff; border: 5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; box-shadow: 4px 4px 0 #000; }
-        #money-bar { background: #a200ff; color: #fff; padding: 12px 25px; border: 4px solid #000; border-radius: 15px; font-size: 24px; font-weight: bold; box-shadow: 6px 6px 0 #000; min-width: 200px; }
+        .money-wrap { display: flex; align-items: center; gap: 15px; }
+        .money-circle { width: 90px; height: 90px; background: #fff; border: 6px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 55px; font-weight: 900; box-shadow: 4px 4px 0 #000; }
+        #money-plate { background: #a200ff; color: #fff; padding: 15px 30px; border: 5px solid #000; border-radius: 20px; font-size: 26px; font-weight: 900; box-shadow: 6px 6px 0 #000; min-width: 220px; }
 
         /* КНОПКА СТАРТА */
-        #start-action-btn { 
-            position: absolute; bottom: 50px; right: 40px; 
-            background: #ccff00; color: #fff; padding: 25px 60px; 
-            border: 8px solid #fff; border-radius: 30px; font-size: 45px; 
-            font-weight: 900; cursor: pointer; z-index: 150;
+        #btn-start { 
+            position: absolute; bottom: 50px; right: 50px; 
+            background: #ccff00; color: #fff; padding: 30px 70px; 
+            border: 8px solid #fff; border-radius: 35px; font-size: 45px; 
+            font-weight: 900; cursor: pointer; z-index: 200;
             text-shadow: 3px 3px #000; box-shadow: 0 12px 0 #88aa00;
         }
 
-        /* ИГРОК И ОРУЖИЕ */
-        #player-wrapper { position: absolute; bottom: 80px; left: 40px; width: 320px; z-index: 50; }
-        #player-img { width: 260px; pointer-events: none; }
-        #weapon-img { position: absolute; top: 130px; left: 130px; width: 220px; transform: rotate(-5deg); pointer-events: none; }
-        #heli-companion { position: absolute; top: -120px; left: 50px; width: 150px; display: none; }
-
-        /* ВРАГИ И ХП */
-        .enemy { position: absolute; bottom: 80px; z-index: 60; display: flex; flex-direction: column; align-items: center; }
-        .enemy-hp-container { width: 100%; height: 15px; background: #333; border: 2px solid #fff; margin-bottom: 5px; position: relative; }
-        .enemy-hp-fill { height: 100%; background: #00ff00; width: 100%; transition: width 0.2s; }
-        .enemy-hp-text { position: absolute; width: 100%; text-align: center; color: #fff; font-size: 12px; font-weight: bold; top: -1px; }
-
-        /* МАГАЗИН */
-        #shop-ui { 
+        /* МАГАЗИН (ПО СКРИНАМ) */
+        #shop-modal { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 90%; max-width: 800px; background: #fff; border: 8px solid #000; 
-            padding: 40px; display: none; z-index: 1000; box-shadow: 30px 30px 0 rgba(0,0,0,0.5); 
+            width: 90%; height: 85%; background: #fff; border: 10px solid #000; 
+            padding: 40px; display: none; z-index: 1000; box-shadow: 0 0 0 1000px rgba(0,0,0,0.5); 
         }
-        .shop-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 6px solid #000; padding-bottom: 20px; margin-bottom: 20px; }
-        .close-shop { width: 80px; height: 80px; background: #ffcc00; border: 5px solid #fff; border-radius: 50%; font-size: 45px; color: #fff; cursor: pointer; box-shadow: 4px 4px 0 #000; }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .btn-close-shop { width: 80px; height: 80px; background: #ffcc00; border: 5px solid #fff; border-radius: 50%; font-size: 45px; color: #fff; cursor: pointer; }
         
-        .shop-items-grid { display: flex; gap: 30px; }
-        .item-card { border: 5px solid #ff0000; padding: 20px; flex: 1; text-align: center; background: #fff; position: relative; }
-        .item-card img { width: 100%; height: 220px; object-fit: contain; background: #000; border: 4px solid #000; margin-bottom: 15px; }
-        .item-info { color: #888; font-size: 14px; margin: 10px 0; font-weight: bold; }
-        .buy-label { background: #ccff00; border: 4px solid #000; padding: 15px 30px; border-radius: 15px; font-weight: 900; font-size: 24px; cursor: pointer; width: 100%; }
-        .already-bought { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: #fff; display: none; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; transform: rotate(-10deg); pointer-events: none; }
+        .shop-items { display: flex; gap: 30px; }
+        .card { border: 6px solid #ff0000; padding: 20px; flex: 1; text-align: center; }
+        .card img { width: 100%; height: 250px; object-fit: contain; background: #000; margin-bottom: 15px; border: 4px solid #000; }
+        .card p { color: #888; font-size: 16px; font-weight: bold; margin: 10px 0; }
+        .btn-buy { background: #ccff00; border: 4px solid #000; padding: 15px; border-radius: 15px; font-weight: 900; font-size: 24px; cursor: pointer; width: 100%; }
 
-        /* ЭФФЕКТЫ */
-        .bullet { position: absolute; width: 45px; z-index: 100; pointer-events: none; }
-        #death-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(128,128,128,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; }
+        /* ГЕРОЙ */
+        #player-hero { position: absolute; bottom: 80px; left: 50px; width: 300px; z-index: 50; }
+
+        /* ЭКРАН СМЕРТИ */
+        #death-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(120,120,120,0.95); display: none; 
+            flex-direction: column; align-items: center; justify-content: center; z-index: 9999; 
+        }
+        #death-screen h1 { color: #fff; font-size: 55px; text-align: center; margin-bottom: 30px; }
+        #btn-lan { background: #ccff00; color: #fff; border: 6px solid #fff; padding: 15px 60px; font-size: 35px; font-weight: 900; border-radius: 20px; cursor: pointer; }
+
+        /* ВРАГИ */
+        .enemy-unit { position: absolute; bottom: 80px; z-index: 60; display: flex; flex-direction: column; align-items: center; }
+        .hp-bar-bg { width: 100px; height: 15px; background: #333; border: 2px solid #fff; margin-bottom: 5px; position: relative; }
+        .hp-bar-fill { height: 100%; background: #00ff00; width: 100%; }
+        .hp-text { position: absolute; width: 100%; text-align: center; color: #fff; font-size: 11px; font-weight: 900; top: 0; }
     </style>
 </head>
-<body onclick="playerShoot()">
+<body onclick="shoot()">
 
-<div id="game-stage">
+<div id="game-box">
     <div class="ui-top-left">
-        <div id="game-label">Purple Battleground</div>
-        <div id="player-hp-label">Ваша Шкала ХП: <span id="hp-val">350</span></div>
+        <div id="game-title">Purple Battleground</div><br>
+        <div id="player-hp-box">Ваша Шкала ХП: <span id="cur-hp">350</span></div>
     </div>
 
     <div class="ui-top-right">
-        <h1 id="wave-count">1 Волна</h1>
-        <p id="enemies-left-txt">Осталось Врагов: <span id="e-val">10</span></p>
+        <h1 id="wave-num">1 Волна</h1>
+        <p id="enemies-count">Осталось Врагов: <span id="cur-e">10</span></p>
     </div>
 
     <div class="ui-side-left">
-        <div id="shop-btn" onclick="toggleShop(event)">
-            <img src="https://cdn-icons-png.flaticon.com/512/606/606548.png" class="house-icon">
+        <div id="btn-open-shop" onclick="toggleShop(event)">
+            <div class="draw-house"></div>
         </div>
-        <div class="money-display">
-            <div class="coin-icon">$</div>
-            <div id="money-bar">Purple Money: <span id="m-val">0</span></div>
+        <div class="money-wrap">
+            <div class="money-circle">$</div>
+            <div id="money-plate">Purple Money: <span id="cur-m">0</span></div>
         </div>
     </div>
 
-    <div id="player-wrapper">
-        <img id="heli-companion" src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
-        <img id="player-img" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
-        <img id="weapon-img" src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
-    </div>
+    <img id="player-hero" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
 
-    <button id="start-action-btn" onclick="startWave(event)">Начать Перестрелку</button>
+    <button id="btn-start" onclick="startWave(event)">Начать Перестрелку</button>
 
-    <div id="shop-ui">
+    <div id="shop-modal">
         <div class="shop-header">
-            <div style="font-size: 32px; font-weight: 900;">Ваш Балланс: <span id="s-m-val">0</span></div>
-            <button class="close-shop" onclick="toggleShop(event)">✕</button>
+            <div style="font-size: 35px; font-weight: 900;">Ваш Балланс: <span id="shop-m">0</span></div>
+            <button class="btn-close-shop" onclick="toggleShop(event)">✕</button>
         </div>
-        <div class="shop-items-grid">
-            <div class="item-card">
+        <div class="shop-items">
+            <div class="card">
                 <img src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
                 <h2>Верто-Заяц</h2>
-                <p class="item-info">Ваш личный помощник! Всегда готов отбиваться от врагов с вами до конца! Он очень дружелюбный.</p>
-                <p><strong>1800 PurpleMoney</strong></p>
-                <button class="buy-label" onclick="buyHeli(event)">Приобрести</button>
-                <div id="heli-sold" class="already-bought">Уже Приобретено</div>
+                <p>Ваш личный помощник! Всегда готов отбиваться от врагов с вами до конца! Он очень дружелюбный.</p>
+                <button class="btn-buy" onclick="buyHeli(event)">1800 PurpleMoney</button>
             </div>
-            <div class="item-card">
+            <div class="card">
                 <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
                 <h2>Снаряды</h2>
-                <p class="item-info">150 Монет = +20 Урона для вашего оружия.</p>
-                <p><strong id="dmg-cost">150 Монет</strong></p>
-                <button class="buy-label" onclick="buyDmg(event)">Приобрести</button>
+                <p>150 Монет = +20 Урона для вашего оружия. </p>
+                <button class="btn-buy" onclick="buyDmg(event)">Купить Урон</button>
             </div>
         </div>
     </div>
 
     <div id="death-screen">
-        <h1 style="font-size: 50px;">Отлично, надо было стараться.</h1>
-        <button onclick="location.reload()" style="padding: 20px 50px; font-size: 30px; cursor: pointer; background: #ccff00; border: none; border-radius: 15px; font-weight: 900;">Лан.</button>
+        <h1>Молодец, надо было стараться</h1>
+        <button id="btn-lan" onclick="location.reload()">Лан.</button>
     </div>
 </div>
 
 <script>
-    const ENEMY_DATA = [
-        { id: "1lsjdbdu0i9ubx2br0a07", hp: 55, dmg: 20, speed: 6, size: 160, name: "Zombie" },
-        { id: "tdixfa0a15c8yi5sdefha", hp: 310, dmg: 80, speed: 5, size: 180, name: "Slave" },
-        { id: "z3omefpvjio3aj6f4cgss", hp: 550, dmg: 130, speed: 4, size: 200, name: "Hyr" },
-        { id: "sa88ntns8llt94yyipjho", hp: 1200, dmg: 250, speed: 4.1, size: 220, name: "Tolk" },
-        { id: "cumlg6kmbyntnz8z83699", hp: 2210, dmg: 398, speed: 2.8, size: 230, name: "Bow" },
-        { id: "c76zhvy901pqj6wnhc6ss", hp: 5777, dmg: 566, speed: 7.9, size: 240, name: "Guest" },
-        { id: "rscd5vy3hjxfb2gxlxskb", hp: 18500, dmg: 1888, speed: 15, size: 280, name: "Night Boss" },
-        { id: "dg27h6rb2330uyntn2ga5", hp: 12000, dmg: 899, speed: 6, size: 300, name: "Father" },
-        { id: "zdwojmpsz3mf2ie4f1jwj", hp: 15600, dmg: 1090, speed: 7, size: 260, name: "Inchi" },
-        { id: "982f5rb5tg1qg4st58kj1", hp: 19980, dmg: 1000, speed: 10, size: 270, name: "Shadow" },
-        { id: "ivx4llojwlbso1zn571sd", hp: 45879, dmg: 9999, speed: 27, size: 320, name: "Agetha Boss" }
-    ];
+    let g = { hp: 350, money: 0, wave: 1, killed: 0, target: 10, active: false, dmg: 50 };
 
-    let state = {
-        hp: 350, maxHp: 350, money: 0, wave: 1, damage: 50,
-        active: false, killed: 0, target: 10,
-        hasHeli: false, dmgPrice: 150
-    };
-
-    function updateUI() {
-        document.getElementById('hp-val').innerText = state.hp;
-        document.getElementById('m-val').innerText = state.money;
-        document.getElementById('s-m-val').innerText = state.money;
-        document.getElementById('wave-count').innerText = state.wave + " Волна";
-        document.getElementById('e-val').innerText = state.target - state.killed;
-        document.getElementById('dmg-cost').innerText = state.dmgPrice + " Монет";
-        if(state.hasHeli) {
-            document.getElementById('heli-sold').style.display = 'flex';
-            document.getElementById('heli-companion').style.display = 'block';
-        }
+    function ui() {
+        document.getElementById('cur-hp').innerText = g.hp;
+        document.getElementById('cur-m').innerText = g.money;
+        document.getElementById('shop-m').innerText = g.money;
+        document.getElementById('cur-e').innerText = g.target - g.killed;
     }
 
     function toggleShop(e) {
         e.stopPropagation();
-        if(state.active) return;
-        const s = document.getElementById('shop-ui');
+        const s = document.getElementById('shop-modal');
         s.style.display = s.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function buyDmg(e) {
-        e.stopPropagation();
-        if(state.money >= state.dmgPrice) {
-            state.money -= state.dmgPrice;
-            state.damage += 20;
-            state.dmgPrice += 100;
-            updateUI();
-        }
-    }
-
-    function buyHeli(e) {
-        e.stopPropagation();
-        if(state.money >= 1800 && !state.hasHeli) {
-            state.money -= 1800;
-            state.hasHeli = true;
-            updateUI();
-        }
     }
 
     function startWave(e) {
         e.stopPropagation();
-        state.active = true;
-        state.killed = 0;
-        state.hp = state.maxHp;
-        document.getElementById('start-action-btn').style.display = 'none';
-        document.getElementById('shop-ui').style.display = 'none';
-        
-        spawnEnemies();
-        if(state.hasHeli) startHeliAutoFire();
-        updateUI();
+        g.active = true; g.killed = 0; g.hp = 350;
+        document.getElementById('btn-start').style.display = 'none';
+        document.getElementById('shop-modal').style.display = 'none';
+        ui();
+        spawn();
     }
 
-    function spawnEnemies() {
-        let spawned = 0;
-        let type = getEnemyForWave();
-        let loop = setInterval(() => {
-            if(spawned >= state.target || !state.active) { clearInterval(loop); return; }
-            createEnemy(type);
-            spawned++;
-        }, 3000);
+    function spawn() {
+        let count = 0;
+        let t = setInterval(() => {
+            if(count >= g.target || !g.active) { clearInterval(t); return; }
+            createZombie();
+            count++;
+        }, 2500);
     }
 
-    function getEnemyForWave() {
-        if(state.wave < 5) return ENEMY_DATA[0];
-        if(state.wave < 10) return ENEMY_DATA[1];
-        if(state.wave < 20) return ENEMY_DATA[2];
-        if(state.wave < 35) return ENEMY_DATA[3];
-        if(state.wave < 50) return ENEMY_DATA[4];
-        if(state.wave < 65) return ENEMY_DATA[5];
-        if(state.wave === 75) return ENEMY_DATA[6]; // Boss Night
-        if(state.wave < 85) return ENEMY_DATA[7];
-        if(state.wave < 90) return ENEMY_DATA[8];
-        if(state.wave < 93) return ENEMY_DATA[9];
-        return ENEMY_DATA[10]; // Agetha
-    }
+    function createZombie() {
+        const en = document.createElement('div');
+        en.className = 'enemy-unit';
+        en.style.right = '-200px';
+        en.dataset.hp = 100;
 
-    function createEnemy(data) {
-        const wrap = document.createElement('div');
-        wrap.className = 'enemy';
-        wrap.style.right = '-350px';
-        wrap.style.width = data.size + 'px';
-        wrap.dataset.hp = data.hp;
-        wrap.dataset.max = data.hp;
-
-        wrap.innerHTML = `
-            <div class="enemy-hp-container">
-                <div class="enemy-hp-fill"></div>
-                <div class="enemy-hp-text">${data.hp} HP</div>
-            </div>
-            <img src="https://www.dropbox.com/scl/fi/${data.id}/...dl=1".replace('...','').replace('?dl=0','?dl=1') style="width:100%">
+        en.innerHTML = `
+            <div class="hp-bar-bg"><div class="hp-bar-fill"></div><div class="hp-text">100 HP</div></div>
+            <img src="https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=n1iht3ml&dl=1" width="180">
         `;
-        
-        // Фикс ссылки Dropbox для прямого отображения
-        const img = wrap.querySelector('img');
-        img.src = `https://www.dropbox.com/scl/fi/${data.id}/...png?rlkey=...&st=...&dl=1`
-            .replace('...', '') 
-            .replace('...', '') 
-            .replace('...', ''); 
-        // Я использую твои полные ссылки из массива в реальности:
-        const realLink = getRealLinkById(data.id);
-        img.src = realLink.replace('dl=0', 'dl=1');
+        document.getElementById('game-box').appendChild(en);
 
-        document.getElementById('game-stage').appendChild(wrap);
-
-        let pos = -350;
-        let moveInt = setInterval(() => {
-            if(!state.active || !wrap.parentElement) { clearInterval(moveInt); return; }
-            pos += (data.speed * 0.8);
-            wrap.style.right = pos + 'px';
-
-            if(pos > window.innerWidth - 400) {
-                state.hp -= data.dmg;
-                wrap.remove();
-                state.killed++;
-                updateUI();
-                if(state.hp <= 0) gameOver();
-                if(state.killed >= state.target) endWave();
-                clearInterval(moveInt);
+        let x = -200;
+        let m = setInterval(() => {
+            if(!g.active) { clearInterval(m); return; }
+            x += 4;
+            en.style.right = x + 'px';
+            if(x > window.innerWidth - 350) {
+                g.hp -= 50; en.remove(); g.killed++; ui();
+                if(g.hp <= 0) { g.active = false; document.getElementById('death-overlay'); document.getElementById('death-screen').style.display = 'flex'; }
+                if(g.killed >= g.target) win();
+                clearInterval(m);
             }
         }, 20);
-    }
 
-    function getRealLinkById(id) {
-        const links = {
-            "1lsjdbdu0i9ubx2br0a07": "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=n1iht3ml&dl=1",
-            "tdixfa0a15c8yi5sdefha": "https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=uylrffto&dl=1",
-            "z3omefpvjio3aj6f4cgss": "https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=oog4piyn&dl=1",
-            "sa88ntns8llt94yyipjho": "https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=w2b3vrmc&dl=1",
-            "cumlg6kmbyntnz8z83699": "https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=4h8c9tod&dl=1",
-            "c76zhvy901pqj6wnhc6ss": "https://www.dropbox.com/scl/fi/c76zhvy901pqj6wnhc6ss/Picsart_26-02-25_19-09-48-052.png?rlkey=8erkxojcqgom1in01kzqmh2q6&st=csusvp&dl=1",
-            "rscd5vy3hjxfb2gxlxskb": "https://www.dropbox.com/scl/fi/rscd5vy3hjxfb2gxlxskb/Picsart_26-02-25_19-10-10-083.png?rlkey=xz01b2w8wl6q3aqqwd7azim6s&st=4a8if5m6&dl=1",
-            "dg27h6rb2330uyntn2ga5": "https://www.dropbox.com/scl/fi/dg27h6rb2330uyntn2ga5/Picsart_26-02-25_19-10-23-990.png?rlkey=5x10l6ki04hvfld6krujy21vl&st=7kt5x010&dl=1",
-            "zdwojmpsz3mf2ie4f1jwj": "https://www.dropbox.com/scl/fi/zdwojmpsz3mf2ie4f1jwj/Picsart_26-02-25_19-10-33-922.png?rlkey=e4l9uktjlvtl7h4du0v7gmluc&st=otnbry7r&dl=1",
-            "982f5rb5tg1qg4st58kj1": "https://www.dropbox.com/scl/fi/982f5rb5tg1qg4st58kj1/Picsart_26-02-25_19-10-51-597.png?rlkey=6l5f4zshwf3ctc4r1z5q4jrcb&st=d0fp8myp&dl=1",
-            "ivx4llojwlbso1zn571sd": "https://www.dropbox.com/scl/fi/ivx4llojwlbso1zn571sd/Picsart_26-02-25_19-12-22-085.png?rlkey=lzpcyrefycb4jy6utlyi6snh2&st=pt7m5scg&dl=1"
+        en.onclick = (e) => {
+            e.stopPropagation();
+            let h = en.dataset.hp - g.dmg;
+            en.dataset.hp = h;
+            en.querySelector('.hp-bar-fill').style.width = h + '%';
+            en.querySelector('.hp-text').innerText = h + " HP";
+            if(h <= 0) { en.remove(); g.killed++; g.money += 100; ui(); if(g.killed >= g.target) win(); clearInterval(m); }
         };
-        return links[id];
     }
 
-    function playerShoot() {
-        if(!state.active) return;
-        createBullet(state.damage, false);
-    }
+    function win() { g.active = false; document.getElementById('btn-start').style.display = 'block'; }
+    function buyDmg(e) { e.stopPropagation(); if(g.money >= 150) { g.money -= 150; g.dmg += 20; ui(); } }
+    function buyHeli(e) { e.stopPropagation(); if(g.money >= 1800) { g.money -= 1800; ui(); } }
+    function shoot() {}
 
-    function createBullet(dmg, isHeli) {
-        const b = document.createElement('img');
-        b.src = 'https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=vda4mzua&dl=1';
-        b.className = 'bullet';
-        let startX = isHeli ? 150 : 250;
-        let startY = isHeli ? window.innerHeight - 300 : window.innerHeight - 150;
-        b.style.left = startX + 'px';
-        b.style.bottom = (window.innerHeight - startY) + 'px';
-        document.getElementById('game-stage').appendChild(b);
-
-        let bX = startX;
-        function moveB() {
-            bX += 20;
-            b.style.left = bX + 'px';
-            
-            const enemies = document.querySelectorAll('.enemy');
-            enemies.forEach(en => {
-                let r1 = b.getBoundingClientRect();
-                let r2 = en.getBoundingClientRect();
-                if(r1.left < r2.right && r1.right > r2.left && r1.top < r2.bottom && r1.bottom > r2.top) {
-                    let currentHp = parseFloat(en.dataset.hp) - dmg;
-                    en.dataset.hp = currentHp;
-                    en.querySelector('.enemy-hp-fill').style.width = (currentHp / en.dataset.max * 100) + '%';
-                    en.querySelector('.enemy-hp-text').innerText = Math.max(0, Math.floor(currentHp)) + " HP";
-                    b.remove();
-                    if(currentHp <= 0) {
-                        en.remove();
-                        state.killed++;
-                        state.money += 45;
-                        updateUI();
-                        if(state.killed >= state.target) endWave();
-                    }
-                }
-            });
-
-            if(bX < window.innerWidth && b.parentElement) requestAnimationFrame(moveB);
-            else if(b.parentElement) b.remove();
-        }
-        moveB();
-    }
-
-    function startHeliAutoFire() {
-        let heliInt = setInterval(() => {
-            if(!state.active) { clearInterval(heliInt); return; }
-            createBullet(100, true);
-        }, 200);
-    }
-
-    function endWave() {
-        state.active = false;
-        state.wave++;
-        state.target += 5;
-        document.getElementById('start-action-btn').style.display = 'block';
-        updateUI();
-    }
-
-    function gameOver() {
-        state.active = false;
-        document.getElementById('death-screen').style.display = 'flex';
-    }
-
-    updateUI();
+    ui();
 </script>
 </body>
 </html>
