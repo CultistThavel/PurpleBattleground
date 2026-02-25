@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - BLOOD UPDATE</title>
+    <title>Purple Battleground - GUEST UPDATE</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -15,27 +15,25 @@
         #game-container { position: relative; width: 100vw; height: 100vh; cursor: crosshair; }
         #floor { position: absolute; bottom: 0; width: 100%; height: 40%; background: #60646b; border-top: 12px solid #000; z-index: 10; }
 
-        /* ИНТЕРФЕЙС */
         .header-center { position: absolute; top: 15px; left: 5%; width: 90%; display: flex; flex-direction: column; align-items: center; z-index: 100; }
         #title-box { background: #fff; border: 8px solid #000; border-radius: 20px; font-size: 40px; width: 100%; text-align: center; margin-bottom: 10px; }
         
         #hp-container { background: red; border: 8px solid #000; border-radius: 20px; padding: 12px 0; width: 85%; text-align: center; overflow: hidden; position: relative; }
         #hp-fill { position: absolute; top:0; left:0; width: 100%; height: 100%; background: #ccff00; z-index: 1; transition: width 0.2s; }
-        #hp-text { color: #fff; font-size: 28px; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000; position: relative; z-index: 2; }
+        #hp-text { color: #fff; font-size: 28px; text-shadow: 2px 2px 0 #000; position: relative; z-index: 2; }
 
         .left-ui-panel { position: absolute; top: 150px; left: 30px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
         #money-display { color: #fff; font-size: 45px; text-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 10px; }
-        #shop-btn { width: 180px; height: 180px; background: #fff; border: 10px solid #000; border-radius: 35px; font-size: 110px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 10px 10px 0 #000; }
+        #shop-btn { width: 180px; height: 180px; background: #fff; border: 10px solid #000; border-radius: 35px; font-size: 110px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 10px 10px 0 #000; transition: 0.3s; }
+        #shop-btn.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
         .wave-ui { position: absolute; top: 200px; right: 40px; text-align: right; color: #fff; z-index: 100; }
         #wave-big { font-size: 80px; margin: 0; -webkit-text-stroke: 3px #000; }
         #enemies-count { font-size: 24px; text-shadow: 3px 3px 0 #000; }
 
-        /* ПЕРСОНАЖИ */
         #main-hare { position: absolute; bottom: 25%; left: -50px; width: 500px; z-index: 50; }
         #heli-hare { position: absolute; bottom: 15%; left: 20px; width: 350px; z-index: 60; display: none; }
 
-        /* ВРАГИ */
         .zombie-container { position: absolute; bottom: 25%; right: -300px; width: 350px; z-index: 45; display: flex; flex-direction: column; align-items: center; }
         .zombie-img { width: 100%; }
         .zombie-hp-bar { width: 90%; height: 25px; background: red; border: 4px solid #000; position: relative; margin-bottom: 5px; }
@@ -45,7 +43,6 @@
         .bullet { position: absolute; z-index: 48; width: 120px; pointer-events: none; }
         #start-btn-ui { position: absolute; bottom: 240px; right: 60px; background: #ccff00; color: #fff; padding: 35px 70px; border: 8px solid #fff; border-radius: 45px; font-size: 45px; text-shadow: 3px 3px 0 #000; z-index: 100; cursor: pointer; }
 
-        /* МАГАЗИН (УЛУЧШЕННЫЙ) */
         #shop-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: center; }
         #shop-window { width: 90%; max-height: 80%; background: #fff; border: 12px solid #000; position: relative; display: flex; padding: 40px; gap: 40px; }
         .shop-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -56,17 +53,12 @@
         .btn-buy { background: #00ff00; border: 5px solid #000; padding: 15px 40px; color: #fff; font-size: 28px; cursor: pointer; border-radius: 15px; box-shadow: 5px 5px 0 #000; }
         #close-shop { position: absolute; top: -30px; right: -30px; width: 70px; height: 70px; background: #ff0000; border: 6px solid #000; border-radius: 50%; color: #fff; font-size: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
-        #upgrade-popup { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 45px; font-weight: 900; -webkit-text-stroke: 2px #ff0000; z-index: 2000; display: none; animation: fadeUp 1.5s forwards; }
-        @keyframes fadeUp { 0% { opacity: 1; transform: translate(-50%, -50%); } 100% { opacity: 0; transform: translate(-50%, -150%); } }
-
         #lose-screen { position: fixed; bottom: -700px; left: 50%; transform: translateX(-50%); width: 650px; background: #333; border: 10px solid #000; padding: 50px; z-index: 3000; text-align: center; transition: bottom 0.6s ease-out; }
     </style>
 </head>
 <body onclick="shoot(event, 'main')">
 
 <div id="game-container">
-    <div id="upgrade-popup">УЛУЧШЕНО — +30 Урона</div>
-
     <div class="header-center">
         <div id="title-box">Purple Battleground</div>
         <div id="hp-container">
@@ -113,7 +105,7 @@
 </div>
 
 <div id="lose-screen">
-    <h2 style="color:white; font-size: 60px; margin: 0;">Поражение</h2>
+    <h2 style="color:white; font-size: 60px;">Поражение</h2>
     <p style="color:white; font-size: 26px;">Молодец, надо было стараться.</p>
     <button style="background: #00ff00; color: #fff; padding: 20px 60px; border: 5px solid #000; font-size: 35px; cursor:pointer; border-radius: 15px;" onclick="closeLoseScreen()">Лан.</button>
 </div>
@@ -122,24 +114,28 @@
     let money = 0; let hp = 350; let damage = 50;
     let enemiesLeft = 10; let wave = 1;
     let isGameActive = false; let hasHeli = false;
-    let enemiesSpawned = 0;
+    let enemiesSpawnedInWave = 0;
 
-    function openShop() { document.getElementById('shop-overlay').style.display = 'flex'; }
+    function openShop() { 
+        if(isGameActive) return;
+        document.getElementById('shop-overlay').style.display = 'flex'; 
+    }
     function closeShop() { document.getElementById('shop-overlay').style.display = 'none'; }
 
     function updateUI() {
         document.getElementById('m-val').innerText = money;
         document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + Math.max(0, hp);
         document.getElementById('enemies-count').innerText = "Осталось Врагов: " + enemiesLeft;
-        let hpPercent = Math.max(0, (hp / 350) * 100);
-        document.getElementById('hp-fill').style.width = hpPercent + "%";
+        document.getElementById('hp-fill').style.width = Math.max(0, (hp / 350) * 100) + "%";
+        
+        let sBtn = document.getElementById('shop-btn');
+        if(isGameActive) sBtn.classList.add('locked');
+        else sBtn.classList.remove('locked');
     }
 
     function buyAmmo() {
         if (money >= 250) {
             money -= 250; damage += 30; updateUI();
-            let pop = document.getElementById('upgrade-popup');
-            pop.style.display = 'block'; setTimeout(() => pop.style.display = 'none', 1500);
             closeShop();
         }
     }
@@ -156,17 +152,18 @@
     function startBattle() {
         if (isGameActive) return;
         isGameActive = true;
+        enemiesSpawnedInWave = 0;
+        enemiesLeft = 10;
         document.getElementById('start-btn-ui').style.display = 'none';
-        spawnLoop();
+        updateUI();
+        spawnSequence();
     }
 
-    function spawnLoop() {
-        if (!isGameActive) return;
-        if (enemiesSpawned < 10) {
-            spawnEnemy();
-            enemiesSpawned++;
-            setTimeout(spawnLoop, 4000);
-        }
+    function spawnSequence() {
+        if (!isGameActive || enemiesSpawnedInWave >= 10) return;
+        spawnEnemy();
+        enemiesSpawnedInWave++;
+        setTimeout(spawnSequence, 4000);
     }
 
     function spawnEnemy() {
@@ -176,12 +173,14 @@
         let hpMax = 55;
         let img = "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=j2fo8ed0&dl=1";
         let dmg = 20;
-        let speed = 4; // Пикселей за тик (базовая)
+        let speed = 4;
 
-        // ТИПЫ ВРАГОВ ПО ВОЛНАМ
-        if (wave >= 55 && wave <= 66) {
+        if (wave >= 66 && wave <= 75) {
+            hpMax = 5777; img = "https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=1t7gchrz&dl=1";
+            dmg = 566; speed = 4.5; // Скорость под 7.99 сек до цели
+        } else if (wave >= 55 && wave <= 66) {
             hpMax = 2210; img = "https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=8ylg44xa&dl=1";
-            dmg = 398; speed = 12; // Скорость - пипец!
+            dmg = 398; speed = 12;
         } else if (wave >= 25 && wave <= 34) {
             hpMax = 550; img = "https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=1cski86b&dl=1";
             dmg = 130; speed = 4;
@@ -190,11 +189,7 @@
             dmg = 80; speed = 4;
         }
 
-        container.innerHTML = `
-            <div class="zombie-hp-bar"><div class="zombie-hp-text">${hpMax} ХП</div><div class="zombie-hp-fill"></div></div>
-            <img class="zombie-img" src="${img}">
-        `;
-        
+        container.innerHTML = `<div class="zombie-hp-bar"><div class="zombie-hp-text">${hpMax} ХП</div><div class="zombie-hp-fill"></div></div><img class="zombie-img" src="${img}">`;
         container.dataset.hp = hpMax;
         container.dataset.maxHp = hpMax;
         document.getElementById('game-container').appendChild(container);
@@ -205,7 +200,7 @@
             pos += speed; container.style.right = pos + 'px';
             if (window.innerWidth - pos < 350) {
                 hp -= dmg; updateUI(); container.remove(); clearInterval(moveInt);
-                checkNext();
+                enemyDefeated();
                 if (hp <= 0) gameOver();
             }
         }, 30);
@@ -233,14 +228,12 @@
                     z.dataset.hp -= currentDmg;
                     let fill = z.querySelector('.zombie-hp-fill');
                     let text = z.querySelector('.zombie-hp-text');
-                    let percent = (z.dataset.hp / z.dataset.maxHp) * 100;
-                    fill.style.width = Math.max(0, percent) + "%";
-                    text.innerText = Math.max(0, z.dataset.hp) + " ХП";
+                    fill.style.width = Math.max(0, (z.dataset.hp / z.dataset.maxHp) * 100) + "%";
+                    text.innerText = Math.max(0, Math.floor(z.dataset.hp)) + " ХП";
                     b.remove(); clearInterval(bInt);
                     if (z.dataset.hp <= 0) {
                         clearInterval(z.dataset.moveInt); z.remove();
-                        money += 85; enemiesLeft--; updateUI();
-                        checkNext();
+                        money += 85; enemyDefeated();
                     }
                     break;
                 }
@@ -249,19 +242,24 @@
         }, 20);
     }
 
-    function checkNext() {
+    function enemyDefeated() {
+        enemiesLeft--;
+        updateUI();
         if (enemiesLeft <= 0) {
-            wave++; enemiesSpawned = 0; enemiesLeft = 10;
+            isGameActive = false;
+            wave++;
             document.getElementById('wave-big').innerText = wave + " Волна";
-            spawnLoop();
+            document.getElementById('start-btn-ui').style.display = 'block';
+            updateUI();
         }
     }
 
-    function gameOver() { isGameActive = false; document.getElementById('lose-screen').style.bottom = "50%"; }
+    function gameOver() { isGameActive = false; document.getElementById('lose-screen').style.bottom = "50%"; updateUI(); }
     function closeLoseScreen() { 
         document.getElementById('lose-screen').style.bottom = "-700px";
-        hp = 350; isGameActive = true; enemiesSpawned = 0; enemiesLeft = 10;
-        updateUI(); spawnLoop();
+        hp = 350; isGameActive = false;
+        document.getElementById('start-btn-ui').style.display = 'block';
+        updateUI();
     }
 </script>
 </body>
