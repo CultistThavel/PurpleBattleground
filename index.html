@@ -69,16 +69,16 @@
         #wave-big { font-size: 90px; margin: 0; line-height: 0.8; font-weight: 900; -webkit-text-stroke: 4px #000; }
         #enemies-count { font-size: 28px; font-weight: 900; margin-top: 5px; text-shadow: 3px 3px 0 #000; }
 
-        /* ЗАЯЦ - ОТОДВИНУЛ ЧУТЬ ДАЛЬШЕ (НАЗАД) */
+        /* ГЛАВНЫЙ ЗАЯЦ - В 2 РАЗА БОЛЬШЕ И БЛИЖЕ К УГЛУ */
         #main-hare { 
-            position: absolute; bottom: 30%; left: 120px; 
-            width: 450px; z-index: 50; pointer-events: none;
+            position: absolute; bottom: 20%; left: 20px; 
+            width: 800px; z-index: 50; pointer-events: none;
         }
-        
-        /* ВЕРТО-ЗАЯЦ (ПОЯВЛЯЕТСЯ ТУТ) */
+
+        /* ВЕРТО-ЗАЯЦ (ПОЯВЛЯЕТСЯ ПРИ ПОКУПКЕ) */
         #heli-hare {
-            position: absolute; bottom: 55%; left: 20px;
-            width: 250px; z-index: 51; display: none;
+            position: absolute; bottom: 20%; left: 600px;
+            width: 400px; z-index: 49; display: none;
         }
 
         /* КНОПКА СТАРТА */
@@ -91,39 +91,43 @@
             z-index: 100;
         }
 
-        /* --- МАГАЗИН (ОКНО) --- */
-        #shop-window {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; height: 80%; background: #fff; border: 12px solid #000;
-            z-index: 1000; display: none; padding: 30px; box-sizing: border-box;
+        /* --- МАГАЗИН --- */
+        #shop-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000; display: none;
+            justify-content: center; align-items: center;
         }
-        
-        .shop-close {
+
+        #shop-window {
+            width: 90%; height: 80%; background: #fff; border: 12px solid #000;
+            position: relative; display: flex; padding: 40px; gap: 50px;
+        }
+
+        .shop-item { flex: 1; display: flex; flex-direction: column; align-items: flex-start; }
+
+        .red-frame {
+            width: 100%; height: 350px; border: 10px solid #ff0000;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 20px; overflow: hidden; background: #f0f0f0;
+        }
+
+        .red-frame img { max-width: 90%; max-height: 90%; object-fit: contain; }
+
+        .item-title { color: #000; font-size: 40px; font-weight: 900; margin: 0; }
+        .item-desc { color: #888; font-size: 20px; font-weight: 900; margin: 10px 0; line-height: 1.2; }
+        .item-price { color: #000; font-size: 30px; font-weight: 900; margin-top: auto; }
+
+        .btn-buy {
+            background: #00ff00; border: 3px solid #000; padding: 15px 40px;
+            border-radius: 10px; color: #fff; font-size: 25px; font-weight: 900;
+            text-shadow: 2px 2px 0 #000; cursor: pointer; margin-top: 15px;
+        }
+
+        #close-shop {
             position: absolute; top: -30px; right: -30px; width: 80px; height: 80px;
             background: #ff0000; border: 6px solid #000; border-radius: 50%;
-            color: #fff; font-size: 40px; display: flex; align-items: center; 
-            justify-content: center; cursor: pointer;
-        }
-
-        .shop-flex { display: flex; justify-content: space-around; height: 100%; align-items: flex-start; }
-
-        .item-card { width: 45%; display: flex; flex-direction: column; align-items: flex-start; }
-        
-        .img-frame { 
-            width: 100%; height: 350px; border: 10px solid #ff0000; 
-            display: flex; align-items: center; justify-content: center; 
-            background: #f0f0f0; margin-bottom: 15px; 
-        }
-        .img-frame img { max-width: 90%; max-height: 90%; object-fit: contain; }
-
-        .price-tag { color: #000; font-size: 35px; font-weight: 900; margin-bottom: 10px; }
-        .item-title { color: #000; font-size: 40px; font-weight: 900; margin-bottom: 5px; }
-        .item-desc { color: #888; font-size: 20px; font-weight: bold; line-height: 1.2; margin-bottom: 20px; }
-        
-        .buy-btn { 
-            background: #ccff00; color: #fff; padding: 15px 40px; 
-            border: 5px solid #fff; border-radius: 20px; font-size: 28px; 
-            font-weight: 900; text-shadow: 2px 2px 0 #000; cursor: pointer;
+            color: #fff; font-size: 40px; font-weight: 900; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
         }
     </style>
 </head>
@@ -138,8 +142,8 @@
     </div>
 
     <div class="left-ui-panel">
-        <div id="money-display">🪙 Purple Money: 0</div>
-        <div id="shop-btn" onclick="toggleShop()">🛍️</div>
+        <div id="money-display">🪙 Purple Money: <span id="m-val">0</span></div>
+        <div id="shop-btn" onclick="openShop()">🛍️</div>
     </div>
 
     <div class="wave-ui">
@@ -147,58 +151,51 @@
         <div id="enemies-count">Осталось Врагов: 10</div>
     </div>
 
-    <img id="heli-hare" src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1">
-
     <img id="main-hare" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
+    <img id="heli-hare" src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1">
 
     <div id="floor"></div>
 
     <div id="start-btn-ui">Начать Перестрелку</div>
+</div>
 
+<div id="shop-overlay">
     <div id="shop-window">
-        <div class="shop-close" onclick="toggleShop()">✕</div>
-        <div class="shop-flex">
-            
-            <div class="item-card">
-                <div class="img-frame">
-                    <img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1">
-                </div>
-                <div class="price-tag">1800 Монет</div>
-                <div class="item-title">Верто-Заяц</div>
-                <div class="item-desc">Ваш личный помощник, который всегда будет отбиваться от врагов вместе с вами, очень полезный, И очень дружелюбный!</div>
-                <div class="buy-btn" onclick="buyHeli()">Приобрести</div>
+        <div id="close-shop" onclick="closeShop()">X</div>
+        
+        <div class="shop-item">
+            <div class="red-frame">
+                <img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1">
             </div>
+            <h2 class="item-title">Верто-Заяц</h2>
+            <p class="item-desc">Ваш личный помощник, который всегда будет отбиваться от врагов вместе с вами, очень полезный, И очень дружелюбный!</p>
+            <div class="item-price">1800 Монет</div>
+            <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
+        </div>
 
-            <div class="item-card">
-                <div class="img-frame">
-                    <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
-                </div>
-                <div class="price-tag">250 Монет</div>
-                <div class="item-title">Снаряды</div>
-                <div class="item-desc">250 Монет = +30 Урона для вашего оружия</div>
-                <div class="buy-btn" onclick="buyAmmo()">Приобрести</div>
+        <div class="shop-item">
+            <div class="red-frame">
+                <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
             </div>
-
+            <h2 class="item-title">Снаряды</h2>
+            <p class="item-desc">250 Монет = +30 Урона для вашего оружия</p>
+            <div class="item-price">250 Монет</div>
+            <button class="btn-buy">Приобрести</button>
         </div>
     </div>
 </div>
 
 <script>
-    function toggleShop() {
-        const shop = document.getElementById('shop-window');
-        shop.style.display = (shop.style.display === 'block') ? 'none' : 'block';
+    function openShop() {
+        document.getElementById('shop-overlay').style.display = 'flex';
     }
-
+    function closeShop() {
+        document.getElementById('shop-overlay').style.display = 'none';
+    }
     function buyHeli() {
-        // Логика покупки (пока просто показываем его на экране)
+        // Пока просто показываем его для теста визуала
         document.getElementById('heli-hare').style.display = 'block';
-        toggleShop();
-        alert("Верто-Заяц в деле!");
-    }
-
-    function buyAmmo() {
-        alert("Урон увеличен на +30!");
-        toggleShop();
+        closeShop();
     }
 </script>
 
