@@ -3,200 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground: THE FINAL SHOWDOWN</title>
+    <title>Purple Battleground - FINAL VERSION</title>
     <style>
-        /* БАЗОВЫЕ НАСТРОЙКИ — СТИЛЬ "КАК НА ЧЕРТЕЖЕ" */
+        /* БАЗОВЫЙ СТИЛЬ И ФОН */
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #3d4147; font-family: 'Arial Black', sans-serif; user-select: none; }
-        #game-box { position: relative; width: 100vw; height: 100vh; background: #3d4147; overflow: hidden; transition: filter 0.5s; }
-        
-        /* ВЕРХНИЙ ЛЕВЫЙ УГОЛ */
-        .top-left-panel { position: absolute; top: 15px; left: 15px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
-        #game-name { background: #fff; color: #000; padding: 8px 15px; border: 4px solid #000; border-radius: 12px; font-size: 22px; width: fit-content; box-shadow: 4px 4px 0 #000; }
-        #hp-display { background: #ccff00; color: #000; padding: 5px 15px; border: 4px solid #000; border-radius: 10px; font-size: 18px; width: fit-content; box-shadow: 4px 4px 0 #000; }
+        #game-container { position: relative; width: 100vw; height: 100vh; background: #3d4147; }
 
-        /* ВЕРХНИЙ ПРАВЫЙ УГОЛ */
-        .top-right-panel { position: absolute; top: 10px; right: 20px; z-index: 100; text-align: right; color: #fff; }
-        #wave-number { font-size: 70px; margin: 0; line-height: 1; text-shadow: 5px 5px #000; -webkit-text-stroke: 2px #000; }
-        #enemies-count { font-size: 22px; margin: 0; font-weight: bold; text-shadow: 2px 2px #000; }
+        /* ВЕРХНИЙ ЛЕВЫЙ УГОЛ (Название и ХП) */
+        .top-left-ui { position: absolute; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        #title-plate { background: #fff; color: #000; padding: 10px 25px; border: 5px solid #000; border-radius: 15px; font-size: 28px; font-weight: 900; width: fit-content; box-shadow: 6px 6px 0 #000; }
+        #hp-plate { background: #ccff00; color: #000; padding: 8px 20px; border: 4px solid #000; border-radius: 12px; font-size: 22px; font-weight: 900; width: fit-content; box-shadow: 6px 6px 0 #000; }
 
-        /* ЛЕВОЕ МЕНЮ */
-        .side-menu { position: absolute; top: 150px; left: 15px; z-index: 100; display: flex; flex-direction: column; gap: 20px; }
-        #shop-trigger { width: 110px; height: 110px; background: #fff; border: 5px solid #000; border-radius: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 6px 6px 0 #000; }
-        .house-icon { width: 80px; height: 80px; }
-        
-        .money-group { display: flex; align-items: center; gap: 10px; }
-        .coin-icon { width: 85px; height: 85px; background: #fff; border: 5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; box-shadow: 4px 4px 0 #000; }
-        #money-bar { background: #a200ff; color: #fff; padding: 12px 25px; border: 5px solid #000; border-radius: 15px; font-size: 22px; box-shadow: 6px 6px 0 #000; min-width: 200px; font-weight: bold; }
+        /* ВЕРХНИЙ ПРАВЫЙ УГОЛ (Волны) */
+        #wave-plate { position: absolute; top: 15px; right: 25px; text-align: right; color: #fff; z-index: 100; }
+        #wave-title { font-size: 80px; margin: 0; line-height: 1; -webkit-text-stroke: 3px #000; font-weight: 900; }
+        #wave-sub { font-size: 24px; margin: 0; font-weight: bold; }
 
-        /* КНОПКА СТАРТА */
-        #start-wave-btn { 
-            position: absolute; bottom: 40px; right: 40px; z-index: 200;
-            background: #ccff00; color: #fff; padding: 25px 60px; 
-            border: 7px solid #fff; border-radius: 30px; font-size: 45px; 
-            font-weight: 900; cursor: pointer; text-shadow: 3px 3px #000; 
-            box-shadow: 0 12px 0 #88aa00, 5px 15px 15px rgba(0,0,0,0.5);
+        /* ЛЕВОЕ МЕНЮ (Магазин и Деньги) */
+        .side-menu { position: absolute; top: 180px; left: 20px; display: flex; flex-direction: column; gap: 30px; z-index: 100; }
+        #shop-btn { width: 120px; height: 120px; background: #fff; border: 6px solid #000; border-radius: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 8px 8px 0 #000; }
+        .house-icon { width: 85px; height: 85px; }
+
+        .money-group { display: flex; align-items: center; gap: 15px; }
+        .money-circle { width: 90px; height: 90px; background: #fff; border: 6px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: 900; box-shadow: 6px 6px 0 #000; }
+        #money-plate { background: #a200ff; color: #fff; padding: 15px 30px; border: 5px solid #000; border-radius: 15px; font-size: 26px; font-weight: 900; box-shadow: 8px 8px 0 #000; min-width: 200px; }
+
+        /* КНОПКА СТАРТА (САЛАТОВАЯ ГИГАНТСКАЯ) */
+        #start-btn { 
+            position: absolute; bottom: 50px; right: 50px; 
+            background: #ccff00; color: #fff; padding: 30px 65px; 
+            border: 8px solid #fff; border-radius: 35px; 
+            font-size: 50px; font-weight: 900; cursor: pointer; z-index: 200;
+            text-shadow: 4px 4px 0 #000; box-shadow: 0 15px 0 #88aa00;
         }
-        #start-wave-btn:active { transform: translateY(8px); box-shadow: 0 4px 0 #88aa00; }
+        #start-btn:active { transform: translateY(10px); box-shadow: 0 5px 0 #88aa00; }
 
-        /* ИГРОВЫЕ ОБЪЕКТЫ */
-        #player-sprite { position: absolute; bottom: 80px; left: 60px; width: 300px; z-index: 50; }
-        #heli-bunny { position: absolute; top: 50px; left: 100px; width: 180px; z-index: 40; display: none; animation: float 2s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        /* ИГРОК И ОРУЖИЕ */
+        #player-wrap { position: absolute; bottom: 100px; left: 80px; width: 350px; height: 350px; z-index: 10; }
+        #char-img { width: 300px; position: absolute; bottom: 0; }
+        #gun-img { width: 250px; position: absolute; bottom: 120px; left: 140px; transform: rotate(-5deg); transition: transform 0.1s; }
 
-        .bullet { position: absolute; width: 45px; z-index: 60; filter: drop-shadow(2px 2px 0 #000); }
-        .enemy { position: absolute; bottom: 80px; z-index: 70; transition: filter 0.3s; }
-        .enemy-hp-bar { position: absolute; top: -20px; left: 0; width: 100%; height: 10px; background: #000; border: 2px solid #fff; }
-        .enemy-hp-fill { height: 100%; background: #ff0000; width: 100%; }
+        /* ВРАГИ */
+        .enemy { position: absolute; bottom: 100px; width: 220px; z-index: 50; }
+        .bullet { position: absolute; width: 45px; z-index: 40; }
 
-        /* МАГАЗИН */
-        #shop-ui { 
+        /* МАГАЗИН (КАК НА ЧЕРТЕЖЕ) */
+        #shop-modal { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 90%; max-width: 850px; background: #fff; border: 8px solid #000; 
+            width: 85%; max-width: 900px; background: #fff; border: 8px solid #000; 
             padding: 40px; display: none; z-index: 1000; box-shadow: 30px 30px 0 rgba(0,0,0,0.4); 
         }
-        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 5px solid #000; padding-bottom: 15px; }
-        .close-shop-btn { width: 80px; height: 80px; background: #ffcc00; border-radius: 50%; border: 5px solid #fff; font-size: 50px; color: #fff; cursor: pointer; box-shadow: 5px 5px 0 #000; }
-        
-        .shop-items-container { display: flex; gap: 30px; justify-content: center; }
-        .shop-card { border: 5px solid #ff0000; padding: 20px; flex: 1; text-align: center; position: relative; }
-        .shop-card img { width: 100%; height: 250px; object-fit: contain; background: #000; border: 4px solid #000; margin-bottom: 15px; }
-        .buy-btn { background: #ccff00; border: 4px solid #000; padding: 15px 30px; font-size: 24px; font-weight: 900; cursor: pointer; border-radius: 15px; }
-        .sold-out { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: #fff; display: none; align-items: center; justify-content: center; font-size: 35px; transform: rotate(-15deg); font-weight: 900; pointer-events: none; }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 6px solid #000; margin-bottom: 30px; padding-bottom: 10px; }
+        #shop-close { width: 80px; height: 80px; background: #ffcc00; border: 5px solid #fff; border-radius: 50%; font-size: 45px; color: #fff; cursor: pointer; box-shadow: 4px 4px 0 #000; }
+        .shop-grid { display: flex; gap: 40px; justify-content: center; }
+        .shop-card { border: 6px solid #ff0000; padding: 25px; flex: 1; text-align: center; position: relative; }
+        .shop-card img { width: 100%; height: 250px; object-fit: contain; background: #000; border: 4px solid #000; }
+        .buy-btn { background: #ccff00; border: 4px solid #000; padding: 15px 40px; font-size: 24px; font-weight: 900; margin-top: 20px; cursor: pointer; border-radius: 15px; }
+        .sold-out { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: #fff; display: none; align-items: center; justify-content: center; font-size: 30px; transform: rotate(-15deg); font-weight: 900; }
 
-        /* ДИАЛОГИ БОССА */
-        #boss-dialogue {
-            position: fixed; bottom: -300px; left: 50%; transform: translateX(-50%);
-            width: 85%; background: #fff; border: 6px solid #000; padding: 25px;
-            transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2000;
-        }
-        #boss-name-tag { position: absolute; top: -35px; left: 0; background: #000; color: #fff; padding: 5px 20px; font-size: 22px; font-weight: bold; }
-        #boss-text { font-size: 24px; font-weight: bold; color: #000; }
+        /* ЭФФЕКТЫ И ДИАЛОГИ */
+        #fx-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 500; }
+        #dialogue { position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 85%; background: #fff; border: 6px solid #000; padding: 25px; transition: 0.5s; z-index: 2000; }
+        #diag-name { position: absolute; top: -40px; left: 0; background: #000; color: #fff; padding: 5px 20px; font-size: 24px; }
+        #diag-text { font-size: 26px; font-weight: 900; color: #000; }
+        #final-timer { position: absolute; top: 50%; right: 50px; font-size: 100px; color: #fff; font-weight: 900; display: none; transform: translateY(-50%); }
 
-        #final-timer { position: absolute; top: 100px; right: 100px; font-size: 120px; color: #fff; font-weight: 900; display: none; text-shadow: 8px 8px #ff0000; }
-        
-        /* ЭФФЕКТЫ */
-        .nightmare-bg { background: rgba(255, 0, 0, 0.4) !important; }
-        .agetha-blur { filter: blur(15px) !important; }
-        .purp-bg { background: rgba(128, 0, 128, 0.4) !important; }
-
-        #death-screen { position: fixed; inset: 0; background: rgba(128,128,128,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; text-align: center; }
+        /* СМЕРТЬ */
+        #death-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(100,100,100,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 3000; color: #fff; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="game-box" onclick="handleShoot()">
-    <div class="top-left-panel">
-        <div id="game-name">Purple Battleground</div>
-        <div id="hp-display">Ваша Шкала ХП: <span id="hp-val">350</span></div>
+<div id="game-container" onclick="playerShoot()">
+    <div id="fx-layer"></div>
+
+    <div class="top-left-ui">
+        <div id="title-plate">Purple Battleground</div>
+        <div id="hp-plate">Ваша Шкала ХП: <span id="hp-val">350</span></div>
     </div>
 
-    <div class="top-right-panel">
-        <h1 id="wave-number">1 Волна</h1>
-        <p id="enemies-count">Осталось Врагов: <span id="e-left">10</span></p>
+    <div id="wave-plate">
+        <h1 id="wave-num">1 Волна</h1>
+        <p id="wave-sub">Осталось Врагов: <span id="enemies-left">10</span></p>
     </div>
 
     <div class="side-menu">
-        <div id="shop-trigger" onclick="toggleShop(event)">
+        <div id="shop-btn" onclick="toggleShop(event)">
             <img src="https://cdn-icons-png.flaticon.com/512/606/606548.png" class="house-icon">
         </div>
         <div class="money-group">
-            <div class="coin-icon">$</div>
-            <div id="money-bar">Purple Money: <span id="m-val">0</span></div>
+            <div class="money-circle">$</div>
+            <div id="money-plate">Purple Money: <span id="m-val">0</span></div>
         </div>
     </div>
 
-    <img id="player-sprite" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
-    <img id="heli-bunny" src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
+    <div id="player-wrap">
+        <img id="char-img" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
+        <img id="gun-img" src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
+    </div>
 
-    <button id="start-wave-btn" onclick="startWave(event)">Начать Перестрелку</button>
+    <button id="start-btn" onclick="startWave(event)">Начать Перестрелку</button>
     <div id="final-timer">100</div>
 
-    <div id="shop-ui">
+    <div id="shop-modal">
         <div class="shop-header">
             <div style="font-size: 35px; font-weight: 900;">Ваш Балланс: <span id="shop-m-val">0</span></div>
-            <button class="close-shop-btn" onclick="toggleShop(event)">✕</button>
+            <button id="shop-close" onclick="toggleShop(event)">✕</button>
         </div>
-        <div class="shop-items-container">
+        <div class="shop-grid">
             <div class="shop-card">
                 <img src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
                 <h2>Верто-Заяц</h2>
-                <p>Инфа: Авто-атака (500 DPS)</p>
-                <p><strong>1800 PurpleMoney</strong></p>
+                <p>1800 PurpleMoney</p>
                 <button class="buy-btn" onclick="buyHeli(event)">Приобрести</button>
                 <div id="heli-sold" class="sold-out">Уже Приобретено</div>
             </div>
             <div class="shop-card">
                 <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
                 <h2>Снаряды</h2>
-                <p>Инфа: Урон +20</p>
-                <p><strong id="dmg-cost">150 Монет</strong></p>
-                <button class="buy-btn" onclick="upgradeDmg(event)">Приобрести</button>
+                <p id="dmg-price-text">150 Монет</p>
+                <button class="buy-btn" onclick="buyDmg(event)">Приобрести</button>
             </div>
         </div>
     </div>
 
-    <div id="boss-dialogue">
-        <div id="boss-name-tag">Пурпулезка</div>
-        <div id="boss-text">...</div>
+    <div id="dialogue">
+        <div id="diag-name">Пурпулезка</div>
+        <div id="diag-text">...</div>
     </div>
 
     <div id="death-screen">
-        <h1 style="font-size: 50px;">Отлично, надо было стараться.</h1>
-        <button onclick="location.reload()" style="padding: 20px 50px; font-size: 30px; cursor: pointer;">Лан.</button>
+        <h1 style="font-size: 60px;">Отлично, надо было стараться.</h1>
+        <button onclick="location.reload()" style="padding:20px 60px; font-size: 30px; cursor: pointer;">ЛАН.</button>
     </div>
 </div>
 
 <script>
-    // --- ДАННЫЕ ВРАГОВ (ВСЕ 12 ИЗ ЧЕРТЕЖА) ---
-    const ENEMY_DATA = {
-        1:  { name: 'Zombie', hp: 55, dmg: 20, spd: 6, id: 'nkfmtaim2b95l86u99dvc' },
-        10: { name: 'Slave', hp: 310, dmg: 80, spd: 5, id: 'nwzcf8q90k577boz61ppb' },
-        25: { name: 'Hyr', hp: 550, dmg: 130, spd: 4, id: '9fxmu3unlcgoe5cze2rlg' },
-        45: { name: 'Tolk', hp: 1200, dmg: 250, spd: 4.09, id: '67h54u64tetq830xd07ux' },
-        55: { name: 'Bow', hp: 2210, dmg: 398, spd: 2.78, id: 'h7tehqlxiabzmb4jtm1x2' },
-        66: { name: 'Guest', hp: 5777, dmg: 566, spd: 7.99, id: 'wd3g5c5j224yuzjhwgnle' },
-        75: { name: 'Nightmare', hp: 18500, dmg: 1888, spd: 15, id: 'bbjebj7lzud0yqyvgan9h', boss: true, fx: 'nightmare' },
-        76: { name: 'Father', hp: 12000, dmg: 899, spd: 6, id: '5wbpzxujy76bt3h51kx9v' },
-        82: { name: 'Inchi', hp: 15600, dmg: 1090, spd: 7, id: 'nyluwpmxyua8cygv9brn4' },
-        89: { name: 'Shadow', hp: 19980, dmg: 919192929, spd: 10, id: 'wkokjyaee5ugk9tf3ymxq' },
-        93: { name: 'Agetha', hp: 45879, dmg: 9e20, spd: 27, id: 'j7f4hzpgljgz0tvwtgar8', boss: true, fx: 'blur' },
-        94: { name: 'Purpulezka', hp: 100000, dmg: 0, spd: 0, id: '948wqdc7vn67eimy9itur', final: true }
+    // --- ДАННЫЕ ВРАГОВ (ВСЕ 12) ---
+    const ENEMIES = {
+        1:  { name: 'Zombie', hp: 55, dmg: 20, speed: 6, id: 'nkfmtaim2b95l86u99dvc' },
+        10: { name: 'Slave', hp: 310, dmg: 80, speed: 5, id: 'nwzcf8q90k577boz61ppb' },
+        25: { name: 'Hyr', hp: 550, dmg: 130, speed: 4, id: '9fxmu3unlcgoe5cze2rlg' },
+        45: { name: 'Tolk', hp: 1200, dmg: 250, speed: 4.1, id: '67h54u64tetq830xd07ux' },
+        55: { name: 'Bow', hp: 2210, dmg: 398, speed: 2.8, id: 'h7tehqlxiabzmb4jtm1x2' },
+        66: { name: 'Guest', hp: 5777, dmg: 566, speed: 8, id: 'wd3g5c5j224yuzjhwgnle' },
+        75: { name: 'Nightmare', hp: 18500, dmg: 1888, speed: 15, id: 'bbjebj7lzud0yqyvgan9h', boss: true },
+        76: { name: 'Father', hp: 12000, dmg: 899, speed: 6, id: '5wbpzxujy76bt3h51kx9v' },
+        82: { name: 'Inchi', hp: 15600, dmg: 1090, speed: 7, id: 'nyluwpmxyua8cygv9brn4' },
+        89: { name: 'Shadow', hp: 19980, dmg: 9191929, speed: 10, id: 'wkokjyaee5ugk9tf3ymxq' },
+        93: { name: 'Agetha', hp: 45879, dmg: 9e20, speed: 27, id: 'j7f4hzpgljgz0tvwtgar8', boss: true },
+        94: { name: 'Purple', hp: 100000, dmg: 15, speed: 0, id: '948wqdc7vn67eimy9itur', final: true }
     };
 
     let state = {
         hp: 350, money: 0, wave: 1, dmg: 50,
         hasHeli: false, dmgPrice: 150,
-        isWaveActive: false, killed: 0, target: 10,
-        purpTimer: 100
+        active: false, killed: 0, target: 10,
+        heliInterval: null, bossFight: false
     };
 
     function updateUI() {
         document.getElementById('hp-val').innerText = state.hp;
         document.getElementById('m-val').innerText = state.money;
         document.getElementById('shop-m-val').innerText = state.money;
-        document.getElementById('wave-number').innerText = state.wave + " Волна";
-        document.getElementById('e-left').innerText = Math.max(0, state.target - state.killed);
-        document.getElementById('dmg-cost').innerText = state.dmgPrice + " Монет";
+        document.getElementById('wave-num').innerText = state.wave + " Волна";
+        document.getElementById('enemies-left').innerText = state.target - state.killed;
+        document.getElementById('dmg-price-text').innerText = state.dmgPrice + " Монет";
         if(state.hasHeli) document.getElementById('heli-sold').style.display = 'flex';
     }
 
     function toggleShop(e) {
-        if(e) e.stopPropagation();
-        if(state.isWaveActive) return;
-        const s = document.getElementById('shop-ui');
-        s.style.display = s.style.display === 'block' ? 'none' : 'block';
+        e.stopPropagation();
+        if(state.active) return;
+        const s = document.getElementById('shop-modal');
+        s.style.display = (s.style.display === 'block') ? 'none' : 'block';
     }
 
-    function buyHeli() {
-        if(state.money >= 1800 && !state.hasHeli) {
-            state.money -= 1800;
-            state.hasHeli = true;
-            document.getElementById('heli-bunny').style.display = 'block';
-            updateUI();
-        }
-    }
-
-    function upgradeDmg() {
+    function buyDmg(e) {
+        e.stopPropagation();
         if(state.money >= state.dmgPrice) {
             state.money -= state.dmgPrice;
             state.dmg += 20;
@@ -205,265 +189,229 @@
         }
     }
 
+    function buyHeli(e) {
+        e.stopPropagation();
+        if(state.money >= 1800 && !state.hasHeli) {
+            state.money -= 1800;
+            state.hasHeli = true;
+            updateUI();
+        }
+    }
+
     function startWave(e) {
         e.stopPropagation();
-        state.isWaveActive = true;
+        state.active = true;
         state.killed = 0;
         state.hp = 350;
-        document.getElementById('start-wave-btn').style.display = 'none';
+        document.getElementById('start-btn').style.display = 'none';
         
         if(state.wave === 94) {
-            spawnPurpBoss();
+            spawnPurpleBoss();
         } else {
-            runWaveLogic();
+            spawnSequence();
+        }
+        if(state.hasHeli) {
+            state.heliInterval = setInterval(() => { if(state.active) createBullet(100, true); }, 200);
         }
         updateUI();
     }
 
-    function runWaveLogic() {
-        let type = getEnemyForWave();
-        state.target = type.boss ? 1 : 10;
+    function spawnSequence() {
+        let type = getEnemyType();
         let spawned = 0;
+        let count = type.boss ? 1 : 10;
+        state.target = count;
+
         let loop = setInterval(() => {
-            if(spawned >= state.target || !state.isWaveActive) { clearInterval(loop); return; }
-            spawnEnemy(type);
+            if(spawned >= count || !state.active) { clearInterval(loop); return; }
+            createEnemy(type);
             spawned++;
-        }, 3000);
-
-        if(state.hasHeli) {
-            state.heliAttack = setInterval(() => {
-                let enemies = document.querySelectorAll('.enemy');
-                if(enemies.length > 0) heliShoot(enemies[0]);
-            }, 200);
-        }
+        }, type.boss ? 1000 : 3000);
     }
 
-    function getEnemyForWave() {
-        let lastType = ENEMY_DATA[1];
-        for (let w in ENEMY_DATA) {
-            if (state.wave >= w) lastType = ENEMY_DATA[w];
-        }
-        return lastType;
+    function getEnemyType() {
+        let keys = Object.keys(ENEMIES).reverse();
+        for(let k of keys) { if(state.wave >= k) return ENEMIES[k]; }
+        return ENEMIES[1];
     }
 
-    function spawnEnemy(type) {
-        const en = document.createElement('div');
+    function createEnemy(type) {
+        const en = document.createElement('img');
         en.className = 'enemy';
-        en.dataset.hp = type.hp;
-        en.dataset.maxHp = type.hp;
+        en.src = `https://www.dropbox.com/scl/fi/${type.id}/...dl=1`.replace('...', '');
+        // Исправляем ссылки вручную по твоим ID
+        en.src = getLink(type.id);
         en.style.right = '-250px';
-        en.style.width = type.boss ? '350px' : '220px';
+        en.dataset.hp = type.hp;
+        document.getElementById('game-container').appendChild(en);
 
-        const img = document.createElement('img');
-        img.src = `https://www.dropbox.com/scl/fi/${type.id}/...dl=1`.replace('...', '');
-        img.style.width = '100%';
-        
-        const hpBar = document.createElement('div');
-        hpBar.className = 'enemy-hp-bar';
-        const hpFill = document.createElement('div');
-        hpFill.className = 'enemy-hp-fill';
-        hpBar.appendChild(hpFill);
-
-        en.appendChild(hpBar);
-        en.appendChild(img);
-        document.getElementById('game-box').appendChild(en);
-
-        if(type.fx === 'nightmare') document.getElementById('game-box').classList.add('nightmare-bg');
-        if(type.fx === 'blur') document.getElementById('game-box').classList.add('agetha-blur');
+        if(type.name === 'Nightmare') document.getElementById('fx-layer').style.background = 'rgba(255,0,0,0.3)';
+        if(type.name === 'Agetha') document.getElementById('fx-layer').style.backdropFilter = 'blur(10px)';
 
         let pos = -250;
-        let speed = (window.innerWidth + 300) / (type.spd * 50);
         let move = setInterval(() => {
             if(!en.parentElement) { clearInterval(move); return; }
-            pos += speed;
+            pos += (type.speed);
             en.style.right = pos + 'px';
-            if(pos > window.innerWidth - 300) {
+
+            if(pos > window.innerWidth - 350) {
                 state.hp -= type.dmg;
                 en.remove();
                 state.killed++;
                 updateUI();
-                if(state.hp <= 0) gameOver();
-                if(state.killed >= state.target) endWave();
+                if(state.hp <= 0) endGame();
+                if(state.killed >= state.target) winWave();
                 clearInterval(move);
             }
-        }, 20);
-
-        en.onclick = (e) => { e.stopPropagation(); damageEnemy(en, state.dmg); };
+        }, 30);
     }
 
-    function damageEnemy(en, amount) {
-        let current = parseFloat(en.dataset.hp) - amount;
-        en.dataset.hp = current;
-        en.querySelector('.enemy-hp-fill').style.width = (current / en.dataset.maxHp * 100) + '%';
-        if(current <= 0) {
-            en.remove();
-            state.killed++;
-            state.money += 150;
-            updateUI();
-            if(state.killed >= state.target) endWave();
-        }
+    function getLink(id) {
+        const db = {
+            'nkfmtaim2b95l86u99dvc': 'https://www.dropbox.com/scl/fi/nkfmtaim2b95l86u99dvc/IMG_20260225_160651_923.jpg?rlkey=33k8yede9melyuia2p49ye20u&st=h8keto1f&dl=1',
+            'nwzcf8q90k577boz61ppb': 'https://www.dropbox.com/scl/fi/nwzcf8q90k577boz61ppb/IMG_20260225_160702_185.jpg?rlkey=vkhhdlkkqhmktnq5kjphug50j&st=1i97zxfa&dl=1',
+            '9fxmu3unlcgoe5cze2rlg': 'https://www.dropbox.com/scl/fi/9fxmu3unlcgoe5cze2rlg/IMG_20260225_160658_957.jpg?rlkey=2wpc4ag8jg611pdqk0hj66y3c&st=ghc57r63&dl=1',
+            '67h54u64tetq830xd07ux': 'https://www.dropbox.com/scl/fi/67h54u64tetq830xd07ux/IMG_20260225_160605_657.jpg?rlkey=4d3rje3yvn66lj3f50zzo4lhy&st=t58ae9a5&dl=1',
+            'h7tehqlxiabzmb4jtm1x2': 'https://www.dropbox.com/scl/fi/h7tehqlxiabzmb4jtm1x2/IMG_20260225_160708_501.jpg?rlkey=4g7whfymch5kftf0t6q26qm8b&st=l3nr32vx&dl=1',
+            'wd3g5c5j224yuzjhwgnle': 'https://www.dropbox.com/scl/fi/wd3g5c5j224yuzjhwgnle/IMG_20260225_160607_728.jpg?rlkey=dc2l8x5mb9w9hpsinb2eq18a6&st=b7m6jtxn&dl=1',
+            'bbjebj7lzud0yqyvgan9h': 'https://www.dropbox.com/scl/fi/bbjebj7lzud0yqyvgan9h/IMG_20260225_160653_986.jpg?rlkey=xhmlavbsjitq5lm6vd3m6zlbf&st=883jv7zy&dl=1',
+            '5wbpzxujy76bt3h51kx9v': 'https://www.dropbox.com/scl/fi/5wbpzxujy76bt3h51kx9v/IMG_20260225_160715_422.jpg?rlkey=xj9nn47leay9yxvz1o9p0pa2a&st=429vu7bl&dl=1',
+            'nyluwpmxyua8cygv9brn4': 'https://www.dropbox.com/scl/fi/nyluwpmxyua8cygv9brn4/IMG_20260225_160703_347.jpg?rlkey=nz5rhd45pguc3etcbqkthm6nu&st=pygekgvw&dl=1',
+            'wkokjyaee5ugk9tf3ymxq': 'https://www.dropbox.com/scl/fi/wkokjyaee5ugk9tf3ymxq/IMG_20260225_160709_808.jpg?rlkey=rtkroaad60nj4mvyfs35v1nj7&st=b70jfcj4&dl=1',
+            'j7f4hzpgljgz0tvwtgar8': 'https://www.dropbox.com/scl/fi/j7f4hzpgljgz0tvwtgar8/IMG_20260225_160706_712.jpg?rlkey=2mnk6tu9tktk6peqr0y6kll2q&st=mldjj3g9&dl=1',
+            '948wqdc7vn67eimy9itur': 'https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=j4rqh5wl&dl=1'
+        };
+        return db[id];
     }
 
-    function heliShoot(target) {
-        const b = document.createElement('div');
+    function playerShoot() {
+        if(!state.active) return;
+        document.getElementById('gun-img').style.transform = 'rotate(-15deg)';
+        setTimeout(() => document.getElementById('gun-img').style.transform = 'rotate(-5deg)', 100);
+        createBullet(state.dmg);
+    }
+
+    function createBullet(damage, isHeli = false) {
+        const b = document.createElement('img');
         b.className = 'bullet';
-        b.style.left = '150px';
-        b.style.top = '100px';
-        b.style.background = '#ff0';
-        b.style.height = '10px';
-        document.getElementById('game-box').appendChild(b);
+        b.src = 'https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=vda4mzua&dl=1';
+        b.style.left = isHeli ? '150px' : '300px';
+        b.style.top = isHeli ? '100px' : (window.innerHeight - 300) + 'px';
+        document.getElementById('game-container').appendChild(b);
 
-        let bx = 150;
-        let bMove = setInterval(() => {
+        let bx = parseInt(b.style.left);
+        let bmove = setInterval(() => {
             bx += 20;
             b.style.left = bx + 'px';
-            let r1 = b.getBoundingClientRect();
-            let r2 = target.getBoundingClientRect();
-            if(r1.left > r2.left) {
-                damageEnemy(target, 100);
-                b.remove();
-                clearInterval(bMove);
-            }
-            if(bx > window.innerWidth) { b.remove(); clearInterval(bMove); }
-        }, 10);
-    }
-
-    function handleShoot() {
-        if(!state.isWaveActive) return;
-        const b = document.createElement('img');
-        b.src = 'https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=vda4mzua&dl=1';
-        b.className = 'bullet';
-        b.style.left = '250px';
-        b.style.bottom = '180px';
-        document.getElementById('game-box').appendChild(b);
-
-        let bx = 250;
-        let bMove = setInterval(() => {
-            bx += 30;
-            b.style.left = bx + 'px';
-            document.querySelectorAll('.enemy').forEach(en => {
+            
+            let ens = document.querySelectorAll('.enemy');
+            ens.forEach(en => {
                 let r1 = b.getBoundingClientRect();
                 let r2 = en.getBoundingClientRect();
-                if(r1.left < r2.right && r1.right > r2.left && r1.top < r2.bottom) {
-                    damageEnemy(en, state.dmg);
+                if(r1.left < r2.right && r1.right > r2.left && r1.top < r2.bottom && r1.bottom > r2.top) {
+                    en.dataset.hp -= damage;
                     b.remove();
-                    clearInterval(bMove);
+                    clearInterval(bmove);
+                    if(en.dataset.hp <= 0) {
+                        en.remove();
+                        state.killed++;
+                        state.money += 150;
+                        updateUI();
+                        if(state.killed >= state.target) winWave();
+                    }
                 }
             });
-            if(bx > window.innerWidth) { b.remove(); clearInterval(bMove); }
+            if(bx > window.innerWidth) { b.remove(); clearInterval(bmove); }
         }, 15);
     }
 
-    function endWave() {
-        state.isWaveActive = false;
-        clearInterval(state.heliAttack);
+    function winWave() {
+        state.active = false;
+        clearInterval(state.heliInterval);
+        document.getElementById('start-btn').style.display = 'block';
+        document.getElementById('fx-layer').style.background = 'none';
+        document.getElementById('fx-layer').style.backdropFilter = 'none';
         state.wave++;
-        document.getElementById('game-box').classList.remove('nightmare-bg', 'agetha-blur');
-        document.getElementById('start-wave-btn').style.display = 'block';
         updateUI();
     }
 
-    function gameOver() {
-        state.isWaveActive = false;
+    function endGame() {
+        state.active = false;
+        clearInterval(state.heliInterval);
         document.getElementById('death-screen').style.display = 'flex';
     }
 
-    // --- ЛОГИКА ПУРПУЛЕЗКИ (ФИНАЛ) ---
-    function spawnPurpBoss() {
-        const gb = document.getElementById('game-box');
-        gb.classList.add('purp-bg');
+    // --- ПУРПУЛЕЗКА (ФИНАЛ) ---
+    function spawnPurpleBoss() {
+        const type = ENEMIES[94];
+        state.target = 1;
+        document.getElementById('fx-layer').style.background = 'rgba(128, 0, 128, 0.4)';
         
-        const boss = document.createElement('div');
+        const boss = document.createElement('img');
+        boss.id = 'final-boss';
         boss.className = 'enemy';
-        boss.id = 'purp-boss';
-        boss.dataset.hp = 100000;
-        boss.dataset.maxHp = 100000;
-        boss.style.right = '-400px';
+        boss.src = getLink(type.id);
+        boss.style.right = '50px';
         boss.style.bottom = '30%';
-        boss.style.width = '400px';
-        
-        const img = document.createElement('img');
-        img.src = 'https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=j4rqh5wl&dl=1';
-        img.style.width = '100%';
-        boss.appendChild(img);
-        gb.appendChild(boss);
+        boss.dataset.hp = 100000;
+        document.getElementById('game-container').appendChild(boss);
 
-        // Появление
-        setTimeout(() => { boss.style.transition = 'right 4s'; boss.style.right = '50px'; }, 100);
+        showDiag("ХАХ? ДУМАЛИ ВСЁ ТАК ПРОСТО? ИДИОТЫ, Я ТУТ КОРОЛЬ, ВИДИМО СЛИШКОМ РАЗОГНАЛИСЬ, МОЯ ОЧЕРЕДЬ ОТОМСТИТЬ ЗА МОИХ ЗАЙЦЕВ!", 4000);
 
-        // Диалог
         setTimeout(() => {
-            showDialogue("ХАХ? ДУМАЛИ ВСЁ ТАК ПРОСТО? ИДИОТЫ, Я ТУТ КОРОЛЬ, ВИДИМО СЛИШКОМ РАЗОГНАЛИСЬ, МОЯ ОЧЕРЕДЬ ОТОМСТИТЬ ЗА МОИХ ЗАЙЦЕВ!", 4000);
-            
-            setTimeout(() => {
-                document.getElementById('final-timer').style.display = 'block';
-                let t = setInterval(() => {
-                    state.purpTimer--;
-                    document.getElementById('final-timer').innerText = state.purpTimer;
-                    if(state.purpTimer <= 0) {
-                        clearInterval(t);
-                        showDialogue("БОЛЬШЕ НЕ ИГРАЮ, ДЕРЖИТЕСЬ РУКАМИ!", 3000);
-                        setTimeout(() => { state.hp = -999999999; gameOver(); }, 3000);
-                    }
-                    if(boss.dataset.hp <= 0) clearInterval(t);
-                }, 1000);
+            const timer = document.getElementById('final-timer');
+            timer.style.display = 'block';
+            let sec = 100;
+            let tInt = setInterval(() => {
+                sec--;
+                timer.innerText = sec;
+                if(sec <= 0) {
+                    clearInterval(tInt);
+                    showDiag("БОЛЬШЕ НЕ ИГРАЮ, ДЕРЖИТЕСЬ РУКАМИ!", 3000);
+                    setTimeout(() => { state.hp = -99999999; endGame(); }, 3500);
+                }
+                if(!document.getElementById('final-boss')) clearInterval(tInt);
+            }, 1000);
 
-                // Атака клонами
-                setInterval(() => {
-                    if(boss.parentElement) { state.hp -= 15; updateUI(); }
-                }, 10000);
-
-            }, 4000);
+            let atk = setInterval(() => {
+                if(!document.getElementById('final-boss')) { clearInterval(atk); return; }
+                state.hp -= 15;
+                updateUI();
+            }, 10000);
         }, 4500);
-
-        boss.onclick = (e) => { e.stopPropagation(); damageEnemy(boss, state.dmg); };
     }
 
-    function showDialogue(txt, time) {
-        const box = document.getElementById('boss-dialogue');
-        document.getElementById('boss-text').innerText = txt;
-        box.style.bottom = '30px';
-        setTimeout(() => { box.style.bottom = '-300px'; }, time);
+    function showDiag(txt, time) {
+        const d = document.getElementById('dialogue');
+        document.getElementById('diag-text').innerText = txt;
+        d.style.bottom = '20px';
+        setTimeout(() => d.style.bottom = '-300px', time);
     }
 
-    // Перехват смерти босса для финала
-    const oldDamage = damageEnemy;
-    damageEnemy = function(en, amt) {
-        oldDamage(en, amt);
-        if(en.id === 'purp-boss' && en.dataset.hp <= 0) {
-            triggerFinalWin(en);
+    // Перехват смерти босса
+    setInterval(() => {
+        const b = document.getElementById('final-boss');
+        if(b && b.dataset.hp <= 0) {
+            b.id = 'dead-boss';
+            b.style.transition = '2s';
+            b.style.transform = 'rotate(90deg)';
+            handleWin();
         }
-    };
+    }, 100);
 
-    function triggerFinalWin(boss) {
-        state.isWaveActive = false;
-        boss.style.transition = 'transform 2s';
-        boss.style.transform = 'translateY(500px) rotate(90deg)';
-        
-        setTimeout(() => { showDialogue("ТЫ СЧИТЕРИЛ!", 3000); }, 1000);
-        setTimeout(() => { showDialogue("СМОТРЯ НА ВАШИ ДОВОЛЬНЫЕ ЛИЦА, ВЫ ТОЧНО СЧИТЕРЕЛИ!", 5000); }, 4000);
-        setTimeout(() => { showDialogue("В СЛЕДУЮЩИЙ РАЗ, КОГДА У СВОЕЙ МАМЫ БУДЕШЬ ПРОСИТЬ КТО НАСТОЯЩИЙ БОСС, СКАЖИ, ЧТО ЭТО ЯЯЯЯ!!", 5000); }, 9000);
-        
+    function handleWin() {
+        state.active = false;
+        clearInterval(state.heliInterval);
+        setTimeout(() => showDiag("ТЫ СЧИТЕРИЛ!", 3000), 1000);
+        setTimeout(() => showDiag("СМОТРЯ НА ВАШИ ДОВОЛЬНЫЕ ЛИЦА, ВЫ ТОЧНО СЧИТЕРЕЛИ!", 5000), 4000);
+        setTimeout(() => showDiag("В СЛЕДУЮЩИЙ РАЗ, КОГДА У СВОЕЙ МАМЫ БУДЕШЬ ПРОСИТЬ КТО НАСТОЯЩИЙ БОСС, СКАЖИ, ЧТО ЭТО ЯЯЯЯ!!", 5000), 9000);
         setTimeout(() => {
-            document.body.style.background = "#fff";
-            document.getElementById('game-box').style.display = 'none';
-            showEndText("Они тут...", 4000, () => {
-                showEndText("Поспеши пожалуйста...", 6000, () => {
-                    showEndText("THE END<br><small>Создано пользователем: @Xn1ckname, спасибо за игру!</small>", 8000, () => {
-                        document.body.innerHTML = "";
-                    });
-                });
-            });
-        }, 14500);
-    }
-
-    function showEndText(txt, time, callback) {
-        const d = document.createElement('div');
-        d.style.position = 'fixed'; d.style.top = '50%'; d.style.left = '50%';
-        d.style.transform = 'translate(-50%, -50%)'; d.style.fontSize = '40px';
-        d.style.textAlign = 'center'; d.innerHTML = txt; d.style.zIndex = '10000';
-        document.body.appendChild(d);
-        setTimeout(() => { d.remove(); if(callback) callback(); }, time);
+            document.getElementById('game-container').style.background = '#fff';
+            document.getElementById('game-container').innerHTML = '<h1 style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#000; font-size:40px;" id="final-txt">Они тут...</h1>';
+            setTimeout(() => document.getElementById('final-txt').innerText = "Поспеши пожалуйста...", 4000);
+            setTimeout(() => document.getElementById('final-txt').innerHTML = "THE END<br><small>Создано пользователем: @Xn1ckname, спасибо за игру!</small>", 10000);
+            setTimeout(() => window.close(), 18000);
+        }, 15000);
     }
 
     updateUI();
