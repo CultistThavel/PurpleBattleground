@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - EVOLUTION</title>
+    <title>Purple Battleground - SLAVES UPDATE</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -16,42 +16,45 @@
 
         #floor { position: absolute; bottom: 0; width: 100%; height: 40%; background: #60646b; border-top: 12px solid #000; z-index: 10; }
 
+        /* ИНТЕРФЕЙС - ПОДНЯЛ ВЫШЕ */
         .header-center { position: absolute; top: 15px; left: 5%; width: 90%; display: flex; flex-direction: column; align-items: center; z-index: 100; }
         #title-box { background: #fff; border: 8px solid #000; border-radius: 20px; font-size: 40px; width: 100%; text-align: center; margin-bottom: 10px; }
+        
         #hp-container { background: #ccff00; border: 8px solid #000; border-radius: 20px; padding: 12px 0; width: 85%; text-align: center; overflow: hidden; position: relative;}
         #hp-bg { position: absolute; top:0; left:0; width: 100%; height: 100%; background: red; z-index: -1; }
         #hp-text { color: #fff; font-size: 28px; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; position: relative; }
 
-        .left-ui-panel { position: absolute; bottom: 60%; left: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        #money-display { color: #fff; font-size: 40px; text-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 10px; }
-        #shop-btn { width: 120px; height: 120px; background: #fff; border: 8px solid #000; border-radius: 25px; font-size: 70px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        /* ПАНЕЛЬ СЛЕВА - К ХП */
+        .left-ui-panel { position: absolute; top: 150px; left: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        #money-display { color: #fff; font-size: 45px; text-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 10px; }
+        #shop-btn { width: 160px; height: 160px; background: #fff; border: 10px solid #000; border-radius: 30px; font-size: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 8px 8px 0 #000; }
 
         .wave-ui { position: absolute; top: 200px; right: 40px; text-align: right; color: #fff; z-index: 100; }
         #wave-big { font-size: 80px; margin: 0; -webkit-text-stroke: 3px #000; }
         #enemies-count { font-size: 24px; text-shadow: 3px 3px 0 #000; }
 
-        /* ГЕРОИ - ПОДНЯЛ ВЫШЕ */
+        /* ГЕРОИ */
         #main-hare { position: absolute; bottom: 25%; left: -50px; width: 500px; z-index: 50; }
         #heli-hare { position: absolute; bottom: 15%; left: 20px; width: 350px; z-index: 60; display: none; }
 
-        /* ЗОМБИ И ШКАЛА */
-        .zombie-container { position: absolute; bottom: 25%; right: -200px; width: 350px; z-index: 45; display: flex; flex-direction: column; align-items: center; }
+        /* ВРАГИ */
+        .zombie-container { position: absolute; bottom: 25%; right: -250px; width: 350px; z-index: 45; display: flex; flex-direction: column; align-items: center; }
         .zombie-img { width: 100%; }
-        .zombie-hp-bar { width: 80%; height: 20px; background: red; border: 3px solid #000; position: relative; margin-bottom: 5px; }
+        .zombie-hp-bar { width: 85%; height: 22px; background: red; border: 4px solid #000; position: relative; margin-bottom: 5px; }
         .zombie-hp-fill { height: 100%; background: #00ff00; width: 100%; }
-        .zombie-hp-text { position: absolute; width: 100%; text-align: center; top: -15px; color: #fff; font-size: 20px; font-weight: 900; -webkit-text-stroke: 1px #000; }
+        .zombie-hp-text { position: absolute; width: 100%; text-align: center; top: -18px; color: #fff; font-size: 22px; font-weight: 900; -webkit-text-stroke: 1.5px #000; }
 
-        /* ПУЛИ - БОЛЬШЕ */
         .bullet { position: absolute; z-index: 48; width: 120px; pointer-events: none; }
 
         #start-btn-ui { position: absolute; bottom: 240px; right: 60px; background: #ccff00; color: #fff; padding: 30px 60px; border: 8px solid #fff; border-radius: 40px; font-size: 40px; text-shadow: 3px 3px 0 #000; z-index: 100; cursor: pointer; }
 
+        /* МАГАЗИН */
         #shop-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: center; }
         #shop-window { width: 85%; max-height: 75%; background: #fff; border: 10px solid #000; position: relative; display: flex; padding: 30px; gap: 30px; }
         .shop-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .red-frame { width: 100%; height: 200px; border: 8px solid #ff0000; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
-        .red-frame img { max-width: 70%; } /* УМЕНЬШИЛ ИКОНКУ */
-        .btn-buy { background: #00ff00; border: 4px solid #000; padding: 10px 30px; color: #fff; font-size: 22px; cursor: pointer; }
+        .red-frame { width: 100%; height: 220px; border: 8px solid #ff0000; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; background: #f9f9f9; }
+        .red-frame img { max-width: 60%; max-height: 90%; } /* ИКОНКА МЕНЬШЕ И ВНУТРИ */
+        .btn-buy { background: #00ff00; border: 4px solid #000; padding: 10px 30px; color: #fff; font-size: 22px; cursor: pointer; border-radius: 10px; }
         #close-shop { position: absolute; top: -25px; right: -25px; width: 60px; height: 60px; background: #ff0000; border: 5px solid #000; border-radius: 50%; color: #fff; font-size: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
         #upgrade-popup { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 40px; font-weight: 900; -webkit-text-stroke: 1.5px #ff0000; z-index: 2000; display: none; animation: fadeUp 1.5s forwards; }
@@ -96,15 +99,15 @@
         <div class="shop-item">
             <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1"></div>
             <h2 style="color:#000;">Верто-Заяц</h2>
-            <p style="color:#888; font-size:14px;">Ваш личный помощник! Всегда готов отбиваться от врагов вместе с вами! Очень помогает, готов пробить почти всех! Рекомендуется.</p>
-            <div style="color:#000; font-weight:900;">3500 Монет</div>
+            <p style="color:#888; font-size:14px;">Ваш личный помощник! Всегда готов отбиваться от врагов вместе с вами! Очень помогает!</p>
+            <div style="color:#000; font-weight:900; margin: 10px;">3500 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
         <div class="shop-item">
             <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1"></div>
             <h2 style="color:#000;">Снаряды</h2>
             <p style="color:#888; font-size:14px;">Улучшение Снаряд В Вашем Оружии — 250 PurpleMoney = +30 Урона Для Вашего Оружия.</p>
-            <div style="color:#000; font-weight:900;">250 Монет</div>
+            <div style="color:#000; font-weight:900; margin: 10px;">250 Монет</div>
             <button class="btn-buy" onclick="buyAmmo()">Приобрести</button>
         </div>
     </div>
@@ -112,8 +115,8 @@
 
 <div id="lose-screen">
     <h2>Поражение</h2>
-    <p style="color:white">Молодец, надо было стараться.</p>
-    <button style="background: #00ff00; color: #fff; padding: 15px 50px; border: 4px solid #000; font-size: 30px;" onclick="closeLoseScreen()">Лан.</button>
+    <p style="color:white; font-size: 20px;">Молодец, надо было стараться.</p>
+    <button style="background: #00ff00; color: #fff; padding: 15px 50px; border: 4px solid #000; font-size: 30px; cursor:pointer;" onclick="closeLoseScreen()">Лан.</button>
 </div>
 
 <script>
@@ -129,8 +132,9 @@
         document.getElementById('m-val').innerText = money;
         document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + hp;
         document.getElementById('enemies-count').innerText = "Осталось Врагов: " + enemiesLeft;
-        let hpPercent = (hp / 350) * 100;
-        document.getElementById('hp-bg').style.left = hpPercent + "%";
+        let hpPercent = Math.max(0, (hp / 350) * 100);
+        document.getElementById('hp-bg').style.width = hpPercent + "%";
+        document.getElementById('hp-bg').style.left = "0";
     }
 
     function buyAmmo() {
@@ -161,31 +165,42 @@
     function spawnLoop() {
         if (!isGameActive) return;
         if (enemiesSpawned < 10) {
-            spawnZombie();
+            spawnEnemy();
             enemiesSpawned++;
             setTimeout(spawnLoop, 4000);
         }
     }
 
-    function spawnZombie() {
+    function spawnEnemy() {
         let container = document.createElement('div');
         container.className = 'zombie-container';
         
         let hpMax = 55;
+        let enemyImg = "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=j2fo8ed0&dl=1";
+        let dmgToPlayer = 20;
+
+        // ЛОГИКА НОВОГО ВРАГА: РАБ ПУРПУЛЕЗКИ
+        if (wave >= 10 && wave <= 16) {
+            hpMax = 310;
+            enemyImg = "https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=m33boyvr&dl=0";
+            dmgToPlayer = 80;
+        }
+
         container.innerHTML = `
-            <div class="zombie-hp-bar"><div class="zombie-hp-text">55 ХП</div><div class="zombie-hp-fill"></div></div>
-            <img class="zombie-img" src="https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=j2fo8ed0&dl=1">
+            <div class="zombie-hp-bar"><div class="zombie-hp-text">${hpMax} ХП</div><div class="zombie-hp-fill"></div></div>
+            <img class="zombie-img" src="${enemyImg}">
         `;
         
         container.dataset.hp = hpMax;
+        container.dataset.maxHp = hpMax;
         document.getElementById('game-container').appendChild(container);
         
-        let pos = -200;
+        let pos = -250;
         let moveInt = setInterval(() => {
             if (!isGameActive) { clearInterval(moveInt); return; }
             pos += 4; container.style.right = pos + 'px';
             if (window.innerWidth - pos < 350) {
-                hp -= 20; updateUI(); container.remove(); clearInterval(moveInt);
+                hp -= dmgToPlayer; updateUI(); container.remove(); clearInterval(moveInt);
                 checkNext();
                 if (hp <= 0) gameOver();
             }
@@ -199,8 +214,9 @@
         b.src = "https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=b0l23gb9&dl=1";
         b.className = 'bullet';
         
-        let startX = (type === 'main') ? 350 : 250;
-        let startY = (type === 'main') ? "45%" : "55%";
+        // ВЫЛЕТ ИЗ РУК (центр персонажа)
+        let startX = (type === 'main') ? 380 : 250;
+        let startY = (type === 'main') ? "35%" : "55%";
         let currentDmg = (type === 'main') ? damage : 100;
 
         b.style.left = startX + "px"; b.style.bottom = startY;
@@ -217,8 +233,8 @@
                     z.dataset.hp -= currentDmg;
                     let fill = z.querySelector('.zombie-hp-fill');
                     let text = z.querySelector('.zombie-hp-text');
-                    let percent = (z.dataset.hp / 55) * 100;
-                    fill.style.width = percent + "%";
+                    let percent = (z.dataset.hp / z.dataset.maxHp) * 100;
+                    fill.style.width = Math.max(0, percent) + "%";
                     text.innerText = Math.max(0, z.dataset.hp) + " ХП";
 
                     b.remove(); clearInterval(bInt);
@@ -238,7 +254,7 @@
         if (enemiesLeft <= 0) {
             wave++; enemiesSpawned = 0; enemiesLeft = 10;
             document.getElementById('wave-big').innerText = wave + " Волна";
-            if (wave <= 5) spawnLoop();
+            spawnLoop();
         }
     }
 
