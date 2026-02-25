@@ -3,180 +3,471 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - FINAL MOBILE UI</title>
+    <title>Purple Battleground: THE FINAL SHOWDOWN</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #3d4147; font-family: 'Arial Black', sans-serif; }
-        #game-screen { position: relative; width: 100vw; height: 100vh; background: #3d4147; overflow: hidden; }
-
-        /* --- ВЕРХНЯЯ ЧАСТЬ (КАК НА ЧЕРТЕЖЕ) --- */
-        .top-group { position: absolute; top: 15px; left: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
-        #game-title { background: #fff; color: #000; padding: 8px 15px; border-radius: 12px; font-size: 22px; border: 4px solid #000; width: fit-content; box-shadow: 4px 4px 0 #000; }
-        #hp-display { background: #ccff00; color: #000; padding: 6px 15px; border-radius: 10px; font-size: 18px; border: 3px solid #000; box-shadow: 4px 4px 0 #000; }
-
-        /* ВОЛНЫ В УГЛУ */
-        #wave-box { position: absolute; top: 15px; right: 20px; text-align: right; color: #fff; z-index: 10; }
-        #wave-title { font-size: 55px; margin: 0; line-height: 1; text-shadow: 4px 4px #000; }
-        #wave-sub { font-size: 18px; margin: 0; font-weight: bold; }
-
-        /* --- КНОПКИ СБОКУ --- */
-        .left-menu { position: absolute; top: 150px; left: 15px; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
+        /* БАЗОВЫЕ НАСТРОЙКИ — СТИЛЬ "КАК НА ЧЕРТЕЖЕ" */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #3d4147; font-family: 'Arial Black', sans-serif; user-select: none; }
+        #game-box { position: relative; width: 100vw; height: 100vh; background: #3d4147; overflow: hidden; transition: filter 0.5s; }
         
-        /* Кнопка магазина (Домик) */
-        #shop-btn { width: 100px; height: 100px; background: #fff; border: 5px solid #000; border-radius: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 6px 6px 0 #000; }
-        #shop-btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 #000; }
-        .house-icon { width: 70px; height: 70px; }
+        /* ВЕРХНИЙ ЛЕВЫЙ УГОЛ */
+        .top-left-panel { position: absolute; top: 15px; left: 15px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
+        #game-name { background: #fff; color: #000; padding: 8px 15px; border: 4px solid #000; border-radius: 12px; font-size: 22px; width: fit-content; box-shadow: 4px 4px 0 #000; }
+        #hp-display { background: #ccff00; color: #000; padding: 5px 15px; border: 4px solid #000; border-radius: 10px; font-size: 18px; width: fit-content; box-shadow: 4px 4px 0 #000; }
 
-        /* Пурпурные деньги */
+        /* ВЕРХНИЙ ПРАВЫЙ УГОЛ */
+        .top-right-panel { position: absolute; top: 10px; right: 20px; z-index: 100; text-align: right; color: #fff; }
+        #wave-number { font-size: 70px; margin: 0; line-height: 1; text-shadow: 5px 5px #000; -webkit-text-stroke: 2px #000; }
+        #enemies-count { font-size: 22px; margin: 0; font-weight: bold; text-shadow: 2px 2px #000; }
+
+        /* ЛЕВОЕ МЕНЮ */
+        .side-menu { position: absolute; top: 150px; left: 15px; z-index: 100; display: flex; flex-direction: column; gap: 20px; }
+        #shop-trigger { width: 110px; height: 110px; background: #fff; border: 5px solid #000; border-radius: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 6px 6px 0 #000; }
+        .house-icon { width: 80px; height: 80px; }
+        
         .money-group { display: flex; align-items: center; gap: 10px; }
-        .money-icon-circle { width: 80px; height: 80px; background: #fff; border: 5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 900; box-shadow: 4px 4px 0 #000; }
-        #money-label { background: #a200ff; color: #fff; padding: 12px 20px; border-radius: 15px; font-size: 20px; border: 4px solid #000; box-shadow: 6px 6px 0 #000; min-width: 180px; }
+        .coin-icon { width: 85px; height: 85px; background: #fff; border: 5px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 45px; font-weight: 900; box-shadow: 4px 4px 0 #000; }
+        #money-bar { background: #a200ff; color: #fff; padding: 12px 25px; border: 5px solid #000; border-radius: 15px; font-size: 22px; box-shadow: 6px 6px 0 #000; min-width: 200px; font-weight: bold; }
 
-        /* --- КНОПКА СТАРТА (ОГРОМНАЯ) --- */
-        #start-btn { 
-            position: absolute; bottom: 40px; right: 30px; 
-            background: #ccff00; color: #fff; padding: 25px 50px; 
-            border: 6px solid #fff; border-radius: 25px; font-size: 40px; 
-            font-weight: 900; cursor: pointer; z-index: 50;
-            text-shadow: 3px 3px #000; box-shadow: 0 12px 0 #88aa00;
+        /* КНОПКА СТАРТА */
+        #start-wave-btn { 
+            position: absolute; bottom: 40px; right: 40px; z-index: 200;
+            background: #ccff00; color: #fff; padding: 25px 60px; 
+            border: 7px solid #fff; border-radius: 30px; font-size: 45px; 
+            font-weight: 900; cursor: pointer; text-shadow: 3px 3px #000; 
+            box-shadow: 0 12px 0 #88aa00, 5px 15px 15px rgba(0,0,0,0.5);
         }
-        #start-btn:active { transform: translateY(8px); box-shadow: 0 4px 0 #88aa00; }
-
-        /* МАГАЗИН (КАК НА СКРИНЕ) */
-        #shop-window { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 90%; max-width: 700px; background: #fff; border: 6px solid #000; 
-            padding: 30px; display: none; z-index: 100; box-shadow: 20px 20px 0 rgba(0,0,0,0.5); 
-        }
-        .shop-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .close-shop { width: 70px; height: 70px; background: #ffcc00; border-radius: 50%; border: 4px solid #fff; font-size: 40px; color: #fff; cursor: pointer; box-shadow: 4px 4px 0 #000; }
-        
-        .item-box { border: 4px solid #ff0000; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; background: #fff; }
-        .item-box img { width: 100%; max-height: 200px; object-fit: contain; background: #000; border: 3px solid #000; margin-bottom: 15px; }
-        .buy-action { background: #ccff00; border: 3px solid #000; padding: 15px 30px; border-radius: 12px; font-weight: 900; font-size: 22px; cursor: pointer; }
+        #start-wave-btn:active { transform: translateY(8px); box-shadow: 0 4px 0 #88aa00; }
 
         /* ИГРОВЫЕ ОБЪЕКТЫ */
-        #hero { position: absolute; bottom: 100px; left: 50px; width: 280px; z-index: 5; }
-        .zombie { position: absolute; bottom: 100px; width: 200px; z-index: 6; }
+        #player-sprite { position: absolute; bottom: 80px; left: 60px; width: 300px; z-index: 50; }
+        #heli-bunny { position: absolute; top: 50px; left: 100px; width: 180px; z-index: 40; display: none; animation: float 2s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        .bullet { position: absolute; width: 45px; z-index: 60; filter: drop-shadow(2px 2px 0 #000); }
+        .enemy { position: absolute; bottom: 80px; z-index: 70; transition: filter 0.3s; }
+        .enemy-hp-bar { position: absolute; top: -20px; left: 0; width: 100%; height: 10px; background: #000; border: 2px solid #fff; }
+        .enemy-hp-fill { height: 100%; background: #ff0000; width: 100%; }
+
+        /* МАГАЗИН */
+        #shop-ui { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 90%; max-width: 850px; background: #fff; border: 8px solid #000; 
+            padding: 40px; display: none; z-index: 1000; box-shadow: 30px 30px 0 rgba(0,0,0,0.4); 
+        }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 5px solid #000; padding-bottom: 15px; }
+        .close-shop-btn { width: 80px; height: 80px; background: #ffcc00; border-radius: 50%; border: 5px solid #fff; font-size: 50px; color: #fff; cursor: pointer; box-shadow: 5px 5px 0 #000; }
+        
+        .shop-items-container { display: flex; gap: 30px; justify-content: center; }
+        .shop-card { border: 5px solid #ff0000; padding: 20px; flex: 1; text-align: center; position: relative; }
+        .shop-card img { width: 100%; height: 250px; object-fit: contain; background: #000; border: 4px solid #000; margin-bottom: 15px; }
+        .buy-btn { background: #ccff00; border: 4px solid #000; padding: 15px 30px; font-size: 24px; font-weight: 900; cursor: pointer; border-radius: 15px; }
+        .sold-out { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: #fff; display: none; align-items: center; justify-content: center; font-size: 35px; transform: rotate(-15deg); font-weight: 900; pointer-events: none; }
+
+        /* ДИАЛОГИ БОССА */
+        #boss-dialogue {
+            position: fixed; bottom: -300px; left: 50%; transform: translateX(-50%);
+            width: 85%; background: #fff; border: 6px solid #000; padding: 25px;
+            transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 2000;
+        }
+        #boss-name-tag { position: absolute; top: -35px; left: 0; background: #000; color: #fff; padding: 5px 20px; font-size: 22px; font-weight: bold; }
+        #boss-text { font-size: 24px; font-weight: bold; color: #000; }
+
+        #final-timer { position: absolute; top: 100px; right: 100px; font-size: 120px; color: #fff; font-weight: 900; display: none; text-shadow: 8px 8px #ff0000; }
+        
+        /* ЭФФЕКТЫ */
+        .nightmare-bg { background: rgba(255, 0, 0, 0.4) !important; }
+        .agetha-blur { filter: blur(15px) !important; }
+        .purp-bg { background: rgba(128, 0, 128, 0.4) !important; }
+
+        #death-screen { position: fixed; inset: 0; background: rgba(128,128,128,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="game-screen" onclick="playerAttack()">
-    <div class="top-group">
-        <div id="game-title">Purple Battleground</div>
+<div id="game-box" onclick="handleShoot()">
+    <div class="top-left-panel">
+        <div id="game-name">Purple Battleground</div>
         <div id="hp-display">Ваша Шкала ХП: <span id="hp-val">350</span></div>
     </div>
 
-    <div id="wave-box">
-        <h1 id="wave-title">1 Волна</h1>
-        <p id="wave-sub">Осталось Врагов: <span id="e-left">10</span></p>
+    <div class="top-right-panel">
+        <h1 id="wave-number">1 Волна</h1>
+        <p id="enemies-count">Осталось Врагов: <span id="e-left">10</span></p>
     </div>
 
-    <div class="left-menu">
-        <div id="shop-btn" onclick="openShop(event)">
+    <div class="side-menu">
+        <div id="shop-trigger" onclick="toggleShop(event)">
             <img src="https://cdn-icons-png.flaticon.com/512/606/606548.png" class="house-icon">
         </div>
         <div class="money-group">
-            <div class="money-icon-circle">$</div>
-            <div id="money-label">Purple Money: <span id="m-val">0</span></div>
+            <div class="coin-icon">$</div>
+            <div id="money-bar">Purple Money: <span id="m-val">0</span></div>
         </div>
     </div>
 
-    <img id="hero" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
+    <img id="player-sprite" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
+    <img id="heli-bunny" src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
 
-    <button id="start-btn" onclick="startTheWave(event)">Начать Перестрелку</button>
+    <button id="start-wave-btn" onclick="startWave(event)">Начать Перестрелку</button>
+    <div id="final-timer">100</div>
 
-    <div id="shop-window">
-        <div class="shop-top">
-            <div style="font-size: 30px; font-weight: 900;">Ваш Балланс: <span id="s-m-val">0</span></div>
-            <button class="close-shop" onclick="openShop(event)">✕</button>
+    <div id="shop-ui">
+        <div class="shop-header">
+            <div style="font-size: 35px; font-weight: 900;">Ваш Балланс: <span id="shop-m-val">0</span></div>
+            <button class="close-shop-btn" onclick="toggleShop(event)">✕</button>
         </div>
-        <div class="item-box">
-            <img src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
-            <h2>Верто-Заяц</h2>
-            <p style="font-size: 20px;">Цена: 1800 PurpleMoney</p>
-            <button class="buy-action" onclick="buyHeli(event)">Приобрести</button>
+        <div class="shop-items-container">
+            <div class="shop-card">
+                <img src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
+                <h2>Верто-Заяц</h2>
+                <p>Инфа: Авто-атака (500 DPS)</p>
+                <p><strong>1800 PurpleMoney</strong></p>
+                <button class="buy-btn" onclick="buyHeli(event)">Приобрести</button>
+                <div id="heli-sold" class="sold-out">Уже Приобретено</div>
+            </div>
+            <div class="shop-card">
+                <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
+                <h2>Снаряды</h2>
+                <p>Инфа: Урон +20</p>
+                <p><strong id="dmg-cost">150 Монет</strong></p>
+                <button class="buy-btn" onclick="upgradeDmg(event)">Приобрести</button>
+            </div>
         </div>
+    </div>
+
+    <div id="boss-dialogue">
+        <div id="boss-name-tag">Пурпулезка</div>
+        <div id="boss-text">...</div>
+    </div>
+
+    <div id="death-screen">
+        <h1 style="font-size: 50px;">Отлично, надо было стараться.</h1>
+        <button onclick="location.reload()" style="padding: 20px 50px; font-size: 30px; cursor: pointer;">Лан.</button>
     </div>
 </div>
 
 <script>
-    let g = { hp: 350, money: 0, wave: 1, killed: 0, target: 10, active: false };
+    // --- ДАННЫЕ ВРАГОВ (ВСЕ 12 ИЗ ЧЕРТЕЖА) ---
+    const ENEMY_DATA = {
+        1:  { name: 'Zombie', hp: 55, dmg: 20, spd: 6, id: 'nkfmtaim2b95l86u99dvc' },
+        10: { name: 'Slave', hp: 310, dmg: 80, spd: 5, id: 'nwzcf8q90k577boz61ppb' },
+        25: { name: 'Hyr', hp: 550, dmg: 130, spd: 4, id: '9fxmu3unlcgoe5cze2rlg' },
+        45: { name: 'Tolk', hp: 1200, dmg: 250, spd: 4.09, id: '67h54u64tetq830xd07ux' },
+        55: { name: 'Bow', hp: 2210, dmg: 398, spd: 2.78, id: 'h7tehqlxiabzmb4jtm1x2' },
+        66: { name: 'Guest', hp: 5777, dmg: 566, spd: 7.99, id: 'wd3g5c5j224yuzjhwgnle' },
+        75: { name: 'Nightmare', hp: 18500, dmg: 1888, spd: 15, id: 'bbjebj7lzud0yqyvgan9h', boss: true, fx: 'nightmare' },
+        76: { name: 'Father', hp: 12000, dmg: 899, spd: 6, id: '5wbpzxujy76bt3h51kx9v' },
+        82: { name: 'Inchi', hp: 15600, dmg: 1090, spd: 7, id: 'nyluwpmxyua8cygv9brn4' },
+        89: { name: 'Shadow', hp: 19980, dmg: 919192929, spd: 10, id: 'wkokjyaee5ugk9tf3ymxq' },
+        93: { name: 'Agetha', hp: 45879, dmg: 9e20, spd: 27, id: 'j7f4hzpgljgz0tvwtgar8', boss: true, fx: 'blur' },
+        94: { name: 'Purpulezka', hp: 100000, dmg: 0, spd: 0, id: '948wqdc7vn67eimy9itur', final: true }
+    };
 
-    function ui() {
-        document.getElementById('hp-val').innerText = g.hp;
-        document.getElementById('m-val').innerText = g.money;
-        document.getElementById('s-m-val').innerText = g.money;
-        document.getElementById('wave-title').innerText = g.wave + " Волна";
-        document.getElementById('e-left').innerText = g.target - g.killed;
+    let state = {
+        hp: 350, money: 0, wave: 1, dmg: 50,
+        hasHeli: false, dmgPrice: 150,
+        isWaveActive: false, killed: 0, target: 10,
+        purpTimer: 100
+    };
+
+    function updateUI() {
+        document.getElementById('hp-val').innerText = state.hp;
+        document.getElementById('m-val').innerText = state.money;
+        document.getElementById('shop-m-val').innerText = state.money;
+        document.getElementById('wave-number').innerText = state.wave + " Волна";
+        document.getElementById('e-left').innerText = Math.max(0, state.target - state.killed);
+        document.getElementById('dmg-cost').innerText = state.dmgPrice + " Монет";
+        if(state.hasHeli) document.getElementById('heli-sold').style.display = 'flex';
     }
 
-    function openShop(e) {
-        e.stopPropagation();
-        const s = document.getElementById('shop-window');
+    function toggleShop(e) {
+        if(e) e.stopPropagation();
+        if(state.isWaveActive) return;
+        const s = document.getElementById('shop-ui');
         s.style.display = s.style.display === 'block' ? 'none' : 'block';
     }
 
-    function startTheWave(e) {
-        e.stopPropagation();
-        g.active = true;
-        g.killed = 0;
-        document.getElementById('start-btn').style.display = 'none';
-        
-        let count = 0;
-        let loop = setInterval(() => {
-            if (count >= g.target || !g.active) { clearInterval(loop); return; }
-            createZombie();
-            count++;
-        }, 2500);
+    function buyHeli() {
+        if(state.money >= 1800 && !state.hasHeli) {
+            state.money -= 1800;
+            state.hasHeli = true;
+            document.getElementById('heli-bunny').style.display = 'block';
+            updateUI();
+        }
     }
 
-    function createZombie() {
-        const z = document.createElement('img');
-        z.className = 'zombie';
-        z.src = 'https://www.dropbox.com/scl/fi/nkfmtaim2b95l86u99dvc/IMG_20260225_160651_923.jpg?rlkey=33k8yede9melyuia2p49ye20u&st=h8keto1f&dl=1';
-        z.style.right = '-250px';
-        document.getElementById('game-screen').appendChild(z);
+    function upgradeDmg() {
+        if(state.money >= state.dmgPrice) {
+            state.money -= state.dmgPrice;
+            state.dmg += 20;
+            state.dmgPrice += 100;
+            updateUI();
+        }
+    }
+
+    function startWave(e) {
+        e.stopPropagation();
+        state.isWaveActive = true;
+        state.killed = 0;
+        state.hp = 350;
+        document.getElementById('start-wave-btn').style.display = 'none';
+        
+        if(state.wave === 94) {
+            spawnPurpBoss();
+        } else {
+            runWaveLogic();
+        }
+        updateUI();
+    }
+
+    function runWaveLogic() {
+        let type = getEnemyForWave();
+        state.target = type.boss ? 1 : 10;
+        let spawned = 0;
+        let loop = setInterval(() => {
+            if(spawned >= state.target || !state.isWaveActive) { clearInterval(loop); return; }
+            spawnEnemy(type);
+            spawned++;
+        }, 3000);
+
+        if(state.hasHeli) {
+            state.heliAttack = setInterval(() => {
+                let enemies = document.querySelectorAll('.enemy');
+                if(enemies.length > 0) heliShoot(enemies[0]);
+            }, 200);
+        }
+    }
+
+    function getEnemyForWave() {
+        let lastType = ENEMY_DATA[1];
+        for (let w in ENEMY_DATA) {
+            if (state.wave >= w) lastType = ENEMY_DATA[w];
+        }
+        return lastType;
+    }
+
+    function spawnEnemy(type) {
+        const en = document.createElement('div');
+        en.className = 'enemy';
+        en.dataset.hp = type.hp;
+        en.dataset.maxHp = type.hp;
+        en.style.right = '-250px';
+        en.style.width = type.boss ? '350px' : '220px';
+
+        const img = document.createElement('img');
+        img.src = `https://www.dropbox.com/scl/fi/${type.id}/...dl=1`.replace('...', '');
+        img.style.width = '100%';
+        
+        const hpBar = document.createElement('div');
+        hpBar.className = 'enemy-hp-bar';
+        const hpFill = document.createElement('div');
+        hpFill.className = 'enemy-hp-fill';
+        hpBar.appendChild(hpFill);
+
+        en.appendChild(hpBar);
+        en.appendChild(img);
+        document.getElementById('game-box').appendChild(en);
+
+        if(type.fx === 'nightmare') document.getElementById('game-box').classList.add('nightmare-bg');
+        if(type.fx === 'blur') document.getElementById('game-box').classList.add('agetha-blur');
 
         let pos = -250;
-        let moveZ = setInterval(() => {
-            if (!z.parentElement) { clearInterval(moveZ); return; }
-            pos += 5;
-            z.style.right = pos + 'px';
-            if (pos > window.innerWidth - 300) {
-                g.hp -= 35;
-                z.remove();
-                g.killed++;
-                ui();
-                if (g.hp <= 0) location.reload();
-                if (g.killed >= g.target) winWave();
-                clearInterval(moveZ);
+        let speed = (window.innerWidth + 300) / (type.spd * 50);
+        let move = setInterval(() => {
+            if(!en.parentElement) { clearInterval(move); return; }
+            pos += speed;
+            en.style.right = pos + 'px';
+            if(pos > window.innerWidth - 300) {
+                state.hp -= type.dmg;
+                en.remove();
+                state.killed++;
+                updateUI();
+                if(state.hp <= 0) gameOver();
+                if(state.killed >= state.target) endWave();
+                clearInterval(move);
             }
-        }, 30);
+        }, 20);
 
-        z.onclick = (e) => {
-            e.stopPropagation();
-            g.money += 200;
-            z.remove();
-            g.killed++;
-            ui();
-            if (g.killed >= g.target) winWave();
-            clearInterval(moveZ);
-        };
+        en.onclick = (e) => { e.stopPropagation(); damageEnemy(en, state.dmg); };
     }
 
-    function winWave() {
-        g.active = false;
-        g.wave++;
-        document.getElementById('start-btn').style.display = 'block';
-        ui();
+    function damageEnemy(en, amount) {
+        let current = parseFloat(en.dataset.hp) - amount;
+        en.dataset.hp = current;
+        en.querySelector('.enemy-hp-fill').style.width = (current / en.dataset.maxHp * 100) + '%';
+        if(current <= 0) {
+            en.remove();
+            state.killed++;
+            state.money += 150;
+            updateUI();
+            if(state.killed >= state.target) endWave();
+        }
     }
 
-    function playerAttack() {
-        // Клик по фону (дробовик)
+    function heliShoot(target) {
+        const b = document.createElement('div');
+        b.className = 'bullet';
+        b.style.left = '150px';
+        b.style.top = '100px';
+        b.style.background = '#ff0';
+        b.style.height = '10px';
+        document.getElementById('game-box').appendChild(b);
+
+        let bx = 150;
+        let bMove = setInterval(() => {
+            bx += 20;
+            b.style.left = bx + 'px';
+            let r1 = b.getBoundingClientRect();
+            let r2 = target.getBoundingClientRect();
+            if(r1.left > r2.left) {
+                damageEnemy(target, 100);
+                b.remove();
+                clearInterval(bMove);
+            }
+            if(bx > window.innerWidth) { b.remove(); clearInterval(bMove); }
+        }, 10);
     }
 
-    ui();
+    function handleShoot() {
+        if(!state.isWaveActive) return;
+        const b = document.createElement('img');
+        b.src = 'https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=vda4mzua&dl=1';
+        b.className = 'bullet';
+        b.style.left = '250px';
+        b.style.bottom = '180px';
+        document.getElementById('game-box').appendChild(b);
+
+        let bx = 250;
+        let bMove = setInterval(() => {
+            bx += 30;
+            b.style.left = bx + 'px';
+            document.querySelectorAll('.enemy').forEach(en => {
+                let r1 = b.getBoundingClientRect();
+                let r2 = en.getBoundingClientRect();
+                if(r1.left < r2.right && r1.right > r2.left && r1.top < r2.bottom) {
+                    damageEnemy(en, state.dmg);
+                    b.remove();
+                    clearInterval(bMove);
+                }
+            });
+            if(bx > window.innerWidth) { b.remove(); clearInterval(bMove); }
+        }, 15);
+    }
+
+    function endWave() {
+        state.isWaveActive = false;
+        clearInterval(state.heliAttack);
+        state.wave++;
+        document.getElementById('game-box').classList.remove('nightmare-bg', 'agetha-blur');
+        document.getElementById('start-wave-btn').style.display = 'block';
+        updateUI();
+    }
+
+    function gameOver() {
+        state.isWaveActive = false;
+        document.getElementById('death-screen').style.display = 'flex';
+    }
+
+    // --- ЛОГИКА ПУРПУЛЕЗКИ (ФИНАЛ) ---
+    function spawnPurpBoss() {
+        const gb = document.getElementById('game-box');
+        gb.classList.add('purp-bg');
+        
+        const boss = document.createElement('div');
+        boss.className = 'enemy';
+        boss.id = 'purp-boss';
+        boss.dataset.hp = 100000;
+        boss.dataset.maxHp = 100000;
+        boss.style.right = '-400px';
+        boss.style.bottom = '30%';
+        boss.style.width = '400px';
+        
+        const img = document.createElement('img');
+        img.src = 'https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=j4rqh5wl&dl=1';
+        img.style.width = '100%';
+        boss.appendChild(img);
+        gb.appendChild(boss);
+
+        // Появление
+        setTimeout(() => { boss.style.transition = 'right 4s'; boss.style.right = '50px'; }, 100);
+
+        // Диалог
+        setTimeout(() => {
+            showDialogue("ХАХ? ДУМАЛИ ВСЁ ТАК ПРОСТО? ИДИОТЫ, Я ТУТ КОРОЛЬ, ВИДИМО СЛИШКОМ РАЗОГНАЛИСЬ, МОЯ ОЧЕРЕДЬ ОТОМСТИТЬ ЗА МОИХ ЗАЙЦЕВ!", 4000);
+            
+            setTimeout(() => {
+                document.getElementById('final-timer').style.display = 'block';
+                let t = setInterval(() => {
+                    state.purpTimer--;
+                    document.getElementById('final-timer').innerText = state.purpTimer;
+                    if(state.purpTimer <= 0) {
+                        clearInterval(t);
+                        showDialogue("БОЛЬШЕ НЕ ИГРАЮ, ДЕРЖИТЕСЬ РУКАМИ!", 3000);
+                        setTimeout(() => { state.hp = -999999999; gameOver(); }, 3000);
+                    }
+                    if(boss.dataset.hp <= 0) clearInterval(t);
+                }, 1000);
+
+                // Атака клонами
+                setInterval(() => {
+                    if(boss.parentElement) { state.hp -= 15; updateUI(); }
+                }, 10000);
+
+            }, 4000);
+        }, 4500);
+
+        boss.onclick = (e) => { e.stopPropagation(); damageEnemy(boss, state.dmg); };
+    }
+
+    function showDialogue(txt, time) {
+        const box = document.getElementById('boss-dialogue');
+        document.getElementById('boss-text').innerText = txt;
+        box.style.bottom = '30px';
+        setTimeout(() => { box.style.bottom = '-300px'; }, time);
+    }
+
+    // Перехват смерти босса для финала
+    const oldDamage = damageEnemy;
+    damageEnemy = function(en, amt) {
+        oldDamage(en, amt);
+        if(en.id === 'purp-boss' && en.dataset.hp <= 0) {
+            triggerFinalWin(en);
+        }
+    };
+
+    function triggerFinalWin(boss) {
+        state.isWaveActive = false;
+        boss.style.transition = 'transform 2s';
+        boss.style.transform = 'translateY(500px) rotate(90deg)';
+        
+        setTimeout(() => { showDialogue("ТЫ СЧИТЕРИЛ!", 3000); }, 1000);
+        setTimeout(() => { showDialogue("СМОТРЯ НА ВАШИ ДОВОЛЬНЫЕ ЛИЦА, ВЫ ТОЧНО СЧИТЕРЕЛИ!", 5000); }, 4000);
+        setTimeout(() => { showDialogue("В СЛЕДУЮЩИЙ РАЗ, КОГДА У СВОЕЙ МАМЫ БУДЕШЬ ПРОСИТЬ КТО НАСТОЯЩИЙ БОСС, СКАЖИ, ЧТО ЭТО ЯЯЯЯ!!", 5000); }, 9000);
+        
+        setTimeout(() => {
+            document.body.style.background = "#fff";
+            document.getElementById('game-box').style.display = 'none';
+            showEndText("Они тут...", 4000, () => {
+                showEndText("Поспеши пожалуйста...", 6000, () => {
+                    showEndText("THE END<br><small>Создано пользователем: @Xn1ckname, спасибо за игру!</small>", 8000, () => {
+                        document.body.innerHTML = "";
+                    });
+                });
+            });
+        }, 14500);
+    }
+
+    function showEndText(txt, time, callback) {
+        const d = document.createElement('div');
+        d.style.position = 'fixed'; d.style.top = '50%'; d.style.left = '50%';
+        d.style.transform = 'translate(-50%, -50%)'; d.style.fontSize = '40px';
+        d.style.textAlign = 'center'; d.innerHTML = txt; d.style.zIndex = '10000';
+        document.body.appendChild(d);
+        setTimeout(() => { d.remove(); if(callback) callback(); }, time);
+    }
+
+    updateUI();
 </script>
 </body>
 </html>
+
