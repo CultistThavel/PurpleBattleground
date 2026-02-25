@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - UI CLEANUP</title>
+    <title>Purple Battleground - REAL GAMEPLAY</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -13,137 +13,95 @@
 
         #game-container { position: relative; width: 100vw; height: 100vh; }
 
-        /* СЕРЫЙ ПОЛ */
+        /* ПОЛ */
         #floor { 
             position: absolute; bottom: 0; width: 100%; height: 40%; 
             background: #60646b; border-top: 12px solid #000; z-index: 10;
         }
 
-        /* ЦЕНТРАЛЬНАЯ ШАПКА */
+        /* ШАПКА */
         .header-center { 
             position: absolute; top: 15px; left: 5%; width: 90%; 
             display: flex; flex-direction: column; align-items: center; z-index: 100; 
         }
-        
         #title-box { 
-            background: #fff; color: #000; padding: 12px 0; 
-            border: 8px solid #000; border-radius: 20px; 
-            font-size: 40px; font-weight: 900; width: 100%; 
-            text-align: center; box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
-            margin-bottom: 10px;
+            background: #fff; border: 8px solid #000; border-radius: 20px; 
+            font-size: 40px; width: 100%; text-align: center; margin-bottom: 10px;
         }
-
         #hp-container { 
             background: #ccff00; border: 8px solid #000; border-radius: 20px; 
             padding: 12px 0; width: 85%; text-align: center;
-            box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
         }
-        #hp-text { 
-            color: #fff; font-size: 28px; font-weight: 900; 
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; 
-        }
+        #hp-text { color: #fff; font-size: 28px; text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; }
 
-        /* UI ПАНЕЛЬ */
-        .left-ui-panel { 
-            position: absolute; bottom: 60%; left: 30px; 
-            display: flex; flex-direction: column; gap: 15px; z-index: 100; 
-        }
-
-        #money-display { 
-            color: #fff; font-size: 40px; font-weight: 900; 
-            text-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 10px;
-        }
-
-        #shop-btn { 
-            width: 120px; height: 120px; background: #fff; 
-            border: 8px solid #000; border-radius: 25px; 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 70px; box-shadow: 8px 8px 0 #000; cursor: pointer;
-        }
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        .left-ui-panel { position: absolute; bottom: 60%; left: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        #money-display { color: #fff; font-size: 40px; text-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 10px; }
+        #shop-btn { width: 120px; height: 120px; background: #fff; border: 8px solid #000; border-radius: 25px; font-size: 70px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         /* ВОЛНА */
-        .wave-ui { 
-            position: absolute; top: 200px; right: 40px; 
-            text-align: right; color: #fff; z-index: 100; 
-        }
-        #wave-big { font-size: 80px; margin: 0; line-height: 0.8; font-weight: 900; -webkit-text-stroke: 3px #000; }
-        #enemies-count { font-size: 24px; font-weight: 900; margin-top: 5px; text-shadow: 3px 3px 0 #000; }
+        .wave-ui { position: absolute; top: 200px; right: 40px; text-align: right; color: #fff; z-index: 100; }
+        #wave-big { font-size: 80px; margin: 0; -webkit-text-stroke: 3px #000; }
+        #enemies-count { font-size: 24px; text-shadow: 3px 3px 0 #000; }
 
-        /* ГЛАВНЫЙ ЗАЯЦ - В САМЫЙ УГОЛ */
-        #main-hare { 
-            position: absolute; bottom: 20%; left: 0px; 
-            width: 600px; z-index: 50; pointer-events: none;
-        }
-
-        /* ВЕРТО-ЗАЯЦ - В УГОЛ, НЕМНОГО НИЖЕ ГЕРОЯ */
-        #heli-hare {
-            position: absolute; bottom: 12%; left: 20px;
-            width: 350px; z-index: 60; display: none;
-        }
+        /* ЗАЙЦЫ */
+        #main-hare { position: absolute; bottom: 20%; left: 0px; width: 600px; z-index: 50; transition: transform 0.1s; }
+        #heli-hare { position: absolute; bottom: 12%; left: 20px; width: 350px; z-index: 60; display: none; }
 
         /* КНОПКА СТАРТА */
         #start-btn-ui { 
             position: absolute; bottom: 240px; right: 60px; 
             background: #ccff00; color: #fff; padding: 30px 60px; 
             border: 8px solid #fff; border-radius: 40px; 
-            font-size: 40px; font-weight: 900; 
-            text-shadow: 3px 3px 0 #000; box-shadow: 0 15px 0 #779900;
-            z-index: 100;
+            font-size: 40px; text-shadow: 3px 3px 0 #000; z-index: 100; cursor: pointer;
         }
 
-        /* --- МАГАЗИН БЕЗ ГОРБА --- */
-        #shop-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 1000; display: none;
-            justify-content: center; align-items: center;
-        }
-
-        #shop-window {
-            width: 85%; max-height: 70%; background: #fff; border: 10px solid #000;
-            position: relative; display: flex; padding: 30px; gap: 30px;
-        }
-
+        /* МАГАЗИН */
+        #shop-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: center; }
+        #shop-window { width: 85%; max-height: 70%; background: #fff; border: 10px solid #000; position: relative; display: flex; padding: 30px; gap: 30px; }
         .shop-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
-
-        .red-frame {
-            width: 100%; height: 200px; border: 8px solid #ff0000;
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 15px; background: #f0f0f0;
-        }
-
-        .red-frame img { max-width: 90%; max-height: 90%; }
-
-        .item-title { color: #000; font-size: 32px; font-weight: 900; margin: 0; }
-        .item-desc { color: #888; font-size: 16px; font-weight: 900; margin: 5px 0; line-height: 1.1; }
+        .red-frame { width: 100%; height: 200px; border: 8px solid #ff0000; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+        .red-frame img { max-width: 90%; }
         .item-price { color: #000; font-size: 24px; font-weight: 900; margin: 10px 0; }
+        .btn-buy { background: #00ff00; border: 4px solid #000; padding: 10px 30px; color: #fff; font-size: 22px; cursor: pointer; }
+        #close-shop { position: absolute; top: -25px; right: -25px; width: 60px; height: 60px; background: #ff0000; border: 5px solid #000; border-radius: 50%; color: #fff; font-size: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
-        .btn-buy {
-            background: #00ff00; border: 4px solid #000; padding: 10px 30px;
-            border-radius: 10px; color: #fff; font-size: 22px; font-weight: 900;
-            text-shadow: 2px 2px 0 #000; cursor: pointer;
-        }
+        /* ЗОМБИ */
+        .zombie { position: absolute; bottom: 20%; right: -200px; width: 350px; z-index: 40; transition: right 0.05s linear; }
 
-        #close-shop {
-            position: absolute; top: -25px; right: -25px; width: 60px; height: 60px;
-            background: #ff0000; border: 5px solid #000; border-radius: 50%;
-            color: #fff; font-size: 30px; font-weight: 900; cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
+        /* УВЕДОМЛЕНИЕ ОБ УЛУЧШЕНИИ */
+        #upgrade-popup {
+            position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+            color: rgba(255, 0, 0, 0.6); font-size: 40px; font-weight: 900;
+            -webkit-text-stroke: 1.5px #fff; z-index: 2000; display: none;
+            animation: fadeUp 1.5s forwards;
         }
+        @keyframes fadeUp { 0% { opacity: 1; transform: translate(-50%, -50%); } 100% { opacity: 0; transform: translate(-50%, -150%); } }
+
+        /* ПОРАЖЕНИЕ */
+        #lose-screen {
+            position: fixed; bottom: -500px; left: 50%; transform: translateX(-50%);
+            width: 600px; background: #333; border: 8px solid #000; padding: 40px;
+            z-index: 3000; text-align: center; transition: bottom 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #lose-screen h2 { color: #fff; font-size: 50px; margin: 0; }
+        #lose-screen p { color: #ccc; font-size: 24px; margin: 20px 0; }
+        #btn-lan { background: #00ff00; color: #fff; padding: 15px 50px; border: 4px solid #000; font-size: 30px; cursor: pointer; }
     </style>
 </head>
-<body>
+<body onclick="shoot()">
 
 <div id="game-container">
+    <div id="upgrade-popup">УЛУЧШЕНО — +30 Урона</div>
+
     <div class="header-center">
         <div id="title-box">Purple Battleground</div>
-        <div id="hp-container">
-            <span id="hp-text">Ваша Шкала ХП: 350</span>
-        </div>
+        <div id="hp-container"><span id="hp-text">Ваша Шкала ХП: 350</span></div>
     </div>
 
     <div class="left-ui-panel">
         <div id="money-display">🪙 Purple Money: <span id="m-val">0</span></div>
-        <div id="shop-btn" onclick="openShop()">🛍️</div>
+        <div id="shop-btn" onclick="event.stopPropagation(); openShop()">🛍️</div>
     </div>
 
     <div class="wave-ui">
@@ -155,42 +113,128 @@
     <img id="heli-hare" src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1">
 
     <div id="floor"></div>
-
-    <div id="start-btn-ui">Начать Перестрелку</div>
+    <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
 </div>
 
 <div id="shop-overlay">
     <div id="shop-window">
         <div id="close-shop" onclick="closeShop()">X</div>
-        
         <div class="shop-item">
-            <div class="red-frame">
-                <img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1">
-            </div>
-            <h2 class="item-title">Верто-Заяц</h2>
-            <p class="item-desc">Ваш личный помощник, который всегда будет отбиваться от врагов вместе с вами!</p>
+            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1"></div>
+            <h2 style="font-size:32px; color:#000;">Верто-Заяц</h2>
+            <p style="color:#888; font-size:16px;">Ваш личный помощник!</p>
             <div class="item-price">1800 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
-
         <div class="shop-item">
-            <div class="red-frame">
-                <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
-            </div>
-            <h2 class="item-title">Снаряды</h2>
-            <p class="item-desc">250 Монет = +30 Урона для вашего оружия</p>
+            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1"></div>
+            <h2 style="font-size:32px; color:#000;">Снаряды</h2>
+            <p style="color:#888; font-size:16px;">+30 Урона</p>
             <div class="item-price">250 Монет</div>
-            <button class="btn-buy">Приобрести</button>
+            <button class="btn-buy" onclick="buyAmmo()">Приобрести</button>
         </div>
     </div>
 </div>
 
+<div id="lose-screen">
+    <h2>Поражение</h2>
+    <p>Молодец, надо было стараться.</p>
+    <button id="btn-lan" onclick="location.reload()">Лан.</button>
+</div>
+
 <script>
+    let money = 0;
+    let hp = 350;
+    let damage = 50;
+    let enemiesLeft = 10;
+    let wave = 1;
+    let isGameActive = false;
+    let hasHeli = false;
+
     function openShop() { document.getElementById('shop-overlay').style.display = 'flex'; }
     function closeShop() { document.getElementById('shop-overlay').style.display = 'none'; }
+
+    function updateUI() {
+        document.getElementById('m-val').innerText = money;
+        document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + hp;
+        document.getElementById('enemies-count').innerText = "Осталось Врагов: " + enemiesLeft;
+    }
+
+    function buyAmmo() {
+        if (money >= 250) {
+            money -= 250;
+            damage += 30;
+            updateUI();
+            let pop = document.getElementById('upgrade-popup');
+            pop.style.display = 'block';
+            setTimeout(() => pop.style.display = 'none', 1500);
+            closeShop();
+        }
+    }
+
     function buyHeli() {
-        document.getElementById('heli-hare').style.display = 'block';
-        closeShop();
+        if (money >= 1800 && !hasHeli) {
+            money -= 1800;
+            hasHeli = true;
+            document.getElementById('heli-hare').style.display = 'block';
+            updateUI();
+            closeShop();
+        }
+    }
+
+    function startBattle() {
+        if (isGameActive) return;
+        isGameActive = true;
+        document.getElementById('start-btn-ui').style.display = 'none';
+        spawnZombie();
+    }
+
+    function spawnZombie() {
+        if (!isGameActive) return;
+        let z = document.createElement('img');
+        z.src = "https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1"; // Тут твой айди зомби
+        z.className = 'zombie';
+        z.dataset.hp = 100;
+        document.getElementById('game-container').appendChild(z);
+        
+        let pos = -200;
+        let moveInt = setInterval(() => {
+            if (!isGameActive) { clearInterval(moveInt); return; }
+            pos += 5;
+            z.style.right = pos + 'px';
+            
+            if (window.innerWidth - pos < 500) {
+                hp -= 10;
+                updateUI();
+                if (hp <= 0) gameOver();
+            }
+        }, 50);
+
+        z.onclick = (e) => {
+            e.stopPropagation();
+            z.dataset.hp -= damage;
+            if (z.dataset.hp <= 0) {
+                z.remove();
+                clearInterval(moveInt);
+                money += 85;
+                enemiesLeft--;
+                updateUI();
+                if (enemiesLeft > 0) spawnZombie();
+                else { wave++; enemiesLeft = 10; document.getElementById('wave-big').innerText = wave + " Волна"; spawnZombie(); }
+            }
+        };
+    }
+
+    function shoot() {
+        if (!isGameActive) return;
+        let main = document.getElementById('main-hare');
+        main.style.transform = "scale(1.05)";
+        setTimeout(() => main.style.transform = "scale(1)", 50);
+    }
+
+    function gameOver() {
+        isGameActive = false;
+        document.getElementById('lose-screen').style.bottom = "50%";
     }
 </script>
 
