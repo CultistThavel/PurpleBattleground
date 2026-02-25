@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - SORCERER UPDATE</title>
+    <title>Purple Battleground - SORCERER UPDATE FIXED</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -24,7 +24,7 @@
 
         .left-ui-panel { position: absolute; top: 150px; left: 30px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
         #money-display { color: #fff; font-size: 45px; text-shadow: 4px 4px 0 #000; }
-        #shop-btn { width: 180px; height: 180px; background: #fff; border: 10px solid #000; border-radius: 35px; font-size: 110px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 10px 10px 0 #000; transition: 0.3s; }
+        #shop-btn { width: 180px; height: 180px; background: #fff; border: 10px solid #000; border-radius: 35px; font-size: 110px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 10px 10px 0 #000; transition: 0.3s; -webkit-tap-highlight-color: transparent; }
         #shop-btn.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
         .wave-ui { position: absolute; top: 200px; right: 40px; text-align: right; color: #fff; z-index: 100; }
@@ -56,12 +56,10 @@
         }
         .admin-btn { width: 100%; padding: 18px; margin: 12px 0; background: none; border: 3px solid #00ff00; color: #fff; font-size: 22px; cursor: pointer; }
 
-        /* ОБНОВЛЕННЫЙ SORCERER КНОПКА */
         #sorcerer-toggle-btn { display: flex; align-items: center; gap: 15px; cursor: pointer; background: #333; padding: 10px; border: 2px solid yellow; margin-top: 10px; }
         .yellow-text { color: yellow; font-size: 24px; animation: glow 1s infinite alternate; }
         @keyframes glow { from { text-shadow: 0 0 5px yellow; } to { text-shadow: 0 0 20px yellow; } }
 
-        /* ЧЕРНОЕ ОКНО ОШИБКИ */
         #error-window {
             position: fixed; right: -500px; top: 30%; width: 350px; background: #000; 
             border: 4px solid #fff; padding: 20px; z-index: 20000; transition: right 0.5s ease-in-out;
@@ -69,7 +67,6 @@
         #error-window.active { right: 20px; }
         .error-btn { background: #fff; color: #000; border: none; padding: 10px 30px; font-weight: 900; cursor: pointer; margin-top: 15px; }
 
-        /* СПОСОБНОСТИ КУБЫ */
         #ability-container {
             position: absolute; bottom: -200px; left: 400px; display: flex; gap: 20px; 
             z-index: 100; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -84,7 +81,6 @@
             background: rgba(255, 0, 0, 0.5); transition: none;
         }
 
-        /* ЭФФЕКТЫ */
         #red-screen { position: fixed; inset: 0; background: rgba(255,0,0,0.3); z-index: 500; display: none; pointer-events: none; }
         .ability-asset { position: absolute; z-index: 55; pointer-events: none; transition: transform 0.5s, width 0.5s; }
         #smoke-asset { position: absolute; bottom: 25%; left: 50px; width: 400px; z-index: 49; display: none; opacity: 0.8; }
@@ -126,7 +122,10 @@
 
     <div class="left-ui-panel">
         <div id="money-display">🪙 Purple Money: <span id="m-val">0</span></div>
-        <div id="shop-btn" onmousedown="startAdminTimer()" onmouseup="clearAdminTimer()" onclick="event.stopPropagation(); openShop()">🛍️</div>
+        <div id="shop-btn" 
+             onmousedown="startAdminTimer()" onmouseup="clearAdminTimer()" onmouseleave="clearAdminTimer()"
+             ontouchstart="startAdminTimer()" ontouchend="clearAdminTimer()"
+             onclick="event.stopPropagation(); openShop()">🛍️</div>
     </div>
 
     <div class="wave-ui">
@@ -197,8 +196,25 @@
     let enemiesSpawnedInWave = 0;
     let infMoney = false;
     let isSorcerer = false;
-    let adminTimer;
+    let adminTimer = null;
     let abilitiesCD = { red: false, blue: false, smoke: false };
+
+    // --- ЛОГИКА ТАЙМЕРА АДМИНКИ ---
+    function startAdminTimer() {
+        if (adminTimer) return;
+        adminTimer = setTimeout(() => {
+            document.getElementById("admin-trigger").style.display = 'flex';
+            showFloatMsg("ПАНЕЛЬ АКТИВИРОВАНА.", "blue", true);
+            adminTimer = null;
+        }, 5000);
+    }
+
+    function clearAdminTimer() {
+        if (adminTimer) {
+            clearTimeout(adminTimer);
+            adminTimer = null;
+        }
+    }
 
     // --- ЛОГИКА ПЕРЕМЕЩЕНИЯ АДМИН-ПАНЕЛИ ---
     const dragElement = document.getElementById("admin-trigger");
@@ -234,13 +250,11 @@
         if(Math.abs(pos1) < 2 && Math.abs(pos2) < 2) document.getElementById('admin-menu').style.display = 'flex';
     };
 
-    // --- ОБНОВЛЕННЫЙ SORCERER МОД ---
     function triggerSkinChange() {
         closeAdmin();
         const win = document.getElementById('error-window');
         const txt = document.getElementById('error-text');
         const btn = document.getElementById('error-confirm-btn');
-        
         if(!isSorcerer) {
             txt.innerText = "Ошибка: Хотите ли Вы поменять своего персонажа?";
             btn.innerText = "Ресет";
@@ -259,7 +273,6 @@
         const mainHare = document.getElementById('main-hare');
         const sorcText = document.getElementById('sorc-text');
         const sorcIcon = document.getElementById('sorc-icon');
-        
         if(toSorcerer) {
             mainHare.src = "https://www.dropbox.com/scl/fi/y4osxbudupe0wnhweeaf9/Picsart_26-02-25_22-08-16-343.png?rlkey=kb5bal51fdx58x3ji1jakaf5&st=i1x9ioj5&dl=1";
             sorcText.innerText = "Purple Hare";
@@ -273,77 +286,52 @@
         }
     }
 
-    // --- МАГИЯ СПОСОБНОСТЕЙ ---
     function castAbility(type) {
         if(abilitiesCD[type]) return;
         abilitiesCD[type] = true;
         startCD(type);
-
         if(type === 'red') {
             const ball = document.getElementById('red-ball-asset');
             document.getElementById('red-screen').style.display = 'block';
             ball.style.display = 'block';
             ball.style.left = '250px'; ball.style.bottom = '40%';
-            
             setTimeout(() => {
-                let pos = 250;
-                let rot = 0;
+                let pos = 250; let rot = 0;
                 let moveInt = setInterval(() => {
                     pos += 40; rot += 20;
                     ball.style.left = pos + 'px';
                     ball.style.transform = `rotate(${rot}deg)`;
-                    
                     document.querySelectorAll('.zombie-container').forEach(z => {
                         let zRect = z.getBoundingClientRect(), bRect = ball.getBoundingClientRect();
-                        if(bRect.right > zRect.left) {
-                            z.dataset.hp = -9999999;
-                            killEnemy(z);
-                        }
+                        if(bRect.right > zRect.left) { z.dataset.hp = -9999999; killEnemy(z); }
                     });
-                    if(pos > window.innerWidth) { 
-                        clearInterval(moveInt); ball.style.display = 'none'; 
-                        document.getElementById('red-screen').style.display = 'none';
-                    }
+                    if(pos > window.innerWidth) { clearInterval(moveInt); ball.style.display = 'none'; document.getElementById('red-screen').style.display = 'none'; }
                 }, 20);
             }, 2000);
         }
-
         if(type === 'blue') {
             const hare = document.getElementById('main-hare');
             const ball = document.getElementById('blue-ball-asset');
             hare.style.bottom = '45%';
             setTimeout(() => { hare.style.bottom = '25%'; }, 400);
-
-            ball.style.display = 'block';
-            ball.style.width = '50px';
+            ball.style.display = 'block'; ball.style.width = '50px';
             ball.style.left = '350px'; ball.style.bottom = '35%';
-            
             let size = 50;
-            let growInt = setInterval(() => {
-                size += 2; ball.style.width = size + 'px';
-                if(size >= 250) clearInterval(growInt);
-            }, 40);
-
+            let growInt = setInterval(() => { size += 2; ball.style.width = size + 'px'; if(size >= 250) clearInterval(growInt); }, 40);
             setTimeout(() => {
                 let pos = 350;
                 let moveInt = setInterval(() => {
                     pos += 15; ball.style.left = pos + 'px';
                     ball.style.transform = `rotate(${Date.now()/5 % 360}deg)`;
-                    
                     document.querySelectorAll('.zombie-container').forEach(z => {
                         let dist = Math.abs(z.offsetLeft - ball.offsetLeft);
-                        if(dist < 300) {
-                            z.style.right = (parseInt(z.style.right) - 10) + 'px'; // Засасывание
-                            z.dataset.hp -= 45; // 1500 в сек (примерно 45 за кадр)
-                            updateEnemyHP(z);
-                        }
+                        if(dist < 300) { z.style.right = (parseInt(z.style.right) - 10) + 'px'; z.dataset.hp -= 45; updateEnemyHP(z); }
                     });
                     if(pos > window.innerWidth - 400) clearInterval(moveInt);
                 }, 30);
                 setTimeout(() => { ball.style.display = 'none'; }, 15000);
             }, 5000);
         }
-
         if(type === 'smoke') {
             const smoke = document.getElementById('smoke-asset');
             smoke.style.display = 'block';
@@ -354,11 +342,7 @@
                     if(dist < 100) z.dataset.speedMult = 0;
                 });
             }, 100);
-            setTimeout(() => { 
-                clearInterval(smokeTimer); 
-                smoke.style.display = 'none';
-                document.querySelectorAll('.zombie-container').forEach(z => z.dataset.speedMult = 1);
-            }, 12000);
+            setTimeout(() => { clearInterval(smokeTimer); smoke.style.display = 'none'; document.querySelectorAll('.zombie-container').forEach(z => z.dataset.speedMult = 1); }, 12000);
         }
     }
 
@@ -371,57 +355,37 @@
             let passed = Date.now() - start;
             let progress = 100 - (passed / duration * 100);
             overlay.style.height = progress + '%';
-            if(passed >= duration) {
-                clearInterval(anim);
-                abilitiesCD[type] = false;
-                overlay.style.height = '0%';
-            }
+            if(passed >= duration) { clearInterval(anim); abilitiesCD[type] = false; overlay.style.height = '0%'; }
         }, 50);
     }
 
-    // --- ИГРОВАЯ ЛОГИКА (БАЗА) ---
     function spawnEnemy() {
         let container = document.createElement('div');
         container.className = 'zombie-container';
         let hpMax = 55, dmg = 35, time = 6;
         let img = "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=j2fo8ed0&dl=1";
-
         if (wave >= 48) { hpMax = 4585; dmg = 678; time = 4; }
         else if (wave >= 35) { hpMax = 2590; dmg = 550; time = 2.99; }
         else if (wave >= 20) { hpMax = 1590; dmg = 250; time = 3; }
         else if (wave >= 10) { hpMax = 550; dmg = 150; time = 4; }
         else if (wave >= 5) { hpMax = 350; dmg = 75; time = 5; }
-
         container.innerHTML = `<div class="zombie-hp-bar"><div class="zombie-hp-text">${hpMax} ХП</div><div class="zombie-hp-fill"></div></div><img class="zombie-img" src="${img}">`;
         container.dataset.hp = hpMax; container.dataset.maxHp = hpMax; container.dataset.speedMult = 1;
         document.getElementById('game-container').appendChild(container);
-        
         let distance = window.innerWidth + 350 - 450; 
         let baseSpeed = distance / (time * 60);
-
         let pos = -350;
         let moveInt = setInterval(() => {
             if (!isGameActive) { clearInterval(moveInt); return; }
             pos += baseSpeed * parseFloat(container.dataset.speedMult);
             container.style.right = pos + 'px';
-            if (window.innerWidth - pos < 400) {
-                hp -= dmg; updateUI(); container.remove(); clearInterval(moveInt);
-                enemyDefeated(); if (hp <= 0) gameOver();
-            }
+            if (window.innerWidth - pos < 400) { hp -= dmg; updateUI(); container.remove(); clearInterval(moveInt); enemyDefeated(); if (hp <= 0) gameOver(); }
         }, 16.6);
         container.dataset.moveInt = moveInt;
     }
 
-    function killEnemy(z) {
-        clearInterval(z.dataset.moveInt); z.remove(); 
-        if(!infMoney) money += 85; enemyDefeated();
-    }
-
-    function updateEnemyHP(z) {
-        if(z.dataset.hp <= 0) { killEnemy(z); return; }
-        z.querySelector('.zombie-hp-fill').style.width = (z.dataset.hp / z.dataset.maxHp) * 100 + "%";
-        z.querySelector('.zombie-hp-text').innerText = Math.max(0, Math.floor(z.dataset.hp)) + " ХП";
-    }
+    function killEnemy(z) { clearInterval(z.dataset.moveInt); z.remove(); if(!infMoney) money += 85; enemyDefeated(); }
+    function updateEnemyHP(z) { if(z.dataset.hp <= 0) { killEnemy(z); return; } z.querySelector('.zombie-hp-fill').style.width = (z.dataset.hp / z.dataset.maxHp) * 100 + "%"; z.querySelector('.zombie-hp-text').innerText = Math.max(0, Math.floor(z.dataset.hp)) + " ХП"; }
 
     function shoot(e, type) {
         if (!isGameActive) return;
@@ -438,35 +402,14 @@
             bPos += 25; b.style.left = bPos + 'px';
             document.querySelectorAll('.zombie-container').forEach(z => {
                 let zRect = z.getBoundingClientRect(), bRect = b.getBoundingClientRect();
-                if (bRect.right > zRect.left && bRect.left < zRect.right && bRect.top < zRect.bottom && bRect.bottom > zRect.top) {
-                    z.dataset.hp -= currentDmg; updateEnemyHP(z); b.remove(); clearInterval(bInt);
-                }
+                if (bRect.right > zRect.left && bRect.left < zRect.right && bRect.top < zRect.bottom && bRect.bottom > zRect.top) { z.dataset.hp -= currentDmg; updateEnemyHP(z); b.remove(); clearInterval(bInt); }
             });
             if (bPos > window.innerWidth) { b.remove(); clearInterval(bInt); }
         }, 20);
     }
 
-    function startBattle() {
-        if (isGameActive) return;
-        isGameActive = true; enemiesSpawnedInWave = 0; enemiesLeft = 10;
-        document.getElementById('start-btn-ui').style.display = 'none';
-        if(isSorcerer) document.getElementById('ability-container').style.bottom = '40px';
-        updateUI(); spawnSequence();
-    }
-
-    function enemyDefeated() {
-        enemiesLeft--; updateUI();
-        if (enemiesLeft <= 0) {
-            isGameActive = false; wave++;
-            document.getElementById('wave-big').innerText = wave + " Волна";
-            document.getElementById('start-btn-ui').style.display = 'block';
-            document.getElementById('ability-container').style.bottom = '-200px';
-            updateUI();
-        }
-    }
-
-    function startAdminTimer() { adminTimer = setTimeout(() => { dragElement.style.display = 'flex'; showFloatMsg("ПАНЕЛЬ АКТИВИРОВАНА.", "blue", true); }, 5000); }
-    function clearAdminTimer() { clearTimeout(adminTimer); }
+    function startBattle() { if (isGameActive) return; isGameActive = true; enemiesSpawnedInWave = 0; enemiesLeft = 10; document.getElementById('start-btn-ui').style.display = 'none'; if(isSorcerer) document.getElementById('ability-container').style.bottom = '40px'; updateUI(); spawnSequence(); }
+    function enemyDefeated() { enemiesLeft--; updateUI(); if (enemiesLeft <= 0) { isGameActive = false; wave++; document.getElementById('wave-big').innerText = wave + " Волна"; document.getElementById('start-btn-ui').style.display = 'block'; document.getElementById('ability-container').style.bottom = '-200px'; updateUI(); } }
     function closeAdmin() { document.getElementById('admin-menu').style.display = 'none'; }
     function toggleInfMoney() { infMoney = !infMoney; money = infMoney ? 9999999 : 0; updateUI(); }
     function adminSkipWave() { document.querySelectorAll('.zombie-container').forEach(z => { clearInterval(z.dataset.moveInt); z.remove(); }); enemiesLeft = 0; enemyDefeated(); closeAdmin(); }
