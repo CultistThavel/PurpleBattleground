@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - UI ONLY</title>
+    <title>Purple Battleground - BIG UI</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -11,71 +11,72 @@
             font-family: 'Arial Black', sans-serif; user-select: none; 
         }
 
-        /* ЗАДНИЙ ФОН И ПОЛ */
-        #game-container { position: relative; width: 100vw; height: 100vh; background: #3d4147; }
-        
-        /* СЕРЫЙ ПОЛ - Высокий, почти до середины */
+        #game-container { position: relative; width: 100vw; height: 100vh; }
+
+        /* СЕРЫЙ ПОЛ - Высокий и четкий */
         #floor { 
-            position: absolute; bottom: 0; width: 100%; height: 40%; 
-            background: #60646b; border-top: 10px solid #000; z-index: 10;
+            position: absolute; bottom: 0; width: 100%; height: 42%; 
+            background: #60646b; border-top: 12px solid #000; z-index: 10;
         }
 
-        /* 1. ВЕРХНИЙ БЛОК (ШАПКА) */
-        .header-ui { position: absolute; top: 25px; left: 25px; z-index: 100; }
+        /* ЛЕВЫЙ ВЕРХНИЙ УГОЛ - ГИГАНТСКИЙ */
+        .header-ui { position: absolute; top: 30px; left: 30px; z-index: 100; width: 60%; }
         
         #title-box { 
-            background: #fff; color: #000; padding: 12px 30px; 
-            border: 6px solid #000; border-radius: 18px; 
-            font-size: 32px; font-weight: 900; display: inline-block;
-            margin-bottom: 15px; box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+            background: #fff; color: #000; padding: 15px 50px; 
+            border: 8px solid #000; border-radius: 20px; 
+            font-size: 45px; font-weight: 900; display: inline-block;
+            margin-bottom: 20px; box-shadow: 8px 8px 0 rgba(0,0,0,0.4);
         }
 
         #hp-container { 
-            background: #ccff00; border: 5px solid #000; border-radius: 15px; 
-            padding: 10px 25px; width: fit-content; box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+            background: #ccff00; border: 8px solid #000; border-radius: 20px; 
+            padding: 20px 40px; width: 90%; max-width: 800px;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.4);
         }
         #hp-text { 
-            color: #fff; font-size: 26px; font-weight: 900; 
-            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; 
+            color: #fff; font-size: 40px; font-weight: 900; 
+            text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000; 
+            white-space: nowrap;
         }
 
-        /* 2. ПРАВЫЙ ВЕРХНИЙ УГОЛ (ВОЛНА) */
-        .wave-ui { position: absolute; top: 20px; right: 35px; text-align: right; color: #fff; z-index: 100; }
-        #wave-big { font-size: 100px; margin: 0; line-height: 0.8; font-weight: 900; -webkit-text-stroke: 4px #000; }
-        #wave-sub { font-size: 28px; margin: 0; font-weight: bold; }
+        /* ПРАВЫЙ ВЕРХНИЙ УГОЛ (ВОЛНА) */
+        .wave-ui { position: absolute; top: 25px; right: 40px; text-align: right; color: #fff; z-index: 100; }
+        #wave-big { font-size: 130px; margin: 0; line-height: 0.8; font-weight: 900; -webkit-text-stroke: 5px #000; }
+        #wave-sub { font-size: 35px; margin: 0; font-weight: bold; }
 
-        /* 3. ЛЕВАЯ ПАНЕЛЬ (МАГАЗИН И МОНЕТЫ) */
-        .sidebar-ui { position: absolute; bottom: 45%; left: 25px; display: flex; flex-direction: column; gap: 40px; z-index: 100; }
+        /* ПАНЕЛЬ УПРАВЛЕНИЯ - ВЫШЕ ПОЛА */
+        .sidebar-ui { position: absolute; bottom: 45%; left: 40px; display: flex; flex-direction: column; gap: 30px; z-index: 100; }
 
-        /* ИКОНКА МАГАЗИНА (Выше монет) */
-        #shop-icon-box { 
-            width: 150px; height: 150px; background: #fff; 
-            border: 8px solid #000; border-radius: 25px; 
+        /* ДЕНЬГИ ВЫШЕ МАГАЗИНА - БЕЛЫЙ ТЕКСТ */
+        #money-display { 
+            color: #fff; font-size: 55px; font-weight: 900; 
+            text-shadow: 4px 4px 0 #000; margin-bottom: 10px;
+        }
+
+        /* МАГАЗИН В ВИДЕ ЭМОДЗИ */
+        #shop-btn { 
+            width: 180px; height: 180px; background: #fff; 
+            border: 10px solid #000; border-radius: 30px; 
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 10px 10px 0 #000;
+            font-size: 100px; box-shadow: 12px 12px 0 #000;
+            cursor: pointer;
         }
-        .house-svg { width: 100px; height: 80px; border: 10px solid #000; border-top: none; position: relative; }
-        .house-svg::after { content: ''; position: absolute; top: -45px; left: -15px; width: 110px; height: 45px; border-top: 10px solid #000; border-left: 10px solid #000; transform: skewY(-15deg); }
 
-        /* ПАНЕЛЬ МОНЕТ (Над полом в 2 раза выше) */
-        .money-box { display: flex; align-items: center; gap: 20px; }
-        .coin-circle { width: 110px; height: 110px; background: #fff; border: 8px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 70px; font-weight: 900; box-shadow: 6px 6px 0 #000; }
-        #money-display { background: #a200ff; color: #fff; padding: 20px 40px; border: 7px solid #000; border-radius: 25px; font-size: 32px; font-weight: 900; box-shadow: 10px 10px 0 #000; min-width: 300px; }
-
-        /* 4. ЗАЯЦ (СТОИТ НА ПОЛУ) */
+        /* ГИГАНТСКИЙ ЗАЯЦ - ВЫСОКО НА ПОЛУ */
         #main-hare { 
-            position: absolute; bottom: 25%; left: 80px; 
-            width: 380px; z-index: 50; pointer-events: none;
+            position: absolute; bottom: 30%; left: 100px; 
+            width: 550px; z-index: 50; pointer-events: none;
         }
 
-        /* 5. КНОПКА СТАРТА (СПРАВА ВНИЗУ НА ПОЛЕ) */
+        /* КНОПКА СТАРТА - ОГРОМНАЯ В УГЛУ */
         #start-btn-ui { 
-            position: absolute; bottom: 40px; right: 40px; 
-            background: #ccff00; color: #fff; padding: 40px 90px; 
-            border: 12px solid #fff; border-radius: 50px; 
-            font-size: 55px; font-weight: 900; 
-            text-shadow: 4px 4px 0 #000; box-shadow: 0 20px 0 #779900;
-            z-index: 100; cursor: default;
+            position: absolute; bottom: 50px; right: 50px; 
+            background: #ccff00; color: #fff; padding: 50px 110px; 
+            border: 15px solid #fff; border-radius: 60px; 
+            font-size: 65px; font-weight: 900; 
+            text-shadow: 5px 5px 0 #000; box-shadow: 0 25px 0 #779900;
+            z-index: 100;
         }
     </style>
 </head>
@@ -95,13 +96,8 @@
     </div>
 
     <div class="sidebar-ui">
-        <div id="shop-icon-box">
-            <div class="house-svg"></div>
-        </div>
-        <div class="money-box">
-            <div class="coin-circle">$</div>
-            <div id="money-display">Purple Money: 0</div>
-        </div>
+        <div id="money-display">Purple Money: 0</div>
+        <div id="shop-btn">🏠</div>
     </div>
 
     <img id="main-hare" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
