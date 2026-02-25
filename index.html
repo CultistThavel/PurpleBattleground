@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - GUEST UPDATE</title>
+    <title>Purple Battleground - ADMIN EDITION</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -15,6 +15,7 @@
         #game-container { position: relative; width: 100vw; height: 100vh; cursor: crosshair; }
         #floor { position: absolute; bottom: 0; width: 100%; height: 40%; background: #60646b; border-top: 12px solid #000; z-index: 10; }
 
+        /* ИНТЕРФЕЙС */
         .header-center { position: absolute; top: 15px; left: 5%; width: 90%; display: flex; flex-direction: column; align-items: center; z-index: 100; }
         #title-box { background: #fff; border: 8px solid #000; border-radius: 20px; font-size: 40px; width: 100%; text-align: center; margin-bottom: 10px; }
         
@@ -27,38 +28,80 @@
         #shop-btn { width: 180px; height: 180px; background: #fff; border: 10px solid #000; border-radius: 35px; font-size: 110px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 10px 10px 0 #000; transition: 0.3s; }
         #shop-btn.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 
-        .wave-ui { position: absolute; top: 200px; right: 40px; text-align: right; color: #fff; z-index: 100; }
-        #wave-big { font-size: 80px; margin: 0; -webkit-text-stroke: 3px #000; }
-        #enemies-count { font-size: 24px; text-shadow: 3px 3px 0 #000; }
+        /* АНИМАЦИИ ТЕКСТА */
+        .floating-text {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 50px; font-weight: 900; z-index: 5000; pointer-events: none;
+            animation: textPop 1.5s forwards; display: none; text-align: center;
+        }
+        @keyframes textPop {
+            0% { opacity: 0; scale: 0.5; transform: translate(-50%, 0); }
+            20% { opacity: 1; scale: 1.2; }
+            100% { opacity: 0; transform: translate(-50%, -200px); }
+        }
 
-        #main-hare { position: absolute; bottom: 25%; left: -50px; width: 500px; z-index: 50; }
-        #heli-hare { position: absolute; bottom: 15%; left: 20px; width: 350px; z-index: 60; display: none; }
-
+        /* ВРАГИ */
         .zombie-container { position: absolute; bottom: 25%; right: -300px; width: 350px; z-index: 45; display: flex; flex-direction: column; align-items: center; }
         .zombie-img { width: 100%; }
         .zombie-hp-bar { width: 90%; height: 25px; background: red; border: 4px solid #000; position: relative; margin-bottom: 5px; }
         .zombie-hp-fill { height: 100%; background: #00ff00; width: 100%; }
         .zombie-hp-text { position: absolute; width: 100%; text-align: center; top: -20px; color: #fff; font-size: 24px; font-weight: 900; -webkit-text-stroke: 1.5px #000; }
 
-        .bullet { position: absolute; z-index: 48; width: 120px; pointer-events: none; }
-        #start-btn-ui { position: absolute; bottom: 240px; right: 60px; background: #ccff00; color: #fff; padding: 35px 70px; border: 8px solid #fff; border-radius: 45px; font-size: 45px; text-shadow: 3px 3px 0 #000; z-index: 100; cursor: pointer; }
+        /* АДМИН ПАНЕЛЬ */
+        #admin-trigger {
+            position: fixed; top: 20px; right: 20px; width: 60px; height: 60px;
+            background: rgba(0,0,0,0.5); border: 3px solid #fff; color: #fff;
+            display: none; align-items: center; justify-content: center;
+            font-size: 10px; cursor: move; z-index: 9999; text-align: center;
+        }
 
+        #admin-menu {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 400px; background: rgba(0,0,0,0.9); border: 5px solid #fff;
+            padding: 20px; display: none; flex-direction: column; align-items: center; z-index: 10000;
+            border-radius: 20px; transition: 0.3s;
+        }
+
+        .admin-btn {
+            width: 100%; padding: 15px; margin: 10px 0; background: transparent;
+            border: 3px solid #00ff00; color: #fff; font-size: 20px; cursor: pointer;
+        }
+
+        #close-admin {
+            position: absolute; top: 10px; left: 10px; width: 40px; height: 40px;
+            background: red; border: 2px solid #fff; border-radius: 50%; color: #fff;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+
+        .sorcerer-btn {
+            width: 100%; height: 60px; background: #444; display: flex; align-items: center;
+            padding: 5px; gap: 10px; border-radius: 10px; margin-top: 10px;
+        }
+        .sorcerer-text {
+            color: yellow; font-size: 24px; animation: glow 1s infinite alternate;
+        }
+        @keyframes glow { from { text-shadow: 0 0 5px yellow; } to { text-shadow: 0 0 20px yellow; } }
+
+        /* МАГАЗИН */
         #shop-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; justify-content: center; align-items: center; }
-        #shop-window { width: 90%; max-height: 80%; background: #fff; border: 12px solid #000; position: relative; display: flex; padding: 40px; gap: 40px; }
+        #shop-window { width: 90%; background: #fff; border: 12px solid #000; display: flex; padding: 40px; gap: 40px; }
         .shop-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .red-frame { width: 100%; height: 250px; border: 10px solid #ff0000; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; background: #f9f9f9; }
-        .red-frame img { max-width: 65%; max-height: 90%; }
-        .item-title { font-size: 38px; color: #000; margin: 10px 0; }
-        .item-desc { color: #888; font-size: 18px; line-height: 1.2; margin-bottom: 15px; }
-        .btn-buy { background: #00ff00; border: 5px solid #000; padding: 15px 40px; color: #fff; font-size: 28px; cursor: pointer; border-radius: 15px; box-shadow: 5px 5px 0 #000; }
-        #close-shop { position: absolute; top: -30px; right: -30px; width: 70px; height: 70px; background: #ff0000; border: 6px solid #000; border-radius: 50%; color: #fff; font-size: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .red-frame { width: 100%; height: 250px; border: 10px solid #ff0000; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+        .red-frame img { max-width: 65%; }
 
-        #lose-screen { position: fixed; bottom: -700px; left: 50%; transform: translateX(-50%); width: 650px; background: #333; border: 10px solid #000; padding: 50px; z-index: 3000; text-align: center; transition: bottom 0.6s ease-out; }
+        #start-btn-ui { position: absolute; bottom: 240px; right: 60px; background: #ccff00; color: #fff; padding: 35px 70px; border: 8px solid #fff; border-radius: 45px; font-size: 45px; z-index: 100; cursor: pointer; }
+        #main-hare { position: absolute; bottom: 25%; left: -50px; width: 500px; z-index: 50; }
+        #heli-hare { position: absolute; bottom: 15%; left: 20px; width: 350px; z-index: 60; display: none; }
     </style>
 </head>
 <body onclick="shoot(event, 'main')">
 
 <div id="game-container">
+    <div id="pop-upgrade" class="floating-text" style="color: red; -webkit-text-stroke: 2px white;">УЛУЧШЕНО! +30 Урона!</div>
+    <div id="pop-admin-act" class="floating-text" style="color: #0080ff; -webkit-text-stroke: 2px white;">ПАНЕЛЬ АКТИВИРОВАНА.</div>
+    <div id="pop-money" class="floating-text" style="color: #0080ff;">БЕСКОНЕЧНЫЕ ДЕНЬГИ</div>
+    <div id="pop-skip" class="floating-text" style="color: red; -webkit-text-stroke: 2px white;">Волна Пропущена.</div>
+
     <div class="header-center">
         <div id="title-box">Purple Battleground</div>
         <div id="hp-container">
@@ -69,7 +112,7 @@
 
     <div class="left-ui-panel">
         <div id="money-display">🪙 Purple Money: <span id="m-val">0</span></div>
-        <div id="shop-btn" onclick="event.stopPropagation(); openShop()">🛍️</div>
+        <div id="shop-btn" onmousedown="startAdminTimer()" onmouseup="clearAdminTimer()" ontouchstart="startAdminTimer()" ontouchend="clearAdminTimer()" onclick="event.stopPropagation(); openShop()">🛍️</div>
     </div>
 
     <div class="wave-ui">
@@ -84,114 +127,147 @@
     <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
 </div>
 
+<div id="admin-trigger" onmousedown="dragStart(event)" ontouchstart="dragStart(event)">Админ Панель 1.3 🗣🔥</div>
+<div id="admin-menu">
+    <div id="close-admin" onclick="toggleAdminMenu()">X</div>
+    <h2 style="color:#fff; margin-bottom: 20px;">Админ Панель 1.3 🗣🔥</h2>
+    <button class="admin-btn" onclick="toggleInfMoney()">Бесконечные деньги</button>
+    <button class="admin-btn" onclick="skipWave()">Пропустить волну</button>
+    <div class="sorcerer-btn">
+        <img src="https://www.dropbox.com/scl/fi/cc4cwmtqchatzfo5uif7z/SorcererIcon.webp?rlkey=irn4n55aqudv4zfs568aacz6q&st=jlxlg0lk&dl=1" style="height:100%">
+        <span class="sorcerer-text">Sorcerer</span>
+    </div>
+</div>
+
 <div id="shop-overlay">
     <div id="shop-window">
-        <div id="close-shop" onclick="closeShop()">X</div>
+        <div id="close-shop" onclick="closeShop()" style="position:absolute; top:-20px; right:-20px; background:red; padding:20px; color:#fff; cursor:pointer;">X</div>
         <div class="shop-item">
             <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1"></div>
-            <h2 class="item-title">Верто-Заяц</h2>
-            <p class="item-desc">Ваш личный помощник! Всегда готов отбиваться от врагов вместе с вами! Очень помогает, готов пробить почти всех! Рекомендуется.</p>
-            <div style="color:#000; font-weight:900; font-size: 26px; margin-bottom: 15px;">3500 Монет</div>
+            <h2 style="font-size:38px">Верто-Заяц</h2>
+            <p style="color:#888">Ваш личный помощник! Всегда готов отбиваться от врагов вместе с вами! Очень помогает, готов пробить почти всех! Рекомендуется.</p>
+            <div style="font-size:26px; font-weight:900;">3500 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
         <div class="shop-item">
             <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1"></div>
-            <h2 class="item-title">Снаряды</h2>
-            <p class="item-desc">Улучшение Снарядов В Вашем Оружии — 250 PurpleMoney = +30 Урона Для Вашего Оружия.</p>
-            <div style="color:#000; font-weight:900; font-size: 26px; margin-bottom: 15px;">250 Монет</div>
+            <h2 style="font-size:38px">Снаряды</h2>
+            <p style="color:#888">Улучшение Снаряд В Вашем Оружии — 250 PurpleMoney = +30 Урона Для Вашего Оружия.</p>
+            <div style="font-size:26px; font-weight:900;">250 Монет</div>
             <button class="btn-buy" onclick="buyAmmo()">Приобрести</button>
         </div>
     </div>
-</div>
-
-<div id="lose-screen">
-    <h2 style="color:white; font-size: 60px;">Поражение</h2>
-    <p style="color:white; font-size: 26px;">Молодец, надо было стараться.</p>
-    <button style="background: #00ff00; color: #fff; padding: 20px 60px; border: 5px solid #000; font-size: 35px; cursor:pointer; border-radius: 15px;" onclick="closeLoseScreen()">Лан.</button>
 </div>
 
 <script>
     let money = 0; let hp = 350; let damage = 50;
     let enemiesLeft = 10; let wave = 1;
     let isGameActive = false; let hasHeli = false;
-    let enemiesSpawnedInWave = 0;
+    let infMoney = false;
+    let adminTimer;
 
-    function openShop() { 
-        if(isGameActive) return;
-        document.getElementById('shop-overlay').style.display = 'flex'; 
-    }
+    // ШОП
+    function openShop() { if(!isGameActive) document.getElementById('shop-overlay').style.display = 'flex'; }
     function closeShop() { document.getElementById('shop-overlay').style.display = 'none'; }
-
-    function updateUI() {
-        document.getElementById('m-val').innerText = money;
-        document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + Math.max(0, hp);
-        document.getElementById('enemies-count').innerText = "Осталось Врагов: " + enemiesLeft;
-        document.getElementById('hp-fill').style.width = Math.max(0, (hp / 350) * 100) + "%";
-        
-        let sBtn = document.getElementById('shop-btn');
-        if(isGameActive) sBtn.classList.add('locked');
-        else sBtn.classList.remove('locked');
+    
+    function showPop(id) {
+        const el = document.getElementById(id);
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 1500);
     }
 
     function buyAmmo() {
-        if (money >= 250) {
-            money -= 250; damage += 30; updateUI();
-            closeShop();
+        if (money >= 250 || infMoney) {
+            if(!infMoney) money -= 250; 
+            damage += 30; updateUI(); showPop('pop-upgrade'); closeShop();
         }
     }
 
     function buyHeli() {
-        if (money >= 3500 && !hasHeli) {
-            money -= 3500; hasHeli = true;
-            document.getElementById('heli-hare').style.display = 'block';
+        if ((money >= 3500 || infMoney) && !hasHeli) {
+            if(!infMoney) money -= 3500;
+            hasHeli = true; document.getElementById('heli-hare').style.display = 'block';
             updateUI(); closeShop();
             setInterval(() => { if(isGameActive) shoot(null, 'heli'); }, 200);
         }
     }
 
-    function startBattle() {
-        if (isGameActive) return;
-        isGameActive = true;
-        enemiesSpawnedInWave = 0;
-        enemiesLeft = 10;
-        document.getElementById('start-btn-ui').style.display = 'none';
-        updateUI();
-        spawnSequence();
+    // АДМИНКА ЛОГИКА
+    function startAdminTimer() { adminTimer = setTimeout(() => { 
+        document.getElementById('admin-trigger').style.display = 'flex';
+        showPop('pop-admin-act');
+    }, 5000); }
+    function clearAdminTimer() { clearTimeout(adminTimer); }
+
+    function toggleAdminMenu() {
+        const m = document.getElementById('admin-menu');
+        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+    }
+    
+    document.getElementById('admin-trigger').onclick = (e) => { e.stopPropagation(); toggleAdminMenu(); };
+
+    function toggleInfMoney() {
+        infMoney = !infMoney;
+        showPop('pop-money');
+        if(infMoney) { money = Infinity; updateUI(); } else { money = 0; updateUI(); }
     }
 
-    function spawnSequence() {
-        if (!isGameActive || enemiesSpawnedInWave >= 10) return;
+    function skipWave() {
+        showPop('pop-skip');
+        let zombies = document.querySelectorAll('.zombie-container');
+        zombies.forEach(z => z.remove());
+        enemiesLeft = 0;
+        enemyDefeated();
+    }
+
+    // ПЕРЕТАСКИВАНИЕ КУБА
+    function dragStart(e) {
+        const el = document.getElementById('admin-trigger');
+        let move = (ev) => {
+            let clientX = ev.clientX || ev.touches[0].clientX;
+            let clientY = ev.clientY || ev.touches[0].clientY;
+            el.style.left = (clientX - 30) + 'px';
+            el.style.top = (clientY - 30) + 'px';
+            el.style.right = 'auto';
+        };
+        document.onmousemove = document.ontouchmove = move;
+        document.onmouseup = document.ontouchend = () => { document.onmousemove = document.ontouchmove = null; };
+    }
+
+    // ИГРОВАЯ ЛОГИКА (БАЗА)
+    function updateUI() {
+        document.getElementById('m-val').innerText = infMoney ? "∞" : money;
+        document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + Math.max(0, hp);
+        document.getElementById('enemies-count').innerText = "Осталось Врагов: " + enemiesLeft;
+        document.getElementById('hp-fill').style.width = Math.max(0, (hp / 350) * 100) + "%";
+        document.getElementById('shop-btn').className = isGameActive ? 'locked' : '';
+    }
+
+    function startBattle() {
+        if (isGameActive) return;
+        isGameActive = true; enemiesLeft = 10;
+        document.getElementById('start-btn-ui').style.display = 'none';
+        updateUI(); spawnLoop(0);
+    }
+
+    function spawnLoop(count) {
+        if (!isGameActive || count >= 10) return;
         spawnEnemy();
-        enemiesSpawnedInWave++;
-        setTimeout(spawnSequence, 4000);
+        setTimeout(() => spawnLoop(count + 1), 4000);
     }
 
     function spawnEnemy() {
         let container = document.createElement('div');
         container.className = 'zombie-container';
-        
-        let hpMax = 55;
-        let img = "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=j2fo8ed0&dl=1";
-        let dmg = 20;
-        let speed = 4;
+        let hpMax = 55; let img = "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=j2fo8ed0&dl=1";
+        let dmg = 20; let speed = 4;
 
-        if (wave >= 66 && wave <= 75) {
-            hpMax = 5777; img = "https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=1t7gchrz&dl=1";
-            dmg = 566; speed = 4.5; // Скорость под 7.99 сек до цели
-        } else if (wave >= 55 && wave <= 66) {
-            hpMax = 2210; img = "https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=8ylg44xa&dl=1";
-            dmg = 398; speed = 12;
-        } else if (wave >= 25 && wave <= 34) {
-            hpMax = 550; img = "https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=1cski86b&dl=1";
-            dmg = 130; speed = 4;
-        } else if (wave >= 10 && wave <= 16) {
-            hpMax = 310; img = "https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=m33boyvr&dl=1";
-            dmg = 80; speed = 4;
-        }
+        if (wave >= 66) { hpMax = 5777; img = "https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=1t7gchrz&dl=1"; dmg = 566; speed = 4.5; }
+        else if (wave >= 55) { hpMax = 2210; img = "https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=8ylg44xa&dl=1"; dmg = 398; speed = 12; }
+        else if (wave >= 25) { hpMax = 550; img = "https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=1cski86b&dl=1"; dmg = 130; speed = 4; }
 
         container.innerHTML = `<div class="zombie-hp-bar"><div class="zombie-hp-text">${hpMax} ХП</div><div class="zombie-hp-fill"></div></div><img class="zombie-img" src="${img}">`;
-        container.dataset.hp = hpMax;
-        container.dataset.maxHp = hpMax;
+        container.dataset.hp = hpMax; container.dataset.maxHp = hpMax;
         document.getElementById('game-container').appendChild(container);
         
         let pos = -300;
@@ -201,65 +277,48 @@
             if (window.innerWidth - pos < 350) {
                 hp -= dmg; updateUI(); container.remove(); clearInterval(moveInt);
                 enemyDefeated();
-                if (hp <= 0) gameOver();
+                if (hp <= 0) alert("GAME OVER");
             }
         }, 30);
         container.dataset.moveInt = moveInt;
     }
 
     function shoot(e, type) {
-        if (!isGameActive) return;
+        if (!isGameActive && type !== 'heli') return;
         let b = document.createElement('img');
         b.src = "https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=b0l23gm9&dl=1";
         b.className = 'bullet';
         let startX = (type === 'main') ? 380 : 250;
-        let startY = (type === 'main') ? "35%" : "55%";
         let currentDmg = (type === 'main') ? damage : 100;
-        b.style.left = startX + "px"; b.style.bottom = startY;
+        b.style.left = startX + "px"; b.style.bottom = (type === 'main' ? "35%" : "55%");
         document.getElementById('game-container').appendChild(b);
         let bPos = startX;
         let bInt = setInterval(() => {
             bPos += 25; b.style.left = bPos + 'px';
-            let zombies = document.getElementsByClassName('zombie-container');
-            for (let z of zombies) {
+            let zombies = document.querySelectorAll('.zombie-container');
+            zombies.forEach(z => {
                 let zRect = z.getBoundingClientRect();
                 let bRect = b.getBoundingClientRect();
                 if (bRect.right > zRect.left && bRect.left < zRect.right && bRect.top < zRect.bottom && bRect.bottom > zRect.top) {
                     z.dataset.hp -= currentDmg;
-                    let fill = z.querySelector('.zombie-hp-fill');
-                    let text = z.querySelector('.zombie-hp-text');
-                    fill.style.width = Math.max(0, (z.dataset.hp / z.dataset.maxHp) * 100) + "%";
-                    text.innerText = Math.max(0, Math.floor(z.dataset.hp)) + " ХП";
+                    z.querySelector('.zombie-hp-fill').style.width = (z.dataset.hp / z.dataset.maxHp * 100) + "%";
+                    z.querySelector('.zombie-hp-text').innerText = Math.max(0, Math.floor(z.dataset.hp)) + " ХП";
                     b.remove(); clearInterval(bInt);
-                    if (z.dataset.hp <= 0) {
-                        clearInterval(z.dataset.moveInt); z.remove();
-                        money += 85; enemyDefeated();
-                    }
-                    break;
+                    if (z.dataset.hp <= 0) { clearInterval(z.dataset.moveInt); z.remove(); if(!infMoney) money += 85; enemyDefeated(); }
                 }
-            }
+            });
             if (bPos > window.innerWidth) { b.remove(); clearInterval(bInt); }
         }, 20);
     }
 
     function enemyDefeated() {
-        enemiesLeft--;
-        updateUI();
+        enemiesLeft--; updateUI();
         if (enemiesLeft <= 0) {
-            isGameActive = false;
-            wave++;
+            isGameActive = false; wave++;
             document.getElementById('wave-big').innerText = wave + " Волна";
             document.getElementById('start-btn-ui').style.display = 'block';
             updateUI();
         }
-    }
-
-    function gameOver() { isGameActive = false; document.getElementById('lose-screen').style.bottom = "50%"; updateUI(); }
-    function closeLoseScreen() { 
-        document.getElementById('lose-screen').style.bottom = "-700px";
-        hp = 350; isGameActive = false;
-        document.getElementById('start-btn-ui').style.display = 'block';
-        updateUI();
     }
 </script>
 </body>
