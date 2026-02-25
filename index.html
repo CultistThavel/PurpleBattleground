@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - UI FIX FINAL</title>
+    <title>Purple Battleground - SHOP UPDATE</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -43,7 +43,7 @@
             text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000; 
         }
 
-        /* ЛЕВАЯ ПАНЕЛЬ (МАГАЗИН И МОНЕТЫ) - ПОДНЯТА В 2 РАЗА */
+        /* ЛЕВАЯ ПАНЕЛЬ (МАГАЗИН И МОНЕТЫ) */
         .left-ui-panel { 
             position: absolute; bottom: 65%; left: 40px; 
             display: flex; flex-direction: column; gap: 20px; z-index: 100; 
@@ -59,9 +59,40 @@
             border: 10px solid #000; border-radius: 30px; 
             display: flex; align-items: center; justify-content: center;
             font-size: 85px; box-shadow: 10px 10px 0 #000;
+            cursor: pointer;
         }
 
-        /* ВОЛНА - ОПУЩЕНА НИЖЕ ШКАЛЫ ХП */
+        /* МАГАЗИН - БОЛЬШОЕ БЕЛОЕ ОКНО */
+        #shop-window {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; height: 80%; background: #fff; border: 12px solid #000;
+            z-index: 2000; display: none; padding: 40px; box-sizing: border-box;
+        }
+
+        .shop-flex { display: flex; justify-content: space-around; height: 100%; align-items: flex-start; }
+
+        /* ТОВАРЫ */
+        .item-card { width: 45%; display: flex; flex-direction: column; align-items: flex-start; }
+        .red-frame { 
+            width: 100%; height: 350px; border: 8px solid #ff0000; 
+            background: #eee; display: flex; justify-content: center; align-items: center;
+            margin-bottom: 15px;
+        }
+        .red-frame img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        
+        .item-price { color: #000; font-size: 35px; font-weight: 900; margin-bottom: 10px; }
+        .item-name { color: #000; font-size: 40px; font-weight: 900; margin-bottom: 5px; }
+        .item-desc { color: #888; font-size: 20px; font-weight: bold; line-height: 1.2; margin-bottom: 20px; }
+        
+        .btn-buy { 
+            background: #ccff00; border: 4px solid #000; color: #fff; 
+            padding: 15px 40px; border-radius: 15px; font-size: 28px; font-weight: 900;
+            text-shadow: 2px 2px 0 #000; cursor: pointer;
+        }
+
+        #close-shop { position: absolute; top: -30px; right: -30px; background: #ff0000; color: #fff; border: 6px solid #000; border-radius: 50%; width: 80px; height: 80px; font-size: 50px; cursor: pointer; font-weight: 900; }
+
+        /* ВОЛНА */
         .wave-ui { 
             position: absolute; top: 220px; right: 40px; 
             text-align: right; color: #fff; z-index: 100; 
@@ -69,13 +100,17 @@
         #wave-big { font-size: 90px; margin: 0; line-height: 0.8; font-weight: 900; -webkit-text-stroke: 4px #000; }
         #enemies-count { font-size: 28px; font-weight: 900; margin-top: 5px; text-shadow: 3px 3px 0 #000; }
 
-        /* ЗАЯЦ - В ЛЕВОМ УГЛУ (НО НЕ В ПРИТЫК) */
+        /* ЗАЙЦЫ */
         #main-hare { 
-            position: absolute; bottom: 30%; left: 40px; 
+            position: absolute; bottom: 30%; left: 120px; /* Подвинул немного назад */
             width: 480px; z-index: 50; pointer-events: none;
         }
+        #heli-hare { 
+            position: absolute; bottom: 45%; left: 30px; 
+            width: 250px; z-index: 40; display: none; /* Появится при покупке */
+        }
 
-        /* КНОПКА СТАРТА - ВЫСОКО НАД ПОЛОМ (В 4 РАЗА ВЫШЕ) */
+        /* КНОПКА СТАРТА */
         #start-btn-ui { 
             position: absolute; bottom: 240px; right: 60px; 
             background: #ccff00; color: #fff; padding: 35px 70px; 
@@ -98,7 +133,32 @@
 
     <div class="left-ui-panel">
         <div id="money-display">🪙 Purple Money: 0</div>
-        <div id="shop-btn">🛍️</div>
+        <div id="shop-btn" onclick="openShop()">🛍️</div>
+    </div>
+
+    <div id="shop-window">
+        <button id="close-shop" onclick="closeShop()">X</button>
+        <div class="shop-flex">
+            <div class="item-card">
+                <div class="red-frame">
+                    <img src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
+                </div>
+                <div class="item-price">1800 Монет</div>
+                <div class="item-name">Верто-Заяц</div>
+                <div class="item-desc">Ваш личный помощник, который всегда будет отбиваться от врагов вместе с вами, очень полезный, И очень дружелюбный!</div>
+                <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
+            </div>
+
+            <div class="item-card">
+                <div class="red-frame">
+                    <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1">
+                </div>
+                <div class="item-price">250 Монет</div>
+                <div class="item-name">Снаряды</div>
+                <div class="item-desc">250 Монет = +30 Урона для вашего оружия</div>
+                <button class="btn-buy">Приобрести</button>
+            </div>
+        </div>
     </div>
 
     <div class="wave-ui">
@@ -107,11 +167,26 @@
     </div>
 
     <img id="main-hare" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
+    <img id="heli-hare" src="https://www.dropbox.com/scl/fi/v3k28fe7prltrv1mp9wla/IMG_20260225_160641_715.jpg?rlkey=tb05ifgpleos2nvd3au3gsiou&st=t0kupva2&dl=1">
 
     <div id="floor"></div>
 
     <div id="start-btn-ui">Начать Перестрелку</div>
 </div>
+
+<script>
+    function openShop() {
+        document.getElementById('shop-window').style.display = 'block';
+    }
+    function closeShop() {
+        document.getElementById('shop-window').style.display = 'none';
+    }
+    function buyHeli() {
+        // Показываем верто-зайца в углу
+        document.getElementById('heli-hare').style.display = 'block';
+        closeShop();
+    }
+</script>
 
 </body>
 </html>
