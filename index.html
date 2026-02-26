@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Purple Battleground 1.6</title>
     <style>
-        /* Стили без изменений */
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter .5s; }
         #floor { position:absolute;bottom:0;width:100%;height:40%;background:#60646b;border-top:12px solid #000;z-index:10; }
@@ -115,7 +114,10 @@
         <div id="enemies-count">Осталось Врагов: 10</div>
     </div>
 
+    <!-- Главный герой -->
     <img id="main-hare" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=j22gl8hn&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+
+    <!-- Верто-заяц -->
     <img id="heli-hare" src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
     
     <div id="floor"></div>
@@ -162,14 +164,20 @@
 <div id="shop-overlay">
     <div id="shop-window">
         <div class="shop-item">
-            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div class="red-frame">
+                <!-- Верто-заяц в магазине -->
+                <img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+            </div>
             <h2 style="font-size:30px;margin:0;">Верто-Заяц</h2>
             <p style="font-size:16px;text-align:center;">Отличный Напарник, всегда успешно помогает, всегда готов отбиваться от врагов вместе с вами. Рекомендуется для покупки.</p>
             <div style="font-size:28px;font-weight:900;color:#d00;margin:10px;">3500 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
         <div class="shop-item">
-            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div class="red-frame">
+                <!-- Дробовик/Снаряды в магазине -->
+                <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+            </div>
             <h2 style="font-size:30px;margin:0;">Снаряды</h2>
             <p style="font-size:16px;text-align:center;">Полезная Штука! Проплати 250 PurpleMoney чтобы твои снаряды в оружии получили +30 больше урона. Цена с каждой покупкой растёт на +100 монет.</p>
             <div id="ammo-price-text" style="font-size:28px;font-weight:900;color:#d00;margin:10px;">250 Монет</div>
@@ -190,21 +198,21 @@
 
 <script>
 // ────────────────────────────────────────────────
-// ВРАГИ — ВСЕ С ?raw=1
+// ВРАГИ — ВСЕ С ?raw=1 + АТРИБУТЫ ДЛЯ ANDROID
 // ────────────────────────────────────────────────
 const enemyData = [
     {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=23ym56y0&raw=1"},
     {name:"Рабы Пурпулезки",hp:350,dmg:50,speed:5,start:5,end:10,img:"https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=a92h7at0&raw=1"},
     {name:"Малиновый Хыр",hp:780,dmg:110,speed:4,start:10,end:16,img:"https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=ysk3o11m&raw=1"},
-    {name:"Кровавый Бантик",hp:2590,dmg:340,speed:3,start:16,end:24,img:"https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=qqzxpyhz&st=qqzxpyhz&raw=1"},
-    {name:"Истинный Гость",hp:4567,dmg:567,speed:4,start:24,end:30,img:"https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=j91n7kmi&st=j91n7kmi&raw=1"},
-    {name:"Щеноричный Хыр",hp:8711,dmg:789,speed:4,start:30,end:37,img:"https://www.dropbox.com/scl/fi/c76zhvy901pqj6wnhc6ss/Picsart_26-02-25_19-09-48-052.png?rlkey=znw75ufw&st=znw75ufw&raw=1"},
-    {name:"Shadow Hare",hp:19981,dmg:9191919919191919,speed:9,start:37,end:42,img:"https://www.dropbox.com/scl/fi/dg27h6rb2330uyntn2ga5/Picsart_26-02-25_19-10-23-990.png?rlkey=exuzj9xr&st=exuzj9xr&raw=1"},
-    {name:"The Nameless Hare",hp:28991,dmg:91919288282818181881818181,speed:19,start:42,end:43,isBoss:true,img:"https://www.dropbox.com/scl/fi/zdwojmpsz3mf2ie4f1jwj/Picsart_26-02-25_19-10-33-922.png?rlkey=c8m6uhj3&st=c8m6uhj3&raw=1"},
-    {name:"Zombie Father Hare",hp:21777,dmg:1671,speed:13,start:43,end:48,img:"https://www.dropbox.com/scl/fi/rscd5vy3hjxfb2gxlxskb/Picsart_26-02-25_19-10-10-083.png?rlkey=0we3cti4&st=0we3cti4&raw=1"},
-    {name:"Инши",hp:24677,dmg:91919,speed:8,start:48,end:70,img:"https://www.dropbox.com/scl/fi/ivx4llojwlbso1zn571sd/Picsart_26-02-25_19-12-22-085.png?rlkey=5j4dtt65&st=5j4dtt65&raw=1"},
-    {name:"Agetha Hare",hp:56781,dmg:291919191991991919199181818,speed:30,start:70,end:71,isBoss:true,img:"https://www.dropbox.com/scl/fi/982f5rb5tg1qg4st58kj1/Picsart_26-02-25_19-10-51-597.png?rlkey=d125c8mt&st=d125c8mt&raw=1"},
-    {name:"Пурпулезка",hp:150000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=b3wjnq7y&st=b3wjnq7y&raw=1"}
+    {name:"Кровавый Бантик",hp:2590,dmg:340,speed:3,start:16,end:24,img:"https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=qqzxpyhz&raw=1"},
+    {name:"Истинный Гость",hp:4567,dmg:567,speed:4,start:24,end:30,img:"https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=l7wlaih1&raw=1"},
+    {name:"Щеноричный Хыр",hp:8711,dmg:789,speed:4,start:30,end:37,img:"https://www.dropbox.com/scl/fi/c76zhvy901pqj6wnhc6ss/Picsart_26-02-25_19-09-48-052.png?rlkey=8erkxojcqgom1in01kzqmh2q6&st=50gpbwdu&raw=1"},
+    {name:"Shadow Hare",hp:19981,dmg:9191919919191919,speed:9,start:37,end:42,img:"https://www.dropbox.com/scl/fi/dg27h6rb2330uyntn2ga5/Picsart_26-02-25_19-10-23-990.png?rlkey=5x10l6ki04hvfld6krujy21vl&st=0kpxz4z9&raw=1"},
+    {name:"The Nameless Hare",hp:28991,dmg:91919288282818181881818181,speed:19,start:42,end:43,isBoss:true,img:"https://www.dropbox.com/scl/fi/zdwojmpsz3mf2ie4f1jwj/Picsart_26-02-25_19-10-33-922.png?rlkey=e4l9uktjlvtl7h4du0v7gmluc&st=e4j4mi1c&raw=1"},
+    {name:"Zombie Father Hare",hp:21777,dmg:1671,speed:13,start:43,end:48,img:"https://www.dropbox.com/scl/fi/rscd5vy3hjxfb2gxlxskb/Picsart_26-02-25_19-10-10-083.png?rlkey=xz01b2w8wl6q3aqqwd7azim6s&st=kvkv0apr&raw=1"},
+    {name:"Инши",hp:24677,dmg:91919,speed:8,start:48,end:70,img:"https://www.dropbox.com/scl/fi/ivx4llojwlbso1zn571sd/Picsart_26-02-25_19-12-22-085.png?rlkey=lzpcyrefycb4jy6utlyi6snh2&st=gly90j2p&raw=1"},
+    {name:"Agetha Hare",hp:56781,dmg:291919191991991919199181818,speed:30,start:70,end:71,isBoss:true,img:"https://www.dropbox.com/scl/fi/982f5rb5tg1qg4st58kj1/Picsart_26-02-25_19-10-51-597.png?rlkey=6l5f4zshwf3ctc4r1z5q4jrcb&st=o2a6yf2f&raw=1"},
+    {name:"Пурпулезка",hp:150000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&raw=1"}
 ];
 
 let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
@@ -397,7 +405,7 @@ function updateBossHP(en){
         p.style.top="60%";
         setTimeout(()=>{
             p.style.animation="shake .1s infinite";
-            showSub("Пурпулезка","ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!",4000);
+            showSub("Пурпулезка","ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ ЭТО УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!",4000);
             setTimeout(()=>{
                 showSub("Пурпулезка","В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!",4000);
                 setTimeout(()=>{
@@ -427,7 +435,7 @@ function startPurpBoss(){
     let obj={el:c,hp:p.hp,maxHp:p.hp,isBoss:true};
     currentEnemies.push(obj);setupBossUI(p);
     showSub("Пурпулезка","ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШЕЕ РЕШЕНИЕ?",6000);
-    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ ТЕБЕ РОВНО 100 СЕКУНД ЧТОБЫ ТЫ СДЕЛАЛ СВОИ ПОСЛЕДНИЕ ВДОХИ, ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
+    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ ТЕБЕ РОВНО 100 СЕКУНД, ЧТОБЫ ТЫ СДЕЛАЛ СВОИ ПОСЛЕДНИЕ ВДОХИ. ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
     let ci=setInterval(()=>{if(!bossActive){clearInterval(ci);return;}throwPurpClone();},10000);
     let ti=setInterval(()=>{
         if(!bossActive){clearInterval(ti);return;}
@@ -439,7 +447,7 @@ function startPurpBoss(){
 
 function throwPurpClone(){
     let cl=document.createElement('img');
-    cl.src="https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=b3wjnq7y&st=b3wjnq7y&raw=1";
+    cl.src="https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&raw=1";
     cl.style.position="fixed";cl.style.right="200px";cl.style.top="200px";cl.style.width="80px";
     cl.style.transition="all .8s ease-in";cl.style.zIndex="500";
     cl.crossOrigin="anonymous";cl.loading="lazy";cl.referrerPolicy="no-referrer";
@@ -451,7 +459,7 @@ function throwPurpClone(){
 }
 
 function purpKillPlayer(){
-    showSub("Пурпулезка","ОЙ! А КТО-ТО КАЖЕТСЯ УМЕР! ПОРА БЫ СЛОМАТЬ КАБИНУ!",4000);
+    showSub("Пурпулезка","ОЙ! А КТО-ТО КАЖЕТСЯ ПРОИГРАЛ! ПОРА БЫ СЛОМАТЬ КАБИНУ!",4000);
     setTimeout(()=>{
         let p=document.getElementById('final-purp');
         p.style.transition="right .5s";
@@ -636,4 +644,4 @@ function buyAmmo(){
 updateUI();
 </script>
 </body>
-</html>
+    </html>
