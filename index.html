@@ -114,11 +114,11 @@
         <div id="enemies-count">Осталось Врагов: 10</div>
     </div>
 
-    <!-- Главный герой — новая ссылка с imgbb -->
-    <img id="main-hare" src="https://i.ibb.co/MyrHnKYB/hero.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+    <!-- Главный герой -->
+    <img id="main-hare" src="https://i.ibb.co/Q70CBCKb/main-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
 
-    <!-- Верто-заяц (оставил старую, можешь потом заменить) -->
-    <img id="heli-hare" src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+    <!-- Верто-заяц -->
+    <img id="heli-hare" src="https://i.ibb.co/sdX45DW8/heli-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
     
     <div id="floor"></div>
     <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
@@ -126,7 +126,7 @@
     <div id="admin-trigger">Админ Панель 1.6 🐢</div>
     <div id="admin-menu">
         <div style="display:flex;align-items:center;margin-bottom:20px;">
-            <img id="sorcerer-icon" src="https://www.dropbox.com/scl/fi/cc4cwmtqchatzfo5uif7z/SorcererIcon.webp?rlkey=irn4n55aqudv4zfs568aacz6q&st=or4svham&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+            <img id="sorcerer-icon" src="https://i.ibb.co/KpR8FDxQ/sorcerer-icon.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
             <span style="color:#ff0;font-size:28px;font-weight:900;text-shadow:0 0 10px #ff0,0 0 20px #ff0;animation:glowYellow 2s infinite alternate;">Sorcerer</span>
         </div>
         <button class="admin-btn" onclick="addMoneyAdmin()">Деньжата +100К</button>
@@ -165,7 +165,7 @@
     <div id="shop-window">
         <div class="shop-item">
             <div class="red-frame">
-                <img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+                <img src="https://i.ibb.co/sdX45DW8/heli-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h2 style="font-size:30px;margin:0;">Верто-Заяц</h2>
             <p style="font-size:16px;text-align:center;">Отличный Напарник, всегда успешно помогает, всегда готов отбиваться от врагов вместе с вами. Рекомендуется для покупки.</p>
@@ -174,7 +174,7 @@
         </div>
         <div class="shop-item">
             <div class="red-frame">
-                <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+                <img src="https://i.ibb.co/vCKnQn4L/ammo-icon.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h2 style="font-size:30px;margin:0;">Снаряды</h2>
             <p style="font-size:16px;text-align:center;">Полезная Штука! Проплати 250 PurpleMoney чтобы твои снаряды в оружии получили +30 больше урона. Цена с каждой покупкой растёт на +100 монет.</p>
@@ -196,21 +196,21 @@
 
 <script>
 // ────────────────────────────────────────────────
-// ВРАГИ — ВСЕ С ?raw=1 + АТРИБУТЫ ДЛЯ ANDROID
+// ВРАГИ — ВСЕ С ibb.co
 // ────────────────────────────────────────────────
 const enemyData = [
-    {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=23ym56y0&raw=1"},
-    {name:"Рабы Пурпулезки",hp:350,dmg:50,speed:5,start:5,end:10,img:"https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=a92h7at0&raw=1"},
-    {name:"Малиновый Хыр",hp:780,dmg:110,speed:4,start:10,end:16,img:"https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=ysk3o11m&raw=1"},
-    {name:"Кровавый Бантик",hp:2590,dmg:340,speed:3,start:16,end:24,img:"https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=qqzxpyhz&raw=1"},
-    {name:"Истинный Гость",hp:4567,dmg:567,speed:4,start:24,end:30,img:"https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=l7wlaih1&raw=1"},
-    {name:"Щеноричный Хыр",hp:8711,dmg:789,speed:4,start:30,end:37,img:"https://www.dropbox.com/scl/fi/c76zhvy901pqj6wnhc6ss/Picsart_26-02-25_19-09-48-052.png?rlkey=8erkxojcqgom1in01kzqmh2q6&st=50gpbwdu&raw=1"},
-    {name:"Shadow Hare",hp:19981,dmg:9191919919191919,speed:9,start:37,end:42,img:"https://www.dropbox.com/scl/fi/dg27h6rb2330uyntn2ga5/Picsart_26-02-25_19-10-23-990.png?rlkey=5x10l6ki04hvfld6krujy21vl&st=0kpxz4z9&raw=1"},
-    {name:"The Nameless Hare",hp:28991,dmg:91919288282818181881818181,speed:19,start:42,end:43,isBoss:true,img:"https://www.dropbox.com/scl/fi/zdwojmpsz3mf2ie4f1jwj/Picsart_26-02-25_19-10-33-922.png?rlkey=e4l9uktjlvtl7h4du0v7gmluc&st=e4j4mi1c&raw=1"},
-    {name:"Zombie Father Hare",hp:21777,dmg:1671,speed:13,start:43,end:48,img:"https://www.dropbox.com/scl/fi/rscd5vy3hjxfb2gxlxskb/Picsart_26-02-25_19-10-10-083.png?rlkey=xz01b2w8wl6q3aqqwd7azim6s&st=kvkv0apr&raw=1"},
-    {name:"Инши",hp:24677,dmg:91919,speed:8,start:48,end:70,img:"https://www.dropbox.com/scl/fi/ivx4llojwlbso1zn571sd/Picsart_26-02-25_19-12-22-085.png?rlkey=lzpcyrefycb4jy6utlyi6snh2&st=gly90j2p&raw=1"},
-    {name:"Agetha Hare",hp:56781,dmg:291919191991991919199181818,speed:30,start:70,end:71,isBoss:true,img:"https://www.dropbox.com/scl/fi/982f5rb5tg1qg4st58kj1/Picsart_26-02-25_19-10-51-597.png?rlkey=6l5f4zshwf3ctc4r1z5q4jrcb&st=o2a6yf2f&raw=1"},
-    {name:"Пурпулезка",hp:150000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&raw=1"}
+    {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://i.ibb.co/67QjYjbR/zombie-hare.png"},
+    {name:"Рабы Пурпулезки",hp:350,dmg:50,speed:5,start:5,end:10,img:"https://i.ibb.co/BHmN5CZr/raby-purpu.png"},
+    {name:"Малиновый Хыр",hp:780,dmg:110,speed:4,start:10,end:16,img:"https://i.ibb.co/8DDZLPqz/malinovyy-khyr.png"},
+    {name:"Кровавый Бантик",hp:2590,dmg:340,speed:3,start:16,end:24,img:"https://i.ibb.co/0j1GyZdq/krovavyy-bantik.png"},
+    {name:"Истинный Гость",hp:4567,dmg:567,speed:4,start:24,end:30,img:"https://i.ibb.co/5h1wkQSM/istinnyy-gost.png"},
+    {name:"Щеноричный Сдел",hp:8711,dmg:789,speed:4,start:30,end:37,img:"https://i.ibb.co/DHHsSGBd/shchenorichnyy-sdel.png"},
+    {name:"Shadow Hare",hp:19981,dmg:9191919919191919,speed:9,start:37,end:42,img:"https://i.ibb.co/391X22Gf/shadow-hare.png"},
+    {name:"The Nameless Hare",hp:28991,dmg:91919288282818181881818181,speed:19,start:42,end:43,isBoss:true,img:"https://i.ibb.co/7tj6bpCR/the-nameless-hare.png"},
+    {name:"Zombie Father Hare",hp:21777,dmg:1671,speed:13,start:43,end:48,img:"https://i.ibb.co/BVSwbZHN/zombie-father-hare.png"},
+    {name:"Инши",hp:24677,dmg:91919,speed:8,start:48,end:70,img:"https://i.ibb.co/Ldb9y7jB/inshi.png"},
+    {name:"Agetha Hare",hp:56781,dmg:291919191991991919199181818,speed:30,start:70,end:71,isBoss:true,img:"https://i.ibb.co/Fkw0NDB6/agetha-hare.png"},
+    {name:"Пурпулезка",hp:150000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://i.ibb.co/wZS6FJrz/purpulezka.png"}
 ];
 
 let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
@@ -320,7 +320,7 @@ function playerShoot(e){
 
 function createBullet(t){
     let b=document.createElement('img');
-    b.src="https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=v1t0agvn&raw=1";
+    b.src="https://i.ibb.co/Q70CBCKb/pulya.png";
     b.className='bullet';
     b.style.left=(t=="main"?"380px":"480px");
     b.style.bottom=(t=="main"?"40%":"28%");
@@ -445,7 +445,7 @@ function startPurpBoss(){
 
 function throwPurpClone(){
     let cl=document.createElement('img');
-    cl.src="https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&raw=1";
+    cl.src="https://i.ibb.co/wZS6FJrz/purpulezka.png";
     cl.style.position="fixed";cl.style.right="200px";cl.style.top="200px";cl.style.width="80px";
     cl.style.transition="all .8s ease-in";cl.style.zIndex="500";
     cl.crossOrigin="anonymous";cl.loading="lazy";cl.referrerPolicy="no-referrer";
@@ -531,7 +531,7 @@ function activateSorcerer(){
         setTimeout(()=>{
             confirm.remove();
             isSorcerer=true;
-            document.getElementById('main-hare').src="https://i.ibb.co/MyrHnKYB/hero.png";
+            document.getElementById('main-hare').src="https://i.ibb.co/5gLfm3VW/sorcerer-form.png";
             let alert=document.getElementById('sorcerer-alert');
             alert.style.transform="translate(-50%,-50%) scale(1)";
             setTimeout(()=>{
@@ -574,7 +574,7 @@ function castAbility(type){
         setTimeout(()=>{
             hare.style.bottom="25%";
             let b=document.createElement('img');
-            b.src="https://www.dropbox.com/scl/fi/k7ihgno4veccayv3byksc/Picsart_26-02-25_22-10-29-076.png?rlkey=8nxc67mzs2jy7u23dtyn80qus&st=6kf1of8l&raw=1";
+            b.src="https://i.ibb.co/rRLDmHxS/blue-ball.png";
             b.style.position='absolute';b.style.left='200px';b.style.bottom='35%';b.style.width='50px';
             document.getElementById('game-container').appendChild(b);
             let sz=50;
@@ -593,7 +593,7 @@ function castAbility(type){
 
     if(type==='infinity'){
         let s=document.createElement('img');
-        s.src="https://www.dropbox.com/scl/fi/csmhqsa106rxm5r1orim/Picsart_26-02-25_22-11-03-878.png?rlkey=0v80wn75bqska23tp4b7l8yfp&st=leqc63r6&raw=1";
+        s.src="https://i.ibb.co/chrm5c1s/infinity.png";
         s.style.position='absolute';s.style.left='50px';s.style.bottom='25%';s.style.width='400px';s.style.opacity='0';
         s.style.transition='opacity .5s';
         document.getElementById('game-container').appendChild(s);
