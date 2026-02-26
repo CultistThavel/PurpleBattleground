@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground - Админ Панель 1.6 🍺</title>
+    <title>Purple Battleground 1.6</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter .5s; }
@@ -90,7 +90,7 @@
     </div>
 
     <div class="header-center" id="main-header">
-        <div id="title-box">Purple Battleground - Админ Панель 1.6 🍺</div>
+        <div id="title-box">Purple Battleground 1.6</div>
         <div id="hp-container">
             <div id="hp-fill"></div>
             <span id="hp-text">Ваша Шкала ХП: 350</span>
@@ -174,7 +174,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// ВРАГИ — ТОЧНО ТВОИ АЙДИ И ПАРАМЕТРЫ
+// ВРАГИ — ТОЧНО ТВОИ АЙДИ + АТРИБУТЫ ДЛЯ ANDROID
 // ────────────────────────────────────────────────
 const enemyData = [
     {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=7ar2q0by&dl=0"},
@@ -329,7 +329,7 @@ function removeEnemy(e){
 function checkWaveEnd(){
     if(enemiesLeft<=0&&currentEnemies.length==0){
         isGameActive=false;
-        document.getElementById('tutorial-hint').style.display='none'; // убираем тутор после любой волны
+        document.getElementById('tutorial-hint').style.display='none';
         wave++;
         document.getElementById('side-ui').style.opacity='0';
         document.getElementById('wave-ui').style.opacity='0';
@@ -401,7 +401,7 @@ function startPurpBoss(){
     let obj={el:c,hp:p.hp,maxHp:p.hp,isBoss:true};
     currentEnemies.push(obj);setupBossUI(p);
     showSub("Пурпулезка","ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШЕЕ РЕШЕНИЕ?",6000);
-    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! У ТЕБЯ ЕСТЬ РОВНО 100 СЕКУНД ЧТОБЫ СДЕЛАТЬ ПОСЛЕДНИЕ ВДОХИ, ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
+    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ РОВНО 100 СЕКУНД ЧТОБЫ ТЫ СДЕЛАЛ СВОИ ПОСЛЕДНИЕ ВДОХИ! ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
     let ci=setInterval(()=>{if(!bossActive){clearInterval(ci);return;}throwPurpClone();},10000);
     let ti=setInterval(()=>{
         if(!bossActive){clearInterval(ti);return;}
@@ -425,7 +425,7 @@ function throwPurpClone(){
 }
 
 function purpKillPlayer(){
-    showSub("Пурпулезка","ОЙ! А КТО-ТО КАЖЕТСЯ ПРОИГРАЛ! ПОРА БЫ СЛОМАТЬ КАБИНУ!",4000);
+    showSub("Пурпулезка","ОЙ! А КТО-ТО КАЖЕТСЯ УМЕР! ПОРА БЫ СЛОМАТЬ КАБИНУ!",4000);
     setTimeout(()=>{
         let p=document.getElementById('final-purp');
         p.style.transition="right .5s";
@@ -468,8 +468,22 @@ function showSub(n,t,d){
     setTimeout(()=>{box.classList.remove('active');setTimeout(()=>box.style.display="none",500);},d);
 }
 
-function gameOver(){isGameActive=false;bossActive=false;document.getElementById('lose-screen').style.display="flex";}
-function respawn(){hp=maxHp;updateUI();document.getElementById('lose-screen').style.display="none";toggleUI(true);currentEnemies.forEach(e=>e.el.remove());currentEnemies=[];document.getElementById('game-container').style.filter="none";document.getElementById('red-screen-overlay').style.display="none";}
+function gameOver(){
+    isGameActive=false;bossActive=false;
+    document.getElementById('tutorial-hint').style.display='none';
+    document.getElementById('lose-screen').style.display="flex";
+}
+
+function respawn(){
+    hp=maxHp;updateUI();
+    document.getElementById('lose-screen').style.display="none";
+    document.getElementById('tutorial-hint').style.display='none';
+    toggleUI(true);
+    currentEnemies.forEach(e=>e.el.remove());
+    currentEnemies=[];
+    document.getElementById('game-container').style.filter="none";
+    document.getElementById('red-screen-overlay').style.display="none";
+}
 
 function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
@@ -573,4 +587,4 @@ function buyAmmo(){
 updateUI();
 </script>
 </body>
-</html>
+    </html>
