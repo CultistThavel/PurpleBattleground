@@ -114,10 +114,10 @@
         <div id="enemies-count">Осталось Врагов: 10</div>
     </div>
 
-    <!-- Главный герой -->
-    <img id="main-hare" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=j22gl8hn&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+    <!-- Главный герой — новая ссылка с imgbb -->
+    <img id="main-hare" src="https://i.ibb.co/MyrHnKYB/hero.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
 
-    <!-- Верто-заяц -->
+    <!-- Верто-заяц (оставил старую, можешь потом заменить) -->
     <img id="heli-hare" src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
     
     <div id="floor"></div>
@@ -165,7 +165,6 @@
     <div id="shop-window">
         <div class="shop-item">
             <div class="red-frame">
-                <!-- Верто-заяц в магазине -->
                 <img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h2 style="font-size:30px;margin:0;">Верто-Заяц</h2>
@@ -175,7 +174,6 @@
         </div>
         <div class="shop-item">
             <div class="red-frame">
-                <!-- Дробовик/Снаряды в магазине -->
                 <img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&raw=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <h2 style="font-size:30px;margin:0;">Снаряды</h2>
@@ -533,7 +531,7 @@ function activateSorcerer(){
         setTimeout(()=>{
             confirm.remove();
             isSorcerer=true;
-            document.getElementById('main-hare').src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=j22gl8hn&raw=1";
+            document.getElementById('main-hare').src="https://i.ibb.co/MyrHnKYB/hero.png";
             let alert=document.getElementById('sorcerer-alert');
             alert.style.transform="translate(-50%,-50%) scale(1)";
             setTimeout(()=>{
@@ -644,4 +642,4 @@ function buyAmmo(){
 updateUI();
 </script>
 </body>
-    </html>
+</html>
