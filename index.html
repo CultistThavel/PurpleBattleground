@@ -30,20 +30,19 @@
         .zombie-hp-fill { height:100%;background:#00ff00;width:100%;transition:width .3s; }
         .zombie-name { color:#fff;font-size:24px;-webkit-text-stroke:1px #000;margin-bottom:5px;font-weight:900; }
 
-        #boss-ui-global { position:fixed;top:20px;left:50%;transform:translateX(-50%);width:80%;z-index:1000;display:none;flex-direction:column;align-items:center;transition:opacity .5s; }
+        #boss-ui-global { position:fixed;top:90px;left:50%;transform:translateX(-50%);width:80%;z-index:1000;display:none;flex-direction:column;align-items:center;transition:opacity .5s; }
         #boss-hp-frame { width:100%;height:50px;background:#000;border:6px solid #fff;border-radius:10px;overflow:hidden; }
         #boss-hp-fill { width:100%;height:100%;background:#00ff00;transition:width .3s; }
-        #boss-hp-text { color:#fff;font-size:30px;margin-top:-45px;z-index:1001;position:relative; }
-        #boss-name-text { color:#fff;font-size:35px;-webkit-text-stroke:1.5px #a020f0;margin-top:10px;font-weight:900; }
+        #boss-hp-text { color:#fff;font-size:30px;margin-top:-45px;z-index:1001;position:relative;text-align:center; }
 
-        #tutorial-hint { position:fixed;top:120px;left:50%;transform:translateX(-50%);color:#fff;font-size:30px;-webkit-text-stroke:1.5px #000;z-index:2000;display:none;text-align:center; }
-        #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,.3);z-index:5;display:none;pointer-events:none; }
+        #tutorial-hint { position:fixed;top:220px;left:50%;transform:translateX(-50%);color:#fff;font-size:28px;-webkit-text-stroke:1.5px #000;z-index:2000;display:none;text-align:center; }
+        #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0.25);z-index:5;display:none;pointer-events:none; }
         #white-flash { position:fixed;inset:0;background:#fff;z-index:10000;display:none;opacity:0;transition:opacity .5s; }
         #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
 
         .bullet { position:absolute;z-index:48;width:150px;pointer-events:none; }
 
-        #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .3s; }
+        #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s; }
         #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:60px;background:#222;border:4px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:14px;cursor:pointer;z-index:100000;border-radius:10px; }
         #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:450px;background:rgba(0,0,0,.95);border:5px solid #00ff00;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px; }
         .admin-btn { width:100%;padding:15px;margin:10px 0;background:#111;border:2px solid #00ff00;color:#fff;font-size:18px;cursor:pointer;font-weight:900; }
@@ -86,7 +85,7 @@
 
     <div id="boss-ui-global">
         <div id="boss-hp-frame"><div id="boss-hp-fill"></div></div>
-        <div id="boss-hp-text">150000 ХП</div>
+        <div id="boss-hp-text">100000 ХП</div>
         <div id="boss-name-text">Пурпулезка [FINAL BOSS]</div>
     </div>
 
@@ -174,7 +173,9 @@
 <div id="final-credits"></div>
 
 <script>
-// ДАННЫЕ ВРАГОВ — ТОЧНО ТВОИ АЙДИ И ПАРАМЕТРЫ
+// ────────────────────────────────────────────────
+// ВРАГИ — ТОЧНО ТВОИ АЙДИ И ПАРАМЕТРЫ
+// ────────────────────────────────────────────────
 const enemyData = [
     {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=7ar2q0by&dl=0"},
     {name:"Раб Пурпулезки",hp:350,dmg:50,speed:5,start:5,end:10,img:"https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=y760bfnq&dl=0"},
@@ -228,6 +229,12 @@ function toggleUI(show){
     document.getElementById('wave-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.pointerEvents=show?"auto":"none";
+    if(show){
+        setTimeout(()=>{ 
+            document.getElementById('side-ui').style.transition="opacity .4s";
+            document.getElementById('wave-ui').style.transition="opacity .4s";
+        },10);
+    }
     if(!show)document.getElementById('tutorial-hint').style.display='none';
     if(!show&&!isGameActive)document.getElementById('ability-container').classList.remove('active');
 }
@@ -258,7 +265,7 @@ function moveEnemy(o){
         let step=(window.innerWidth/(o.speed*60));
         o.pos+=step;o.el.style.right=o.pos+"px";
         let r=o.el.getBoundingClientRect();
-        if(r.left<420){
+        if(r.left<440){  // увеличен радиус для попадания
             if(!isCurse)hp-=o.dmg;
             updateUI();
             if(hp<=0)gameOver();
@@ -284,7 +291,7 @@ function createBullet(t){
         pos+=40;b.style.left=pos+"px";
         currentEnemies.forEach(e=>{
             let er=e.el.getBoundingClientRect(),br=b.getBoundingClientRect();
-            if(br.right>er.left&&br.top<er.bottom&&br.bottom>er.top){
+            if(br.right>er.left-20&&br.left<er.right+20&&br.top<er.bottom&&br.bottom>er.top){
                 e.hp-=(t=="heli"?100:damage);
                 updateEnemyVisual(e);
                 clearInterval(i);b.remove();
@@ -318,7 +325,15 @@ function removeEnemy(e){
 function checkWaveEnd(){
     if(enemiesLeft<=0&&currentEnemies.length==0){
         isGameActive=false;wave++;
-        toggleUI(true);
+        document.getElementById('side-ui').style.opacity='0';
+        document.getElementById('wave-ui').style.opacity='0';
+        document.getElementById('start-btn-ui').style.opacity='0';
+        setTimeout(()=>{
+            toggleUI(true);
+            document.getElementById('side-ui').style.transition="opacity .4s";
+            document.getElementById('wave-ui').style.transition="opacity .4s";
+            document.getElementById('start-btn-ui').style.transition="opacity .4s";
+        },400);
         updateUI();
         document.getElementById('game-container').style.filter="none";
         document.getElementById('red-screen-overlay').style.display="none";
@@ -330,10 +345,12 @@ function setupBossUI(t){
     bossActive=true;
     let g=document.getElementById('boss-ui-global');
     g.style.display="flex";
-    document.getElementById('boss-name-text').innerText=`${t.name} [BOSS]`;
+    document.getElementById('boss-name-text').innerText=`${t.name} — ${t.hp} ХП`;
     document.getElementById('boss-hp-text').innerText=t.hp+" ХП";
     document.getElementById('boss-hp-fill').style.width="100%";
-    if(t.name.includes("Nameless"))document.getElementById('red-screen-overlay').style.display="block";
+    if(t.name.includes("The Nameless Hare")){
+        document.getElementById('red-screen-overlay').style.display="block";
+    }
 }
 
 function updateBossHP(en){
@@ -369,14 +386,15 @@ function startPurpBoss(){
     let p=enemyData.find(e=>e.isFinal);
     let c=document.createElement('div');
     c.className='zombie-container';c.id='final-purp';
-    c.style.right="100px";c.style.top="150px";c.style.bottom="auto";
-    c.style.animation="floatPurp 3s infinite ease-in-out";
-    c.innerHTML=`<img src="${p.img}" style="width:450px">`;
+    c.style.right="80px";c.style.top="120px";c.style.bottom="auto";
+    c.style.width="520px";
+    c.style.animation="floatPurp 6s infinite ease-in-out";
+    c.innerHTML=`<img src="${p.img}" style="width:100%">`;
     document.getElementById('game-container').appendChild(c);
     let obj={el:c,hp:p.hp,maxHp:p.hp,isBoss:true};
     currentEnemies.push(obj);setupBossUI(p);
     showSub("Пурпулезка","ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШЕЕ РЕШЕНИЕ?",6000);
-    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ РОВНО 100 СЕКУНД ЧТОБЫ ДАТЬ ТЕБЕ ВЫДОХНУТЬ ПОСЛЕДНИЕ ВДОХИ, ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
+    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ РОВНО 100 СЕКУНД ЧТОБЫ СДЕЛАТЬ ПОСЛЕДНИЕ ВДОХИ, ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
     let ci=setInterval(()=>{if(!bossActive){clearInterval(ci);return;}throwPurpClone();},10000);
     let ti=setInterval(()=>{
         if(!bossActive){clearInterval(ti);return;}
@@ -399,7 +417,7 @@ function throwPurpClone(){
 }
 
 function purpKillPlayer(){
-    showSub("Пурпулезка","ОЙ! А КТО-ТО КАЖЕТСЯ УМЕР! ПОРА БЫ СЛОМАТЬ КАБИНУ!",4000);
+    showSub("Пурпулезка","ОЙ! А КТО-ТО КАЖЕТСЯ ПРОИГРАЛ! ПОРА БЫ СЛОМАТЬ КАБИНУ!",4000);
     setTimeout(()=>{
         let p=document.getElementById('final-purp');
         p.style.transition="right .5s";
