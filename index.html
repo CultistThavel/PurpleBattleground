@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - FINAL RECKONING 🍺</title>
+    <title>Purple Battleground - FINAL BOSS EDITION 🍺</title>
     <style>
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -11,18 +11,22 @@
             font-family: 'Arial Black', sans-serif; user-select: none; 
             touch-action: manipulation;
         }
-
-        #game-container { position: relative; width: 100vw; height: 100vh; cursor: crosshair; transition: filter 0.5s, backdrop-filter 0.5s; }
+        #game-container { position: relative; width: 100vw; height: 100vh; cursor: crosshair; transition: filter 0.5s; }
         #floor { position: absolute; bottom: 0; width: 100%; height: 40%; background: #60646b; border-top: 12px solid #000; z-index: 10; transition: opacity 0.5s; }
-
-        /* UI ИНТЕРФЕЙС */
-        .ui-element { transition: opacity 0.5s ease, transform 0.5s ease; }
+        
+        /* ИНТЕРФЕЙС */
+        .ui-element { transition: opacity 0.5s, transform 0.5s; }
         .header-center { position: absolute; top: 15px; left: 5%; width: 90%; display: flex; flex-direction: column; align-items: center; z-index: 100; }
         #title-box { background: #fff; border: 8px solid #000; border-radius: 20px; font-size: 40px; width: 100%; text-align: center; margin-bottom: 10px; box-shadow: 0 10px 0 #000; }
-        
-        #hp-container { background: red; border: 8px solid #000; border-radius: 20px; padding: 12px 0; width: 85%; text-align: center; overflow: hidden; position: relative; z-index: 200; }
-        #hp-fill { position: absolute; top:0; left:0; width: 100%; height: 100%; background: #ccff00; z-index: 1; transition: width 0.3s cubic-bezier(0.1, 0.7, 1.0, 0.1); }
+        #hp-container { background: red; border: 8px solid #000; border-radius: 20px; padding: 12px 0; width: 85%; text-align: center; overflow: hidden; position: relative; z-index: 101; }
+        #hp-fill { position: absolute; top:0; left:0; width: 100%; height: 100%; background: #ccff00; z-index: 1; transition: width 0.3s; }
         #hp-text { color: #fff; font-size: 28px; text-shadow: 2px 2px 0 #000; position: relative; z-index: 2; }
+        
+        /* ШКАЛА БОССА ГЛОБАЛЬНАЯ */
+        #boss-ui { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 80%; display: none; flex-direction: column; align-items: center; z-index: 2000; opacity: 0; transition: opacity 0.8s; }
+        #boss-hp-bar { width: 100%; height: 40px; background: #000; border: 4px solid #fff; border-radius: 10px; overflow: hidden; }
+        #boss-hp-fill { height: 100%; background: #00ff00; width: 100%; transition: width 0.3s; }
+        #boss-name { color: #fff; font-size: 24px; text-shadow: 0 0 5px #a0f; margin-top: 5px; -webkit-text-stroke: 1px #000; }
 
         .left-ui-panel { position: absolute; top: 150px; left: 30px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
         #money-display { color: #fff; font-size: 45px; text-shadow: 4px 4px 0 #000; }
@@ -30,39 +34,33 @@
 
         .wave-ui { position: absolute; top: 200px; right: 40px; text-align: right; color: #fff; z-index: 100; }
         #wave-big { font-size: 80px; margin: 0; -webkit-text-stroke: 3px #000; }
+        #enemies-count { font-size: 24px; text-shadow: 3px 3px 0 #000; }
 
-        /* ИГРОВЫЕ ОБЪЕКТЫ */
-        #main-hare { position: absolute; bottom: 25%; left: 30px; width: 500px; z-index: 50; transition: transform 0.3s, opacity 0.5s; }
+        #hint-text { position: fixed; top: 150px; width: 100%; text-align: center; color: #fff; font-size: 35px; -webkit-text-stroke: 2px #000; z-index: 5000; opacity: 0; transition: opacity 0.5s; pointer-events: none; }
+
+        /* ПЕРСОНАЖИ */
+        #main-hare { position: absolute; bottom: 25%; left: 30px; width: 500px; z-index: 50; transition: transform 0.2s; }
         #heli-hare { position: absolute; bottom: 10%; left: 180px; width: 320px; z-index: 60; display: none; animation: heliHover 2s infinite ease-in-out; }
         @keyframes heliHover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
-        .zombie-container { position: absolute; bottom: 25%; right: -500px; width: 450px; z-index: 45; display: flex; flex-direction: column; align-items: center; transition: right 0.1s linear, opacity 0.5s; }
-        .zombie-img { width: 100%; transition: transform 0.3s; }
-        .zombie-hp-bar { width: 90%; height: 30px; background: red; border: 5px solid #000; position: relative; margin-bottom: 10px; border-radius: 5px; overflow: hidden; opacity: 0.9; }
-        .zombie-hp-fill { height: 100%; background: #00ff00; width: 100%; transition: width 0.2s; }
+        .zombie-container { position: absolute; bottom: 25%; right: -500px; width: 450px; z-index: 45; display: flex; flex-direction: column; align-items: center; transition: right 0.1s linear; }
+        .zombie-img { width: 100%; }
+        .zombie-hp-bar-small { width: 90%; height: 20px; background: red; border: 3px solid #000; margin-bottom: 5px; }
+        .zombie-hp-fill-small { height: 100%; background: #00ff00; width: 100%; transition: width 0.2s; }
+
+        .bullet { position: absolute; z-index: 48; width: 120px; pointer-events: none; }
         
-        /* ШКАЛА БОССА (ГЛОБАЛЬНАЯ) */
-        #boss-ui { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 80%; z-index: 1000; display: none; opacity: 0; transition: opacity 0.5s; text-align: center; }
-        #boss-hp-frame { width: 100%; height: 40px; background: #000; border: 5px solid #fff; border-radius: 10px; overflow: hidden; position: relative; }
-        #boss-hp-fill { width: 100%; height: 100%; background: #00ff00; transition: width 0.3s; }
-        #boss-hp-text { position: absolute; width: 100%; top: 0; left: 0; color: #fff; font-size: 25px; line-height: 40px; font-weight: 900; }
-        #boss-name { color: #fff; font-size: 30px; margin-top: 5px; -webkit-text-stroke: 1px #8000ff; text-shadow: 2px 2px 5px #000; }
-
-        .bullet { position: absolute; z-index: 48; width: 80px; pointer-events: none; }
-        .clone-tapok { position: absolute; z-index: 49; width: 120px; transition: all 0.5s linear; }
-
         #start-btn-ui { position: absolute; bottom: 240px; right: 60px; background: #ccff00; color: #fff; padding: 35px 70px; border: 8px solid #fff; border-radius: 45px; font-size: 45px; z-index: 100; cursor: pointer; box-shadow: 0 10px 0 #77aa00; }
-        #battle-hint { position: fixed; top: 120px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 28px; -webkit-text-stroke: 1.5px #000; z-index: 1000; display: none; opacity: 0; transition: opacity 0.5s; text-align: center; width: 80%; }
-
-        /* ЭФФЕКТЫ */
-        #red-overlay { position: fixed; inset: 0; background: rgba(255, 0, 0, 0.3); z-index: 5; display: none; pointer-events: none; }
-        #white-flash { position: fixed; inset: 0; background: #fff; z-index: 999999; display: none; opacity: 0; transition: opacity 1s; }
-        #sorcerer-alert { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0); color: #0000ff; font-size: 60px; font-weight: 900; -webkit-text-stroke: 2px #fff; z-index: 200000; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
 
         /* АДМИНКА */
         #admin-trigger { position: fixed; top: 20px; left: 80%; width: 150px; height: 80px; background: #222; border: 5px solid #fff; color: #fff; display: none; justify-content: center; align-items: center; z-index: 99999; border-radius: 10px; cursor: pointer; }
-        #admin-menu { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 500px; background: rgba(0,0,0,0.95); border: 8px solid #00ff00; display: none; flex-direction: column; padding: 30px; z-index: 100000; color: #fff; border-radius: 30px; }
-        .admin-btn { width: 100%; padding: 15px; margin: 5px 0; background: #111; border: 4px solid #00ff00; color: #fff; font-size: 20px; cursor: pointer; border-radius: 10px; }
+        #admin-menu { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 500px; background: rgba(0,0,0,0.98); border: 8px solid #00ff00; display: none; flex-direction: column; padding: 30px; z-index: 100000; color: #fff; border-radius: 30px; }
+        .admin-btn { width: 100%; padding: 15px; margin: 5px 0; background: #111; border: 4px solid #00ff00; color: #fff; font-size: 20px; cursor: pointer; }
+
+        /* ЭФФЕКТЫ */
+        #red-screen { position: fixed; inset: 0; background: rgba(255,0,0,0.4); z-index: 500; display: none; pointer-events: none; }
+        #white-screen { position: fixed; inset: 0; background: #fff; z-index: 999999; display: none; opacity: 0; transition: opacity 2s; }
+        #blur-overlay { position: fixed; inset: 0; backdrop-filter: blur(0px); z-index: 400; pointer-events: none; transition: backdrop-filter 0.5s; }
 
         /* СПОСОБНОСТИ */
         #ability-container { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); display: none; gap: 40px; z-index: 100; }
@@ -71,41 +69,42 @@
 
         /* МАГАЗИН */
         #shop-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; justify-content: center; align-items: center; }
-        #shop-window { width: 90%; background: #fff; border: 15px solid #000; border-radius: 50px; padding: 50px; display: flex; gap: 30px; position: relative; }
-        .shop-item { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .red-frame { width: 100%; height: 300px; border: 10px solid red; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+        #shop-window { width: 92%; background: #fff; border: 15px solid #000; position: relative; display: flex; padding: 50px; gap: 50px; border-radius: 50px; }
+        .shop-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .red-frame { width: 100%; height: 320px; border: 12px solid #ff0000; display: flex; justify-content: center; align-items: center; margin-bottom: 25px; border-radius: 30px; }
         .red-frame img { max-width: 90%; max-height: 90%; }
-        .btn-buy { background: #00ff00; border: 5px solid #000; padding: 20px; font-size: 28px; cursor: pointer; border-radius: 15px; font-weight: 900; }
+        .btn-buy { background: #00ff00; border: 6px solid #000; padding: 25px 60px; color: #fff; font-size: 36px; cursor: pointer; border-radius: 25px; font-weight: 900; }
 
-        /* СУБТИТРЫ */
-        #subtitle-box { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(300px); width: 85%; background: #fff; border: 10px solid #000; padding: 30px; z-index: 9000; transition: transform 0.6s; text-align: center; }
+        /* СУБТИТРЫ ПУРПУЛЕЗКИ */
+        #subtitle-box { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(300px); width: 90%; background: #fff; border: 10px solid #000; padding: 30px; z-index: 9000; transition: transform 0.6s; border-radius: 0px; }
         #subtitle-box.active { transform: translateX(-50%) translateY(0); }
-        #sub-text { font-size: 32px; color: #000; font-weight: 900; }
+        #sub-name { position: absolute; top: -45px; left: 0; background: #000; color: #fff; padding: 5px 30px; font-size: 28px; }
+        #sub-text { font-size: 35px; color: #000; text-align: center; }
 
-        /* ЭКРАНЫ */
-        #lose-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        #final-credits { position: fixed; inset: 0; background: #fff; z-index: 1000000; display: none; flex-direction: column; justify-content: center; align-items: center; }
-        .credit-text { font-size: 45px; color: #000; margin: 20px; opacity: 0; transition: opacity 1.5s; font-weight: 900; }
-        .good-end { color: #00ff00; font-size: 60px; font-weight: 900; text-shadow: 0 0 20px #0f0; animation: glow 1s infinite alternate; display: none; }
-        @keyframes glow { from { text-shadow: 0 0 10px #0f0; } to { text-shadow: 0 0 30px #0f0, 0 0 40px #0f0; } }
+        /* ПОРАЖЕНИЕ */
+        #lose-screen { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        #lose-text { color: #fff; font-size: 60px; text-align: center; margin-bottom: 40px; }
+        #retry-btn { background: #fff; color: #000; padding: 20px 80px; font-size: 40px; border: 8px solid #000; cursor: pointer; border-radius: 20px; }
+
+        /* ФИНАЛ */
+        #final-credits { position: fixed; inset: 0; background: #fff; z-index: 1000000; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .credit-line { font-size: 45px; color: #000; margin: 25px; opacity: 0; transition: opacity 1.5s; font-weight: 900; }
+        .good-end { color: #00ff00; font-size: 60px; text-shadow: 0 0 20px #0f0; animation: glow 1s infinite alternate; }
+        @keyframes glow { from { text-shadow: 0 0 10px #0f0; } to { text-shadow: 0 0 30px #0f0; } }
         @keyframes purpFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-40px); } }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 10% { transform: translate(-2px, -2px); } 20% { transform: translate(3px, 0px); } 100% { transform: translate(0, 0); } }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-3px, -3px); } 100% { transform: translate(1px, 1px); } }
     </style>
 </head>
 <body onclick="shoot(event, 'main')">
 
 <div id="game-container">
-    <div id="red-overlay"></div>
-    <div id="white-flash"></div>
-    <div id="sorcerer-alert">Sorcerer Активирован</div>
-    
-    <div id="battle-hint">Как Действовать: Тапайте по экрану как можно скорее, чтобы одолеть врагов.</div>
+    <div id="red-screen"></div>
+    <div id="white-screen"></div>
+    <div id="blur-overlay"></div>
+    <div id="hint-text">Как Действовать: Тапайте по экрану как можно скорее, чтобы одолеть врагов.</div>
 
     <div id="boss-ui">
-        <div id="boss-hp-frame">
-            <div id="boss-hp-fill"></div>
-            <div id="boss-hp-text">0 ХП</div>
-        </div>
+        <div id="boss-hp-bar"><div id="boss-hp-fill"></div></div>
         <div id="boss-name">BOSS NAME</div>
     </div>
 
@@ -124,6 +123,7 @@
 
     <div class="wave-ui ui-element">
         <h1 id="wave-big">1 Волна</h1>
+        <div id="enemies-count">Осталось Врагов: 10</div>
     </div>
 
     <img id="main-hare" src="https://www.dropbox.com/scl/fi/wkk444qzu4xrvq19yhppg/Picsart_26-02-25_16-18-04-032.png?rlkey=7ktujsblwl5rncjhtzwidmw1u&st=w2isyslh&dl=1">
@@ -134,20 +134,20 @@
 
     <div id="ability-container">
         <div class="ability-cube" onclick="event.stopPropagation(); castAbility('red')">
-            <div style="font-size:35px;color:red;font-weight:900">RED</div><span>Ball</span><div id="cd-red" class="cd-overlay"></div>
+            <div style="font-size:30px;color:red">RED</div><span>Ball</span><div id="cd-red" class="cd-overlay"></div>
+        </div>
+        <div class="ability-cube" onclick="event.stopPropagation(); castAbility('blue')">
+            <div style="font-size:30px;color:blue">BLUE</div><span>Ball</span><div id="cd-blue" class="cd-overlay"></div>
         </div>
     </div>
 
     <div id="admin-trigger">Админ Панель</div>
     <div id="admin-menu">
-        <h2 style="text-align:center; color:#00ff00;">ADMIN PANEL 1.6</h2>
-        <button class="admin-btn" onclick="money+=100000;updateUI()">Добавить 100к Монет</button>
-        <button class="admin-btn" onclick="hp=999999;updateUI()">Бессмертие</button>
-        <button class="admin-btn" onclick="activateSorcerer()">Sorcerer</button>
-        <button class="admin-btn" onclick="wave=50;updateUI();">Волна 50 (Nameless)</button>
-        <button class="admin-btn" onclick="wave=70;updateUI();">Волна 70 (Agetha)</button>
-        <button class="admin-btn" onclick="wave=71;updateUI();">Волна 71 (Пурпулезка)</button>
-        <button class="admin-btn" onclick="document.getElementById('admin-menu').style.display='none'" style="border-color:red">Закрыть</button>
+        <button class="admin-btn" onclick="money += 100000; updateUI()">+100к Purple Money</button>
+        <button class="admin-btn" onclick="hp = 999999; updateUI()">Бессмертие</button>
+        <button class="admin-btn" onclick="activateSorcerer()">Sorcerer Mode</button>
+        <button class="admin-btn" onclick="wave = 71; updateUI(); startBattle()">К Пурпулезке</button>
+        <button class="admin-btn" onclick="document.getElementById('admin-menu').style.display='none'">Закрыть</button>
     </div>
 </div>
 
@@ -155,304 +155,179 @@
     <div id="shop-window">
         <div class="shop-item">
             <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1"></div>
-            <h2>Верто-Заяц</h2>
-            <p>Отличный Напарник, всегда готов отбиваться от врагов вместе с вами защищая вас буквально до конца игры, рекомендуется.</p>
-            <div style="font-size:24px;color:red;font-weight:900">3500 Монет</div>
+            <h2 style="font-size: 30px; margin: 0;">Верто-Заяц</h2>
+            <p style="font-size: 16px; text-align: center;">Отличный Напарник, всегда готов отбиваться от врагов вместе с вами защищая вас буквально до конца игры, рекомендуется.</p>
+            <div style="font-size: 28px; font-weight: 900; color: #d00; margin: 10px;">3500 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
-        <div onclick="closeShop()" style="position:absolute;top:-20px;right:-20px;background:red;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;font-weight:900">X</div>
+        <div class="shop-item">
+            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1"></div>
+            <h2 style="font-size: 30px; margin: 0;">Снаряды</h2>
+            <p style="font-size: 16px; text-align: center;">Полезная штука, проплати 250 PurpleMoney чтобы твои снаряды в оружии получили +30 больше урона. Цена с каждой покупкой растёт на +100 монет.</p>
+            <div id="ammo-price-text" style="font-size: 28px; font-weight: 900; color: #d00; margin: 10px;">250 Монет</div>
+            <button class="btn-buy" onclick="buyAmmo()">Приобрести</button>
+        </div>
+        <div onclick="closeShop()" style="position:absolute; top: -30px; right: -30px; background:red; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; font-weight:900;">X</div>
     </div>
 </div>
 
-<div id="subtitle-box"><div id="sub-text"></div></div>
+<div id="subtitle-box">
+    <div id="sub-name">Пурпулезка</div>
+    <div id="sub-text"></div>
+</div>
 
 <div id="lose-screen">
-    <h1 style="color:white;font-size:60px">Мда, лучше бы постарался.</h1>
-    <button style="background:#fff;color:#000;padding:20px 60px;font-size:30px;cursor:pointer;border:none;border-radius:10px;font-weight:900" onclick="respawn()">Лан.</button>
+    <div id="lose-text">Мда, лучше бы постарался.</div>
+    <button id="retry-btn" onclick="respawn()">Лан.</button>
 </div>
 
 <div id="final-credits"></div>
 
 <script>
-    let money = 0, hp = 350, damage = 55, wave = 1, isGameActive = false, adminTimer, hasHeli = false, isSorcerer = false;
-    let activeEnemies = [];
-    
     const enemyData = [
-        {name: "Зомби Заяц", hp: 55, dmg: 20, speed: 6, s: 1, e: 5, img: "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=7ar2q0by&dl=1"},
-        {name: "Рабы Пурпулезки", hp: 310, dmg: 55, speed: 5, s: 5, e: 11, img: "https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=y760bfnq&dl=1"},
-        {name: "Малиновый Хыр", hp: 780, dmg: 89, speed: 4, s: 11, e: 20, img: "https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=q5nh7n82&dl=1"},
-        {name: "Кровавый Бантик", hp: 1989, dmg: 166, speed: 4, s: 20, e: 28, img: "https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=bfrp08sz&dl=1"},
-        {name: "Истинный Гость", hp: 3100, dmg: 250, speed: 5, s: 28, e: 36, img: "https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=l7wlaih1&dl=1"},
-        {name: "Щеноричный Сдел", hp: 7681, dmg: 489, speed: 4, s: 36, e: 45, img: "https://www.dropbox.com/scl/fi/c76zhvy901pqj6wnhc6ss/Picsart_26-02-25_19-09-48-052.png?rlkey=8erkxojcqgom1in01kzqmh2q6&st=50gpbwdu&dl=1"},
-        {name: "Shadow Hare", hp: 16772, dmg: 919191, speed: 8, s: 45, e: 50, img: "https://www.dropbox.com/scl/fi/dg27h6rb2330uyntn2ga5/Picsart_26-02-25_19-10-23-990.png?rlkey=5x10l6ki04hvfld6krujy21vl&st=0kpxz4z9&dl=1"},
-        {name: "The Nameless Hare", hp: 35000, dmg: 9999, speed: 16, s: 50, e: 51, img: "https://www.dropbox.com/scl/fi/zdwojmpsz3mf2ie4f1jwj/Picsart_26-02-25_19-10-33-922.png?rlkey=e4l9uktjlvtl7h4du0v7gmluc&st=e4j4mi1c&dl=1", boss: true},
-        {name: "Zombie Father Hare", hp: 21781, dmg: 1891, speed: 7, s: 51, e: 60, img: "https://www.dropbox.com/scl/fi/rscd5vy3hjxfb2gxlxskb/Picsart_26-02-25_19-10-10-083.png?rlkey=xz01b2w8wl6q3aqqwd7azim6s&st=kvkv0apr&dl=1"},
-        {name: "Инши", hp: 26789, dmg: 9199, speed: 6, s: 60, e: 70, img: "https://www.dropbox.com/scl/fi/ivx4llojwlbso1zn571sd/Picsart_26-02-25_19-12-22-085.png?rlkey=lzpcyrefycb4jy6utlyi6snh2&st=gly90j2p&dl=1"},
-        {name: "Agetha Hare", hp: 56778, dmg: 91919191, speed: 21, s: 70, e: 71, img: "https://www.dropbox.com/scl/fi/982f5rb5tg1qg4st58kj1/Picsart_26-02-25_19-10-51-597.png?rlkey=6l5f4zshwf3ctc4r1z5q4jrcb&st=o2a6yf2f&dl=1", boss: true},
-        {name: "Пурпулезка", hp: 150000, dmg: 10, speed: 0, s: 71, e: 72, img: "https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&dl=1", final: true}
+        {name: "Зомби Заяц", hp: 55, dmg: 20, speed: 6000, start: 1, end: 5, img: "https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=7ar2q0by&dl=1"},
+        {name: "Рабы Пурпулезки", hp: 310, dmg: 55, speed: 5000, start: 5, end: 11, img: "https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=y760bfnq&dl=1"},
+        {name: "Малиновый Хыр", hp: 780, dmg: 89, speed: 4000, start: 11, end: 20, img: "https://www.dropbox.com/scl/fi/z3omefpvjio3aj6f4cgss/Picsart_26-02-25_19-08-59-599.png?rlkey=u62acjeoulrd9ykrnn64rc4e7&st=q5nh7n82&dl=1"},
+        {name: "Кровавый Бантик", hp: 1989, dmg: 166, speed: 4000, start: 20, end: 28, img: "https://www.dropbox.com/scl/fi/sa88ntns8llt94yyipjho/Picsart_26-02-25_19-09-24-975.png?rlkey=ldstq44p4sdy1n03jlbyfx4qx&st=bfrp08sz&dl=1"},
+        {name: "Истинный Гость", hp: 3100, dmg: 250, speed: 5000, start: 28, end: 36, img: "https://www.dropbox.com/scl/fi/cumlg6kmbyntnz8z83699/Picsart_26-02-25_19-09-38-084.png?rlkey=48xnkn11fe5w29uvvy1sl6l09&st=l7wlaih1&dl=1"},
+        {name: "Щеноричный Сдел", hp: 7681, dmg: 489, speed: 4000, start: 36, end: 45, img: "https://www.dropbox.com/scl/fi/c76zhvy901pqj6wnhc6ss/Picsart_26-02-25_19-09-48-052.png?rlkey=8erkxojcqgom1in01kzqmh2q6&st=50gpbwdu&dl=1"},
+        {name: "Shadow Hare", hp: 16772, dmg: 91919191, speed: 8000, start: 45, end: 50, img: "https://www.dropbox.com/scl/fi/dg27h6rb2330uyntn2ga5/Picsart_26-02-25_19-10-23-990.png?rlkey=5x10l6ki04hvfld6krujy21vl&st=0kpxz4z9&dl=1"},
+        {name: "The Nameless Hare", hp: 35000, dmg: 9999, speed: 16000, start: 50, end: 51, img: "https://www.dropbox.com/scl/fi/zdwojmpsz3mf2ie4f1jwj/Picsart_26-02-25_19-10-33-922.png?rlkey=e4l9uktjlvtl7h4du0v7gmluc&st=e4j4mi1c&dl=1", isBoss: true},
+        {name: "Zombie Father Hare", hp: 21781, dmg: 1891, speed: 7000, start: 51, end: 60, img: "https://www.dropbox.com/scl/fi/rscd5vy3hjxfb2gxlxskb/Picsart_26-02-25_19-10-10-083.png?rlkey=xz01b2w8wl6q3aqqwd7azim6s&st=kvkv0apr&dl=1"},
+        {name: "Инши", hp: 26789, dmg: 9199, speed: 6000, start: 60, end: 70, img: "https://www.dropbox.com/scl/fi/ivx4llojwlbso1zn571sd/Picsart_26-02-25_19-12-22-085.png?rlkey=lzpcyrefycb4jy6utlyi6snh2&st=gly90j2p&dl=1"},
+        {name: "Agetha Hare", hp: 56778, dmg: 999999999, speed: 21000, start: 70, end: 71, img: "https://www.dropbox.com/scl/fi/982f5rb5tg1qg4st58kj1/Picsart_26-02-25_19-10-51-597.png?rlkey=6l5f4zshwf3ctc4r1z5q4jrcb&st=o2a6yf2f&dl=1", isBoss: true},
+        {name: "Пурпулезка", hp: 150000, dmg: 10, speed: 0, start: 71, end: 72, img: "https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&dl=1", isFinal: true}
     ];
+
+    let money = 0, hp = 350, damage = 50, ammoPrice = 250, wave = 1, enemiesLeft = 10;
+    let isGameActive = false, isSorcerer = false, hasHeli = false, adminTimer;
+    let activeEnemies = [];
 
     function updateUI() {
         document.getElementById('m-val').innerText = money;
         document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + Math.max(0, Math.floor(hp));
-        document.getElementById('hp-fill').style.width = (hp/350)*100 + "%";
+        document.getElementById('hp-fill').style.width = Math.min(100, (hp/350)*100) + "%";
         document.getElementById('wave-big').innerText = wave + " Волна";
+        document.getElementById('enemies-count').innerText = "Осталось Врагов: " + enemiesLeft;
     }
 
-    function startAdminTimer() { adminTimer = setTimeout(() => { document.getElementById('admin-trigger').style.display = 'flex'; }, 5000); }
+    function startAdminTimer() { adminTimer = setTimeout(() => { document.getElementById('admin-trigger').style.display='flex'; }, 5000); }
     function clearAdminTimer() { clearTimeout(adminTimer); }
-    document.getElementById('admin-trigger').onclick = () => { document.getElementById('admin-menu').style.display = 'flex'; };
+    document.getElementById('admin-trigger').onclick = () => document.getElementById('admin-menu').style.display='flex';
 
-    function openShop() { document.getElementById('shop-overlay').style.display = 'flex'; }
-    function closeShop() { document.getElementById('shop-overlay').style.display = 'none'; }
-    function buyHeli() { 
-        if(money >= 3500 && !hasHeli) { 
-            money -= 3500; hasHeli = true; 
-            document.getElementById('heli-hare').style.display = 'block'; 
-            updateUI(); closeShop(); 
-            setInterval(() => { if(isGameActive) shoot(null, 'heli'); }, 100);
-        } 
-    }
-
-    function activateSorcerer() {
-        isSorcerer = true;
-        document.getElementById('main-hare').src = "https://www.dropbox.com/scl/fi/y4osxbudupe0wnhweeaf9/Picsart_26-02-25_22-08-16-343.png?rlkey=kb5bal51fdx58x3wji1jakaf5&st=jhn4s6si&dl=1";
-        document.getElementById('ability-container').style.display = 'flex';
-        let a = document.getElementById('sorcerer-alert');
-        a.style.transform = "translate(-50%, -50%) scale(1)";
-        setTimeout(() => a.style.transform = "translate(-50%, -50%) scale(0)", 2000);
-    }
+    function openShop() { document.getElementById('shop-overlay').style.display='flex'; }
+    function closeShop() { document.getElementById('shop-overlay').style.display='none'; }
+    function buyAmmo() { if(money >= ammoPrice) { money -= ammoPrice; damage += 30; ammoPrice += 100; document.getElementById('ammo-price-text').innerText = ammoPrice + " Монет"; updateUI(); } }
+    function buyHeli() { if(money >= 3500 && !hasHeli) { money -= 3500; hasHeli = true; document.getElementById('heli-hare').style.display='block'; updateUI(); setInterval(() => { if(isGameActive) shoot(null, 'heli'); }, 100); } }
 
     function shoot(e, type) {
-        if(!isGameActive && wave < 71) return;
+        if(!isGameActive) return;
         let b = document.createElement('img');
         b.src = "https://www.dropbox.com/scl/fi/p4svu0wsgfhj6gzbb9xvw/Picsart_26-02-25_16-30-12-240.png?rlkey=kjroe5og6sduz1vov53mba0zz&st=b0l23gb9&dl=1";
         b.className = 'bullet';
-        let startX = (type === 'heli') ? 350 : 380;
-        let startY = (type === 'heli') ? 20 : 38;
+        let startX = type === 'heli' ? 350 : 400;
+        let startY = type === 'heli' ? 25 : 35;
         b.style.left = startX + "px"; b.style.bottom = startY + "%";
         document.getElementById('game-container').appendChild(b);
-
-        let bPos = startX;
+        let pos = startX;
         let bInt = setInterval(() => {
-            bPos += 40; b.style.left = bPos + "px";
+            pos += 40; b.style.left = pos + "px";
             activeEnemies.forEach(z => {
                 let zR = z.getBoundingClientRect(), bR = b.getBoundingClientRect();
                 if(bR.right > zR.left && bR.left < zR.right && bR.top < zR.bottom && bR.bottom > zR.top) {
-                    z.dataset.hp -= (type==='heli') ? 100 : damage;
+                    z.dataset.hp -= (type==='heli' ? 100 : damage);
                     updateEnemyHP(z); b.remove(); clearInterval(bInt);
                 }
             });
-            if(bPos > window.innerWidth) { b.remove(); clearInterval(bInt); }
+            if(pos > window.innerWidth) { b.remove(); clearInterval(bInt); }
         }, 16);
     }
 
-    function updateEnemyHP(z) {
-        let fill = z.querySelector('.zombie-hp-fill');
-        let current = parseFloat(z.dataset.hp);
-        let max = parseFloat(z.dataset.maxHp);
-        if(fill) fill.style.width = (current/max)*100 + "%";
-        
-        if(z.dataset.boss || z.dataset.final) {
-            document.getElementById('boss-hp-fill').style.width = (current/max)*100 + "%";
-            document.getElementById('boss-hp-text').innerText = Math.max(0, Math.floor(current)) + " ХП";
-        }
-
-        if(current <= 0) {
-            if(z.dataset.final) { bossDeath(); } else {
-                z.style.opacity = '0';
-                setTimeout(() => { z.remove(); activeEnemies = activeEnemies.filter(e => e !== z); checkWaveEnd(); }, 300);
-                money += 150; updateUI();
-            }
-        }
-    }
-
-    function spawnEnemy(data, isBoss = false) {
+    function spawnEnemy(index, count, type) {
+        if(!isGameActive) return;
         let container = document.createElement('div');
         container.className = 'zombie-container';
-        container.dataset.hp = data.hp; container.dataset.maxHp = data.hp;
-        container.dataset.dmg = data.dmg;
-        if(data.boss) container.dataset.boss = "true";
-        if(data.final) container.dataset.final = "true";
-
-        container.innerHTML = data.final ? `<img class="zombie-img" src="${data.img}">` : `
-            <div class="zombie-hp-bar"><div class="zombie-hp-fill"></div></div>
-            <img class="zombie-img" src="${data.img}">
-        `;
+        container.dataset.hp = type.hp; container.dataset.maxHp = type.hp;
+        container.innerHTML = `<div class="zombie-hp-bar-small"><div class="zombie-hp-fill-small"></div></div><img class="zombie-img" src="${type.img}">`;
         document.getElementById('game-container').appendChild(container);
         activeEnemies.push(container);
 
-        if(data.final) {
-            container.style.right = "50px"; container.style.top = "100px"; container.style.bottom = "auto";
-            container.style.animation = "purpFloat 3s infinite ease-in-out";
-            return;
-        }
-
-        let speedPx = (window.innerWidth) / (data.speed * 60);
-        let pos = -450;
+        let pos = -500;
         let moveInt = setInterval(() => {
-            if(!isGameActive) { clearInterval(moveInt); return; }
-            pos += speedPx; container.style.right = pos + "px";
-            
-            // Эффект Agetha
-            if(data.name === "Agetha Hare") {
+            if(!isGameActive) { clearInterval(moveInt); container.remove(); return; }
+            pos += (window.innerWidth / (type.speed / 16));
+            container.style.right = pos + "px";
+
+            if(type.name === "Agetha Hare") {
                 let dist = container.getBoundingClientRect().left;
-                let blur = Math.max(0, (500 - dist) / 50);
-                document.getElementById('game-container').style.filter = `blur(${blur}px)`;
+                document.getElementById('blur-overlay').style.backdropFilter = `blur(${(1 - dist/window.innerWidth)*20}px)`;
             }
 
             if(container.getBoundingClientRect().left < 450) {
-                hp -= parseFloat(data.dmg); updateUI();
+                hp -= type.dmg; updateUI(); 
                 container.remove(); activeEnemies = activeEnemies.filter(e => e !== container);
-                clearInterval(moveInt); checkWaveEnd();
+                clearInterval(moveInt); enemyDefeated();
                 if(hp <= 0) gameOver();
             }
         }, 16);
     }
 
-    function startBattle() {
-        isGameActive = true;
-        toggleUI(false);
+    function updateEnemyHP(z) {
+        let fill = z.querySelector('.zombie-hp-fill-small');
+        if(fill) fill.style.width = (z.dataset.hp / z.dataset.maxHp) * 100 + "%";
         
-        if(wave >= 1 && wave <= 3) {
-            let h = document.getElementById('battle-hint');
-            h.style.display = 'block'; setTimeout(() => h.style.opacity = '1', 10);
-        }
+        let bossFill = document.getElementById('boss-hp-fill');
+        if(z.dataset.isBoss === "true") bossFill.style.width = (z.dataset.hp / z.dataset.maxHp) * 100 + "%";
 
-        let currentType = enemyData.find(d => wave >= d.s && wave < d.e);
-        if(!currentType) return;
-
-        if(currentType.boss || currentType.final) {
-            if(currentType.name === "The Nameless Hare") {
-                setTimeout(() => document.getElementById('red-overlay').style.display='block', 100);
+        if(z.dataset.hp <= 0) {
+            z.remove(); activeEnemies = activeEnemies.filter(e => e !== z);
+            money += 150; updateUI(); enemyDefeated();
+            if(z.dataset.isBoss === "true") {
+                document.getElementById('boss-ui').style.opacity = 0;
+                document.getElementById('red-screen').style.display = 'none';
+                document.getElementById('blur-overlay').style.backdropFilter = "blur(0px)";
             }
-            showBossUI(currentType.name, currentType.hp);
-            spawnEnemy(currentType, true);
-        } else {
-            let count = 0;
-            let spawnInt = setInterval(() => {
-                if(count >= 8 || !isGameActive) { clearInterval(spawnInt); return; }
-                spawnEnemy(currentType);
-                count++;
-            }, 2000);
         }
-
-        if(currentType.final) startPurpulezkaSequence();
     }
 
-    function checkWaveEnd() {
-        if(activeEnemies.length === 0 && isGameActive) {
-            isGameActive = false; wave++;
-            document.getElementById('red-overlay').style.display = 'none';
-            document.getElementById('game-container').style.filter = 'none';
-            hideBossUI();
-            let h = document.getElementById('battle-hint');
-            h.style.opacity = '0'; setTimeout(() => h.style.display = 'none', 500);
-            setTimeout(() => { toggleUI(true); updateUI(); }, 1000);
+    function startBattle() {
+        if(wave === 71) { startPurpulezka(); return; }
+        isGameActive = true; 
+        toggleUI(false);
+        if(wave <= 3) { let h = document.getElementById('hint-text'); h.style.opacity = 1; setTimeout(() => h.style.opacity = 0, 5000); }
+        
+        let type = enemyData.find(e => wave >= e.start && wave < e.end);
+        enemiesLeft = type.isBoss ? 1 : 10;
+        updateUI();
+
+        if(type.isBoss) {
+            showBossUI(type);
+            setTimeout(() => spawnEnemy(0, 1, type), 1000);
+        } else {
+            for(let i=0; i<10; i++) { setTimeout(() => spawnEnemy(i, 10, type), i * 2000); }
         }
+    }
+
+    function showBossUI(type) {
+        let b = document.getElementById('boss-ui');
+        b.style.display = 'flex'; setTimeout(() => b.style.opacity = 1, 100);
+        document.getElementById('boss-name').innerText = type.name + " [BOSS]";
+        document.getElementById('boss-hp-fill').style.width = "100%";
+        if(type.name === "The Nameless Hare") setTimeout(() => document.getElementById('red-screen').style.display='block', 100);
     }
 
     function toggleUI(show) {
-        let op = show ? '1' : '0';
-        document.querySelectorAll('.ui-element').forEach(el => el.style.opacity = op);
-        document.getElementById('start-btn-ui').style.display = show ? 'block' : 'none';
-        document.getElementById('floor').style.opacity = show ? '1' : '0.5';
+        let els = document.querySelectorAll('.ui-element');
+        els.forEach(e => { e.style.opacity = show ? "1" : "0"; e.style.pointerEvents = show ? "auto" : "none"; });
+        document.getElementById('start-btn-ui').style.display = show ? "block" : "none";
     }
 
-    function showBossUI(name, hp) {
-        let b = document.getElementById('boss-ui');
-        document.getElementById('boss-name').innerText = name + " [BOSS]";
-        document.getElementById('boss-hp-text').innerText = hp + " ХП";
-        document.getElementById('boss-hp-fill').style.width = "100%";
-        b.style.display = 'block'; setTimeout(() => b.style.opacity = '1', 10);
-    }
-    function hideBossUI() {
-        let b = document.getElementById('boss-ui');
-        b.style.opacity = '0'; setTimeout(() => b.style.display = 'none', 500);
-    }
-
-    function castAbility(type) {
-        if(type === 'red' && isSorcerer) {
-            let cd = document.getElementById('cd-red');
-            if(cd.style.height !== '0%' && cd.style.height !== '') return;
-            
-            let hare = document.getElementById('main-hare');
-            hare.style.transform = "rotate(-20deg) scale(1.1)";
-            document.getElementById('red-overlay').style.display = 'block';
-            
-            let ball = document.createElement('img');
-            ball.src = "https://www.dropbox.com/scl/fi/7cnx2g5sp2ggmr62q63ur/Picsart_26-02-25_22-08-44-789.png?rlkey=gnmnldzy0874ffnrcedd8ebhl&st=gdpywh80&dl=1";
-            ball.style.position = 'fixed'; ball.style.left = '450px'; ball.style.bottom = '35%'; ball.style.width = '150px'; ball.style.zIndex = '1000';
-            document.body.appendChild(ball);
-
-            setTimeout(() => {
-                let bPos = 450;
-                let bInt = setInterval(() => {
-                    bPos += 60; ball.style.left = bPos + "px";
-                    activeEnemies.forEach(z => {
-                        z.dataset.hp -= 99999999; updateEnemyHP(z);
-                    });
-                    if(bPos > window.innerWidth) {
-                        ball.remove(); clearInterval(bInt);
-                        hare.style.transform = "rotate(0)";
-                        document.getElementById('red-overlay').style.display = 'none';
-                    }
-                }, 16);
-            }, 1000);
-
-            cd.style.height = '100%';
-            let cur = 100;
-            let cInt = setInterval(() => { cur -= 1; cd.style.height = cur + "%"; if(cur <= 0) clearInterval(cInt); }, 100);
+    function enemyDefeated() {
+        enemiesLeft--; updateUI();
+        if(enemiesLeft <= 0) { 
+            isGameActive = false; activeEnemies.forEach(e => e.remove()); activeEnemies = [];
+            wave++; toggleUI(true);
         }
-    }
-
-    function startPurpulezkaSequence() {
-        setTimeout(() => showSub("ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШОЕ РЕШЕНИЕ?", 4000), 1000);
-        setTimeout(() => showSub("ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, Я РАЗВАЛЮ ТВОЮ КАБИНУ!", 4000), 5500);
-        
-        // Клоны каждые 10 сек
-        let cloneInt = setInterval(() => {
-            if(wave != 71 || !isGameActive) { clearInterval(cloneInt); return; }
-            let clone = document.createElement('img');
-            clone.src = "https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&dl=1";
-            clone.className = "clone-tapok";
-            clone.style.right = "200px"; clone.style.top = "200px";
-            document.body.appendChild(clone);
-            setTimeout(() => {
-                clone.style.right = "85%"; clone.style.top = "60%";
-                setTimeout(() => { hp -= 10; updateUI(); clone.remove(); }, 500);
-            }, 100);
-        }, 10000);
-    }
-
-    function bossDeath() {
-        isGameActive = false;
-        let p = document.getElementById('boss-hp-frame');
-        p.style.transition = "opacity 1s"; p.style.opacity = "0";
-        
-        let boss = activeEnemies[0];
-        boss.style.animation = "none";
-        boss.style.transition = "top 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045)";
-        boss.style.top = "80%";
-        setTimeout(() => { boss.style.animation = "shake 0.1s infinite"; }, 500);
-
-        setTimeout(() => showSub("ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!", 4000), 1000);
-        setTimeout(() => {
-            showSub("В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!", 4000);
-            setTimeout(() => {
-                boss.style.transform = "scale(1.5)";
-                let flash = document.getElementById('white-flash');
-                flash.style.display = 'block'; setTimeout(() => flash.style.opacity = '1', 50);
-                setTimeout(startFinalCredits, 2000);
-            }, 4500);
-        }, 5000);
-    }
-
-    function showSub(t, time) {
-        let b = document.getElementById('subtitle-box');
-        document.getElementById('sub-text').innerText = t;
-        b.classList.add('active');
-        setTimeout(() => b.classList.remove('active'), time);
     }
 
     function gameOver() {
@@ -461,41 +336,140 @@
     }
 
     function respawn() {
-        hp = 350; activeEnemies.forEach(e => e.remove()); activeEnemies = [];
-        updateUI(); document.getElementById('lose-screen').style.display = 'none';
-        document.getElementById('red-overlay').style.display = 'none';
-        document.getElementById('game-container').style.filter = 'none';
+        hp = 350; updateUI();
+        document.getElementById('lose-screen').style.display = 'none';
         toggleUI(true);
     }
 
-    function startFinalCredits() {
+    function activateSorcerer() {
+        isSorcerer = true;
+        document.getElementById('main-hare').src = "https://www.dropbox.com/scl/fi/y4osxbudupe0wnhweeaf9/Picsart_26-02-25_22-08-16-343.png?rlkey=kb5bal51fdx58x3wji1jakaf5&st=jhn4s6si&dl=1";
+        document.getElementById('ability-container').style.display = 'flex';
+    }
+
+    function castAbility(type) {
+        if(!isGameActive) return;
+        let cd = document.getElementById('cd-' + type);
+        if(cd.style.height !== '0%' && cd.style.height !== '') return;
+        cd.style.height = '100%'; setTimeout(() => cd.style.height = '0%', 10000);
+
+        if(type === 'red') {
+            let hare = document.getElementById('main-hare');
+            hare.style.transform = "rotate(-20deg) scale(1.1)";
+            setTimeout(() => {
+                document.getElementById('red-screen').style.display = 'block';
+                let ball = document.createElement('img');
+                ball.src = "https://www.dropbox.com/scl/fi/7cnx2g5sp2ggmr62q63ur/Picsart_26-02-25_22-08-44-789.png?rlkey=gnmnldzy0874ffnrcedd8ebhl&st=gdpywh80&dl=0";
+                ball.style.position = 'fixed'; ball.style.left = '450px'; ball.style.bottom = '30%'; ball.style.width = '150px'; ball.style.zIndex = '1000';
+                document.body.appendChild(ball);
+                setTimeout(() => {
+                    let pos = 450;
+                    let ballInt = setInterval(() => {
+                        pos += 60; ball.style.left = pos + "px";
+                        activeEnemies.forEach(z => { z.dataset.hp -= 99999999; updateEnemyHP(z); });
+                        if(pos > window.innerWidth) { ball.remove(); clearInterval(ballInt); document.getElementById('red-screen').style.display='none'; hare.style.transform="rotate(0)"; }
+                    }, 16);
+                }, 1000);
+            }, 200);
+        }
+    }
+
+    /* ФИНАЛЬНЫЙ БОСС */
+    function startPurpulezka() {
+        isGameActive = true; toggleUI(false);
+        let purp = enemyData.find(e => e.isFinal);
+        let container = document.createElement('div');
+        container.className = 'zombie-container'; container.id = 'purp-boss';
+        container.style.right = '100px'; container.style.top = '10%'; container.style.bottom = 'auto';
+        container.style.animation = "purpFloat 3s infinite ease-in-out";
+        container.dataset.hp = 150000; container.dataset.maxHp = 150000;
+        container.innerHTML = `<img src="${purp.img}" style="width:400px">`;
+        document.getElementById('game-container').appendChild(container);
+        activeEnemies.push(container);
+
+        let bUi = document.getElementById('boss-ui');
+        bUi.style.display = 'flex'; bUi.style.opacity = 1;
+        document.getElementById('boss-name').innerText = "Пурпулезка [FINAL BOSS]";
+
+        showSub("ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШОЕ РЕШЕНИЕ?", 4000);
+        setTimeout(() => showSub("ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ!", 5000), 4500);
+
+        let timer = 100;
+        let tInt = setInterval(() => {
+            timer--;
+            if(timer <= 0) { clearInterval(tInt); bossUltimate(); }
+            if(container.dataset.hp <= 0) { clearInterval(tInt); bossDeath(); }
+        }, 1000);
+
+        setInterval(() => {
+            if(isGameActive && container.dataset.hp > 0) {
+                let clone = document.createElement('img');
+                clone.src = purp.img; clone.style.position = 'fixed'; clone.style.right = '200px'; clone.style.top = '150px'; clone.style.width = '100px';
+                document.body.appendChild(clone);
+                let cx = window.innerWidth - 200, cy = 150;
+                let cInt = setInterval(() => {
+                    cx -= 15; cy += 10; clone.style.left = cx + "px"; clone.style.top = cy + "px";
+                    if(cx < 400) { hp -= 10; updateUI(); clone.remove(); clearInterval(cInt); if(hp <= 0) gameOver(); }
+                }, 16);
+            }
+        }, 10000);
+    }
+
+    function showSub(text, time) {
+        let box = document.getElementById('subtitle-box');
+        document.getElementById('sub-text').innerText = text;
+        box.classList.add('active');
+        setTimeout(() => box.classList.remove('active'), time);
+    }
+
+    function bossUltimate() {
+        showSub("ОЙ, КАЖЕТСЯ КТО-ТО ПРОИГРАЛ, ПОРА БЫ РАЗВАЛИТЬ ТВОЮ КАБИНУ!", 3000);
+        setTimeout(() => {
+            let p = document.getElementById('purp-boss');
+            p.style.transition = "all 0.5s"; p.style.right = "80%";
+            setTimeout(() => { hp -= 999999999; updateUI(); gameOver(); }, 500);
+        }, 3500);
+    }
+
+    function bossDeath() {
+        isGameActive = false;
+        let p = document.getElementById('purp-boss');
+        p.style.animation = "none"; p.style.transition = "all 1s";
+        p.style.top = "60%"; p.style.transform = "rotate(90deg)";
+        document.getElementById('boss-ui').style.opacity = 0;
+        
+        showSub("ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!", 4000);
+        setTimeout(() => {
+            showSub("В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!", 4000);
+            setTimeout(() => {
+                p.style.animation = "shake 0.1s infinite";
+                document.getElementById('white-screen').style.display = 'block';
+                document.getElementById('white-screen').style.opacity = 1;
+                setTimeout(runFinalCredits, 3000);
+            }, 4000);
+        }, 4500);
+    }
+
+    function runFinalCredits() {
+        const credits = ["Эй...", "Не уходи...", "О!", "Я думал, что потерял тебя...", "Слушай...", "Я хочу тебя предупредить...", "Они уже здесь, и идут за тобой...", "Тебе надо скатываться..."];
         let box = document.getElementById('final-credits');
         box.style.display = 'flex';
-        const lines = ["Эй...", "Не уходи...", "О!", "Я думал, что потерял тебя...", "Слушай...", "Я хочу тебя предупредить...", "Они уже здесь, и идут за тобой...", "Тебе надо скатываться..."];
-        
         let i = 0;
         function showLine() {
-            if(i < lines.length) {
-                let p = document.createElement('p'); p.className = 'credit-text'; p.innerText = lines[i];
-                box.appendChild(p); setTimeout(() => p.style.opacity = '1', 100);
-                setTimeout(() => { p.style.opacity = '0'; i++; setTimeout(showLine, 1000); }, 4000);
+            if(i < credits.length) {
+                let p = document.createElement('div'); p.className = 'credit-line'; p.innerText = credits[i];
+                box.appendChild(p); setTimeout(() => p.style.opacity = 1, 100);
+                setTimeout(() => { p.style.opacity = 0; i++; setTimeout(showLine, 1000); }, 4000);
             } else {
-                setTimeout(() => {
-                    box.innerHTML = `
-                        <h1 style="font-size:80px;color:#000;margin-bottom:0;">THE END</h1>
-                        <p style="font-size:25px;color:#000;">Спасибо За Игру! Игра была создана пользователем: @Xn1ckname.</p>
-                        <p class="good-end" style="display:block;">Хорошая Концовка.</p>
-                    `;
-                    setTimeout(() => {
-                        box.style.background = "#000"; box.innerHTML = "";
-                        setTimeout(() => location.reload(), 3000);
-                    }, 19000);
-                }, 1000);
+                box.innerHTML = `<h1 class="credit-line" style="opacity:1; font-size:80px">THE END</h1>
+                <p style="color:#000; font-size:25px">Спасибо За Игру! Игра была создана пользователем: @Xn1ckname.</p>
+                <div class="good-end">Хорошая Концовка.</div>`;
+                setTimeout(() => { box.style.background = '#000'; box.innerHTML = ''; }, 19000);
+                setTimeout(() => location.reload(), 22000);
             }
         }
         showLine();
     }
-
     updateUI();
 </script>
 </body>
