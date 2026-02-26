@@ -36,16 +36,24 @@
         #boss-hp-text { color:#fff;font-size:30px;margin-top:-45px;z-index:1001;position:relative;text-align:center; }
 
         #tutorial-hint { position:fixed;top:220px;left:50%;transform:translateX(-50%);color:#fff;font-size:28px;-webkit-text-stroke:1.5px #000;z-index:2000;display:none;text-align:center; }
-        #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0.25);z-index:5;display:none;pointer-events:none; }
+        #red-screen-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:4;display:none;pointer-events:none; }
         #white-flash { position:fixed;inset:0;background:#fff;z-index:10000;display:none;opacity:0;transition:opacity .5s; }
-        #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
+        #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275),opacity .5s;pointer-events:none;opacity:0; }
 
         .bullet { position:absolute;z-index:48;width:150px;pointer-events:none; }
 
         #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s; }
-        #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:60px;background:#222;border:4px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:14px;cursor:pointer;z-index:100000;border-radius:10px; }
-        #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:450px;background:rgba(0,0,0,.95);border:5px solid #00ff00;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px; }
-        .admin-btn { width:100%;padding:15px;margin:10px 0;background:#111;border:2px solid #00ff00;color:#fff;font-size:18px;cursor:pointer;font-weight:900; }
+        #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:120px;background:#000;border:6px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:14px;cursor:pointer;z-index:100000;border-radius:20px;box-shadow:0 0 20px #000; }
+        #admin-menu { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:380px;background:rgba(0,0,0,0.92);border:6px solid #fff;display:none;flex-direction:column;padding:25px;z-index:100001;color:#fff;border-radius:25px;transition:transform .4s,opacity .4s;opacity:0; }
+        #admin-menu.active { transform:translate(-50%,-50%) scale(1);opacity:1; }
+        .admin-btn { width:100%;padding:18px;margin:12px 0;background:#111;border:3px solid #00ff00;color:#fff;font-size:20px;cursor:pointer;font-weight:900;border-radius:12px; }
+        .sorcerer-row { display:flex;align-items:center;gap:15px;margin:15px 0;padding:12px;background:rgba(255,255,255,0.08);border-radius:12px;cursor:pointer; }
+        .sorcerer-icon { width:60px;height:60px;object-fit:contain; }
+        .sorcerer-text { color:#ffff00;font-size:28px;font-weight:900;text-shadow:0 0 10px #ffff00,0 0 20px #ffff00; }
+
+        #confirm-sorcerer { position:fixed;top:50%;right:-500px;width:400px;background:#000;border:6px solid #fff;padding:30px;z-index:100002;color:#fff;border-radius:25px;transition:right .5s; }
+        #confirm-sorcerer.active { right:20px; }
+        #sorcerer-alert.active { transform:translate(-50%,-50%) scale(1);opacity:1; }
 
         #subtitle-box { position:fixed;bottom:50px;left:50%;transform:translateX(-50%) translateY(300px);width:85%;background:#fff;border:8px solid #000;padding:25px;z-index:9000;transition:transform .5s;border-radius:15px;display:none; }
         #subtitle-box.active { transform:translateX(-50%) translateY(0); }
@@ -56,12 +64,18 @@
         #final-credits { position:fixed;inset:0;background:#fff;z-index:2000000;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center; }
         .credit-line { font-size:45px;color:#000;margin:20px;opacity:0;transition:opacity 1.5s;font-weight:900; }
 
+        .admin-notif { position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:none;justify-content:center;align-items:center; }
+        .admin-notif-box { background:#fff;padding:40px 60px;border-radius:25px;text-align:center;max-width:90%; }
+        .admin-notif-text { font-size:38px;color:#000;margin-bottom:30px; }
+        .admin-ok-btn { background:#00ff00;color:#000;padding:20px 50px;font-size:32px;border:none;border-radius:15px;cursor:pointer;font-weight:900; }
+
         @keyframes floatPurp { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-30px); } }
         @keyframes shake { 0% { transform:translate(1px,1px) rotate(0deg); } 10% { transform:translate(-1px,-2px) rotate(-1deg); } 100% { transform:translate(1px,-2px) rotate(-1deg); } }
         @keyframes glowGreen { from { text-shadow:0 0 5px #0f0; } to { text-shadow:0 0 20px #0f0,0 0 35px #0f0; } }
+        @keyframes floatUpFade { 0% { transform:translateY(0);opacity:1; } 100% { transform:translateY(-120px);opacity:0; } }
 
-        #ability-container { position:absolute;bottom:160px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;opacity:0;transition:opacity .6s; }
-        #ability-container.active { opacity:1; }
+        #ability-container { position:absolute;bottom:-300px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s; }
+        #ability-container.active { bottom:160px; }
         .ability-cube { width:180px;height:180px;background:rgba(0,0,0,.47);border:6px solid #fff;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;cursor:pointer;position:relative;border-radius:20px; }
         .ability-cube .text-label { font-size:30px;font-weight:900;color:#fff;text-shadow:2px 2px #000; }
         .cd-overlay { position:absolute;bottom:0;left:0;width:100%;height:0%;background:rgba(255,0,0,.6);z-index:1;border-radius:0 0 15px 15px;transition:height .1s linear; }
@@ -73,6 +87,11 @@
         .red-frame img { max-width:90%;max-height:90%; }
         .btn-buy { background:#00ff00;border:6px solid #000;padding:25px 60px;color:#fff;font-size:36px;cursor:pointer;border-radius:25px;font-weight:900; }
         #shop-close { position:absolute;top:-30px;right:-30px;background:red;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;font-weight:900;border:4px solid #000; }
+
+        .buy-notif { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:#000;color:#fff;padding:40px;border:6px solid #fff;border-radius:25px;z-index:100002;text-align:center;transition:transform .4s; }
+        .buy-notif.active { transform:translate(-50%,-50%) scale(1); }
+        .upgrade-text { position:fixed;top:30%;left:50%;transform:translateX(-50%) translateY(-50px);color:#ff0000;font-size:60px;-webkit-text-stroke:2px #000;opacity:0;z-index:100003;transition:opacity .5s,transform .8s;pointer-events:none; }
+        .upgrade-text.show { opacity:1;transform:translateX(-50%) translateY(0); }
     </style>
 </head>
 <body onclick="playerShoot(event)">
@@ -113,15 +132,20 @@
     <div id="floor"></div>
     <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
 
-    <div id="admin-trigger">Админ Панель 1.6 🍺</div>
+    <div id="admin-trigger"></div>
     <div id="admin-menu">
-        <h2 style="text-align:center; color:#00ff00;">ADMIN PANEL 1.6</h2>
+        <div class="sorcerer-row" onclick="confirmSorcerer()">
+            <img class="sorcerer-icon" src="https://www.dropbox.com/scl/fi/cc4cwmtqchatzfo5uif7z/SorcererIcon.webp?rlkey=irn4n55aqudv4zfs568aacz6q&st=or4svham&dl=0">
+            <span class="sorcerer-text">Sorcerer</span>
+        </div>
         <button class="admin-btn" onclick="addMoneyAdmin()">Деньжата +100К</button>
         <button class="admin-btn" onclick="toggleCurse()">Проклятие (Бессмертие)</button>
-        <button class="admin-btn" onclick="toggleAutoClick()">Авто Кликер: OFF</button>
-        <button class="admin-btn" onclick="activateSorcerer()">Sorcerer</button>
         <button class="admin-btn" onclick="skipWaveAdmin()">Пропустить Волну</button>
-        <button class="admin-btn" onclick="document.getElementById('admin-menu').style.display='none'">Закрыть</button>
+    </div>
+
+    <div id="confirm-sorcerer">
+        <h2 style="margin:0 0 20px;font-size:28px;">Ошибка: Чи действительно Вы хотите поменять свой облик?</h2>
+        <button style="background:#fff;color:#000;padding:18px 60px;font-size:26px;border:4px solid #000;border-radius:15px;cursor:pointer;" onclick="activateSorcererConfirm()">Да!</button>
     </div>
 
     <div id="ability-container">
@@ -153,14 +177,14 @@
 <div id="shop-overlay">
     <div id="shop-window">
         <div class="shop-item">
-            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1"></div>
+            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/12vlohfl9xc1gsyc834ud/Picsart_26-02-25_20-07-48-108.png?rlkey=ufof2v3c18mp9s0ym3tqlm1sg&st=pyzps94y&dl=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer"></div>
             <h2 style="font-size:30px;margin:0;">Верто-Заяц</h2>
             <p style="font-size:16px;text-align:center;">Отличный Напарник, всегда успешно помогает, всегда готов отбиваться от врагов вместе с вами. Рекомендуется для покупки.</p>
             <div style="font-size:28px;font-weight:900;color:#d00;margin:10px;">3500 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
         <div class="shop-item">
-            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1"></div>
+            <div class="red-frame"><img src="https://www.dropbox.com/scl/fi/zrkwttnk5zuw5qsbefjcp/Picsart_26-02-25_16-53-14-683.png?rlkey=0crppc2qlfuemqmx5b719wmkp&st=mopro9d2&dl=1" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer"></div>
             <h2 style="font-size:30px;margin:0;">Снаряды</h2>
             <p style="font-size:16px;text-align:center;">Полезная Штука! Проплати 250 PurpleMoney чтобы твои снаряды в оружии получили +30 больше урона. Цена с каждой покупкой растёт на +100 монет.</p>
             <div id="ammo-price-text" style="font-size:28px;font-weight:900;color:#d00;margin:10px;">250 Монет</div>
@@ -170,12 +194,24 @@
     </div>
 </div>
 
+<div class="admin-notif" id="admin-notif">
+    <div class="admin-notif-box">
+        <div class="admin-notif-text">Админ Панель 1.6 врублена 👨🏿‍🍳👨🏿‍🍳👨🏿‍🍳</div>
+        <button class="admin-ok-btn" onclick="document.getElementById('admin-notif').style.display='none'">Ок.</button>
+    </div>
+</div>
+
+<div class="buy-notif" id="buy-notif-verto">
+    <h2 style="margin:0 0 20px;color:#00f;font-size:32px;">Вы успешно приобрёли Верто-Зайца за 3500 монет! Наслаждайтесь.</h2>
+    <button style="background:#000;color:#fff;padding:15px 40px;font-size:26px;border:none;border-radius:12px;cursor:pointer;" onclick="document.getElementById('buy-notif-verto').classList.remove('active')">Ок.</button>
+</div>
+
+<div id="upgrade-text" class="upgrade-text">УЛУЧШЕНО! +30 Урона.</div>
+
 <div id="final-credits"></div>
 
 <script>
-// ────────────────────────────────────────────────
-// ВРАГИ — ТОЧНО ТВОИ АЙДИ + АТРИБУТЫ ДЛЯ ANDROID
-// ────────────────────────────────────────────────
+// ВРАГИ — ВСЕ АТРИБУТЫ ДЛЯ ANDROID
 const enemyData = [
     {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://www.dropbox.com/scl/fi/1lsjdbdu0i9ubx2br0a07/Picsart_26-02-25_19-08-39-629.png?rlkey=7guurshr8yh3dd4e2ljmggjlj&st=7ar2q0by&dl=0"},
     {name:"Раб Пурпулезки",hp:350,dmg:50,speed:5,start:5,end:10,img:"https://www.dropbox.com/scl/fi/tdixfa0a15c8yi5sdefha/Picsart_26-02-25_19-08-49-861.png?rlkey=ylf9ebkaga4iyoshw4g3ca2uk&st=y760bfnq&dl=0"},
@@ -191,7 +227,7 @@ const enemyData = [
     {name:"Пурпулезка",hp:150000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&dl=0"}
 ];
 
-let money=0, hp=350, maxHp=350, damage=50, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
+let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
 let hasHeli=false, adminTimer, isSorcerer=false, isCurse=false, isAutoClick=false;
 let currentEnemies=[], bossActive=false, purpTimer=100;
 
@@ -205,7 +241,7 @@ function updateUI(){
 
 function startAdminTimer(){ 
     adminTimer = setTimeout(() => { 
-        document.getElementById('admin-trigger').style.display = 'flex'; 
+        document.getElementById('admin-notif').style.display = 'flex'; 
     }, 5000); 
 }
 function clearAdminTimer(){ clearTimeout(adminTimer); }
@@ -239,8 +275,10 @@ function toggleUI(show){
             document.getElementById('start-btn-ui').style.transition="opacity .4s";
         },10);
     }
-    if(!show)document.getElementById('tutorial-hint').style.display='none';
-    if(!show&&!isGameActive)document.getElementById('ability-container').classList.remove('active');
+    if(!show){
+        document.getElementById('tutorial-hint').style.display='none';
+        document.getElementById('ability-container').classList.remove('active');
+    }
 }
 
 function createEnemy(){
@@ -295,7 +333,7 @@ function createBullet(t){
         pos+=40;b.style.left=pos+"px";
         currentEnemies.forEach(e=>{
             let er=e.el.getBoundingClientRect(),br=b.getBoundingClientRect();
-            if(br.right>er.left-40&&br.left<er.right+40&&br.top<er.bottom+40&&br.bottom>er.top-40){
+            if(br.right>er.left-60&&br.left<er.right+60&&br.top<er.bottom+60&&br.bottom>er.top-60){
                 e.hp-=(t=="heli"?100:damage);
                 updateEnemyVisual(e);
                 clearInterval(i);b.remove();
@@ -330,6 +368,7 @@ function checkWaveEnd(){
     if(enemiesLeft<=0&&currentEnemies.length==0){
         isGameActive=false;
         document.getElementById('tutorial-hint').style.display='none';
+        document.getElementById('ability-container').classList.remove('active');
         wave++;
         document.getElementById('side-ui').style.opacity='0';
         document.getElementById('wave-ui').style.opacity='0';
@@ -343,7 +382,6 @@ function checkWaveEnd(){
         updateUI();
         document.getElementById('game-container').style.filter="none";
         document.getElementById('red-screen-overlay').style.display="none";
-        document.getElementById('ability-container').classList.remove('active');
         if(wave > 2) document.getElementById('tutorial-hint').style.display='none';
     }
 }
@@ -401,7 +439,7 @@ function startPurpBoss(){
     let obj={el:c,hp:p.hp,maxHp:p.hp,isBoss:true};
     currentEnemies.push(obj);setupBossUI(p);
     showSub("Пурпулезка","ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШЕЕ РЕШЕНИЕ?",6000);
-    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ РОВНО 100 СЕКУНД ЧТОБЫ ТЫ СДЕЛАЛ СВОИ ПОСЛЕДНИЕ ВДОХИ! ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
+    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ ТЕБЕ РОВНО 100 СЕКУНД ЧТОБЫ ТЫ СДЕЛАЛ СВОИ ПОСЛЕДНИЕ ВДОХИ. ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
     let ci=setInterval(()=>{if(!bossActive){clearInterval(ci);return;}throwPurpClone();},10000);
     let ti=setInterval(()=>{
         if(!bossActive){clearInterval(ti);return;}
@@ -488,13 +526,21 @@ function respawn(){
 function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
 function toggleAutoClick(){isAutoClick=!isAutoClick;let b=document.querySelector('[onclick="toggleAutoClick()"]');b.innerText=isAutoClick?"Авто Кликер: ON":"Авто Кликер: OFF";if(isAutoClick)setInterval(()=>{if(isGameActive||bossActive)createBullet("main");},1);}
-function activateSorcerer(){
+function activateSorcererConfirm(){
+    document.getElementById('confirm-sorcerer').classList.remove('active');
     isSorcerer=true;
     document.getElementById('main-hare').src="https://www.dropbox.com/scl/fi/y4osxbudupe0wnhweeaf9/Picsart_26-02-25_22-08-16-343.png?rlkey=kb5bal51fdx58x3wji1jakaf5&st=28343xht&dl=0";
     let a=document.getElementById('sorcerer-alert');
-    a.style.transform="translate(-50%,-50%) scale(1)";
-    setTimeout(()=>a.style.transform="translate(-50%,-50%) scale(0)",2000);
+    a.classList.add('active');
+    setTimeout(()=>{
+        a.style.animation="floatUpFade 2s forwards";
+        setTimeout(()=>a.classList.remove('active'),2200);
+    },2000);
 }
+function confirmSorcerer(){
+    document.getElementById('confirm-sorcerer').classList.add('active');
+}
+
 function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies=[];enemiesLeft=0;checkWaveEnd();}
 
 function castAbility(type){
@@ -572,6 +618,7 @@ function buyHeli(){
         money-=3500;hasHeli=true;
         document.getElementById('heli-hare').style.display='block';
         setInterval(()=>{if(isGameActive||bossActive)createBullet("heli");},100);
+        document.getElementById('buy-notif-verto').classList.add('active');
         updateUI();
     }
 }
@@ -580,6 +627,9 @@ function buyAmmo(){
     if(money>=ammoPrice){
         money-=ammoPrice;damage+=30;ammoPrice+=100;
         document.getElementById('ammo-price-text').innerText=ammoPrice+" Монет";
+        let up=document.getElementById('upgrade-text');
+        up.classList.add('show');
+        setTimeout(()=>up.classList.remove('show'),2000);
         updateUI();
     }
 }
@@ -587,4 +637,4 @@ function buyAmmo(){
 updateUI();
 </script>
 </body>
-    </html>
+</html>
