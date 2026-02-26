@@ -85,7 +85,7 @@
 
     <div id="boss-ui-global">
         <div id="boss-hp-frame"><div id="boss-hp-fill"></div></div>
-        <div id="boss-hp-text">100000 ХП</div>
+        <div id="boss-hp-text">150000 ХП</div>
         <div id="boss-name-text">Пурпулезка [FINAL BOSS]</div>
     </div>
 
@@ -99,7 +99,7 @@
 
     <div class="left-ui-panel" id="side-ui">
         <div id="money-display">🪙 Purple Money: <span id="m-val">0</span></div>
-        <div id="shop-btn" onmousedown="startAdminTimer()" onmouseup="clearAdminTimer()" onclick="event.stopPropagation(); openShop()">🛍️</div>
+        <div id="shop-btn" onmousedown="startAdminTimer()" onmouseup="clearAdminTimer()" ontouchstart="startAdminTimer()" ontouchend="clearAdminTimer()" onclick="event.stopPropagation(); openShop()">🛍️</div>
     </div>
 
     <div class="wave-ui" id="wave-ui">
@@ -203,9 +203,12 @@ function updateUI(){
     document.getElementById('enemies-count').innerText="Осталось Врагов: "+enemiesLeft;
 }
 
-function startAdminTimer(){adminTimer=setTimeout(()=>{document.getElementById('admin-trigger').style.display='flex';},5000);}
-function clearAdminTimer(){clearTimeout(adminTimer);}
-document.getElementById('admin-trigger').onclick=()=>{document.getElementById('admin-menu').style.display='flex';};
+function startAdminTimer(){ 
+    adminTimer = setTimeout(() => { 
+        document.getElementById('admin-trigger').style.display = 'flex'; 
+    }, 5000); 
+}
+function clearAdminTimer(){ clearTimeout(adminTimer); }
 
 function startBattle(){
     if(wave==71){startPurpBoss();return;}
@@ -233,6 +236,7 @@ function toggleUI(show){
         setTimeout(()=>{ 
             document.getElementById('side-ui').style.transition="opacity .4s";
             document.getElementById('wave-ui').style.transition="opacity .4s";
+            document.getElementById('start-btn-ui').style.transition="opacity .4s";
         },10);
     }
     if(!show)document.getElementById('tutorial-hint').style.display='none';
@@ -250,7 +254,7 @@ function createEnemy(){
             <div class="zombie-hp-fill" style="width:100%"></div>
             <div style="position:absolute;width:100%;text-align:center;color:#fff;font-size:20px;top:3px;left:0;font-weight:900;text-shadow:1px 1px #000;">${type.hp} ХП</div>
         </div>
-        <img src="${type.img}" style="width:100%">
+        <img src="${type.img}" style="width:100%" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
     `;
     document.getElementById('game-container').appendChild(c);
     let obj={el:c,hp:type.hp,maxHp:type.hp,dmg:type.dmg,speed:type.speed,pos:-500,isBoss:type.isBoss||false};
@@ -265,7 +269,7 @@ function moveEnemy(o){
         let step=(window.innerWidth/(o.speed*60));
         o.pos+=step;o.el.style.right=o.pos+"px";
         let r=o.el.getBoundingClientRect();
-        if(r.left<440){  // увеличен радиус для попадания
+        if(r.left<440){
             if(!isCurse)hp-=o.dmg;
             updateUI();
             if(hp<=0)gameOver();
@@ -291,7 +295,7 @@ function createBullet(t){
         pos+=40;b.style.left=pos+"px";
         currentEnemies.forEach(e=>{
             let er=e.el.getBoundingClientRect(),br=b.getBoundingClientRect();
-            if(br.right>er.left-20&&br.left<er.right+20&&br.top<er.bottom&&br.bottom>er.top){
+            if(br.right>er.left-40&&br.left<er.right+40&&br.top<er.bottom+40&&br.bottom>er.top-40){
                 e.hp-=(t=="heli"?100:damage);
                 updateEnemyVisual(e);
                 clearInterval(i);b.remove();
@@ -324,7 +328,9 @@ function removeEnemy(e){
 
 function checkWaveEnd(){
     if(enemiesLeft<=0&&currentEnemies.length==0){
-        isGameActive=false;wave++;
+        isGameActive=false;
+        document.getElementById('tutorial-hint').style.display='none'; // убираем тутор после любой волны
+        wave++;
         document.getElementById('side-ui').style.opacity='0';
         document.getElementById('wave-ui').style.opacity='0';
         document.getElementById('start-btn-ui').style.opacity='0';
@@ -338,6 +344,7 @@ function checkWaveEnd(){
         document.getElementById('game-container').style.filter="none";
         document.getElementById('red-screen-overlay').style.display="none";
         document.getElementById('ability-container').classList.remove('active');
+        if(wave > 2) document.getElementById('tutorial-hint').style.display='none';
     }
 }
 
@@ -389,12 +396,12 @@ function startPurpBoss(){
     c.style.right="80px";c.style.top="120px";c.style.bottom="auto";
     c.style.width="520px";
     c.style.animation="floatPurp 6s infinite ease-in-out";
-    c.innerHTML=`<img src="${p.img}" style="width:100%">`;
+    c.innerHTML=`<img src="${p.img}" style="width:100%" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">`;
     document.getElementById('game-container').appendChild(c);
     let obj={el:c,hp:p.hp,maxHp:p.hp,isBoss:true};
     currentEnemies.push(obj);setupBossUI(p);
     showSub("Пурпулезка","ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШЕЕ РЕШЕНИЕ?",6000);
-    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ РОВНО 100 СЕКУНД ЧТОБЫ СДЕЛАТЬ ПОСЛЕДНИЕ ВДОХИ, ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
+    setTimeout(()=>showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! У ТЕБЯ ЕСТЬ РОВНО 100 СЕКУНД ЧТОБЫ СДЕЛАТЬ ПОСЛЕДНИЕ ВДОХИ, ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
     let ci=setInterval(()=>{if(!bossActive){clearInterval(ci);return;}throwPurpClone();},10000);
     let ti=setInterval(()=>{
         if(!bossActive){clearInterval(ti);return;}
@@ -409,6 +416,7 @@ function throwPurpClone(){
     cl.src="https://www.dropbox.com/scl/fi/948wqdc7vn67eimy9itur/Picsart_26-02-25_18-08-27-446.png?rlkey=du6vdlmfisfoltki6l760gv4h&st=k6a8yvh2&dl=0";
     cl.style.position="fixed";cl.style.right="200px";cl.style.top="200px";cl.style.width="80px";
     cl.style.transition="all .8s ease-in";cl.style.zIndex="500";
+    cl.crossOrigin="anonymous";cl.loading="lazy";cl.referrerPolicy="no-referrer";
     document.body.appendChild(cl);
     setTimeout(()=>{
         cl.style.right="85%";cl.style.top="60%";
