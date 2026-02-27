@@ -24,7 +24,7 @@
         #enemies-count { font-size:24px;text-shadow:3px 3px 0 #000; }
 
         #main-hare { position:absolute;bottom:25%;left:-20px;width:500px;z-index:50;transition:transform .3s; }
-        #heli-hare { position:absolute;bottom:12%;left:180px;width:250px;z-index:60;display:none;animation:heliFly 1.8s infinite alternate ease-in-out; }
+        #heli-hare { position:absolute;bottom:12%;left:180px;width:250px;z-index:60;display:none;animation:heliFly 1.8s infinite alternate ease-in-out; } /* 2 раза меньше + полёт */
 
         .zombie-container { position:absolute;bottom:25%;right:-500px;width:450px;z-index:45;display:flex;flex-direction:column;align-items:center; }
         .zombie-hp-bar { width:90%;height:30px;background:red;border:5px solid #000;position:relative; }
@@ -35,10 +35,9 @@
         #boss-hp-frame { width:100%;height:50px;background:#000;border:6px solid #fff;border-radius:10px;overflow:hidden; }
         #boss-hp-fill { width:100%;height:100%;background:#00ff00;transition:width .3s; }
         #boss-hp-text { color:#fff;font-size:30px;margin-top:-45px;z-index:1001;position:relative;text-align:center; }
-        #boss-name-text { color:#fff;font-size:26px;-webkit-text-stroke:3px #000;margin-top:5px;font-weight:900; }
 
         #tutorial-hint { position:fixed;top:220px;left:50%;transform:translateX(-50%);color:#fff;font-size:28px;-webkit-text-stroke:1.5px #000;z-index:2000;display:none;text-align:center; }
-        #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0.25);z-index:5;display:none;pointer-events:none; }
+        #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0.25);z-index:5;display:none;pointer-events:none;transition:opacity .6s, filter .8s; }
         #white-flash { position:fixed;inset:0;background:#fff;z-index:10000;display:none;opacity:0;transition:opacity .5s; }
         #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
 
@@ -64,7 +63,7 @@
         @keyframes shake { 0% { transform:translate(1px,1px) rotate(0deg); } 10% { transform:translate(-1px,-2px) rotate(-1deg); } 100% { transform:translate(1px,-2px) rotate(-1deg); } }
         @keyframes glowGreen { from { text-shadow:0 0 5px #0f0; } to { text-shadow:0 0 20px #0f0,0 0 35px #0f0; } }
         @keyframes glowYellow { from { text-shadow:0 0 10px #ff0; } to { text-shadow:0 0 30px #ff0,0 0 50px #ff0; } }
-        @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } }
+        @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } } /* полёт верто-зайца */
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
@@ -120,7 +119,7 @@
     <!-- Главный герой -->
     <img id="main-hare" src="https://i.ibb.co/MyrHnKYB/main-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
 
-    <!-- Верто-заяц -->
+    <!-- Верто-заяц (исправлен размер и позиция) -->
     <img id="heli-hare" src="https://i.ibb.co/sdX45DW8/heli-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
     
     <div id="floor"></div>
@@ -199,7 +198,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// ВРАГИ — исправленные HP и solo-боссы
+// ВРАГИ — обновлённые HP и названия
 // ────────────────────────────────────────────────
 const enemyData = [
     {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://i.ibb.co/67QjYjbR/zombie-hare.png"},
@@ -219,6 +218,7 @@ const enemyData = [
 let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
 let hasHeli=false, adminTimer, isSorcerer=false, isCurse=false, isAutoClick=false;
 let currentEnemies=[], bossActive=false, purpTimer=100;
+let bossBlurInterval = null;
 
 function updateUI(){
     document.getElementById('m-val').innerText=money;
@@ -282,10 +282,13 @@ function toggleUI(show){
 }
 
 function createEnemy(){
-    let pool=enemyData.filter(e=>wave>=e.start&&wave<e.end);
-    if(wave===42) pool = [enemyData.find(e=>e.name==="The Nameless Hare")];
-    if(wave===70) pool = [enemyData.find(e=>e.name==="Agetha Hare")];
-    let type=pool[Math.floor(Math.random()*pool.length)];
+    let pool = enemyData.filter(e=>wave >= e.start && wave < e.end);
+    
+    // Боссы — только одни
+    if (wave === 42) { pool = [enemyData.find(e => e.name === "The Nameless Hare")]; enemiesLeft = 1; }
+    if (wave === 70) { pool = [enemyData.find(e => e.name === "Agetha Hare")]; enemiesLeft = 1; }
+
+    let type = pool[Math.floor(Math.random()*pool.length)];
     let c=document.createElement('div');
     c.className='zombie-container';
     c.innerHTML=`
@@ -309,7 +312,7 @@ function moveEnemy(o){
         let step=(window.innerWidth/(o.speed*60));
         o.pos+=step;o.el.style.right=o.pos+"px";
         let r=o.el.getBoundingClientRect();
-        if(r.left<100){
+        if(r.left<100){ // подходят вплотную
             if(!isCurse)hp-=o.dmg;
             updateUI();
             if(hp<=0)gameOver();
@@ -369,7 +372,7 @@ function removeEnemy(e){
 function checkWaveEnd(){
     if(enemiesLeft<=0&&currentEnemies.length==0){
         isGameActive=false;
-        hp = maxHp;
+        hp = maxHp; // полное восстановление ХП после волны
         updateUI();
         document.getElementById('tutorial-hint').style.display='none';
         wave++;
@@ -391,35 +394,44 @@ function setupBossUI(t){
     bossActive=true;
     let g=document.getElementById('boss-ui-global');
     g.style.display="flex";
-    document.getElementById('boss-name-text').innerText=`${t.name}`;
+    document.getElementById('boss-name-text').innerText=`${t.name} — ${t.hp} ХП`;
     document.getElementById('boss-hp-text').innerText=t.hp+" ХП";
     document.getElementById('boss-hp-fill').style.width="100%";
+    if(t.name.includes("The Nameless Hare") || t.name.includes("Agetha Hare")){
+        document.getElementById('red-screen-overlay').style.display="block";
+    }
 }
 
 function updateBossHP(en){
-    if(en.hp<=0&&en.el.id=='final-purp'){
-        bossActive=false;
-        let g=document.getElementById('boss-ui-global');
-        g.style.transition="opacity 1s";g.style.opacity="0";
-        let p=en.el;
-        p.style.animation="none";
-        p.style.transition="all 1s";
-        p.style.top="60%";
-        setTimeout(()=>{
-            p.style.animation="shake .1s infinite";
-            showSub("Пурпулезка","ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ ЭТО УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!",4000);
+    if(en.hp<=0){
+        if(en.el.id=='final-purp'){
+            bossActive=false;
+            let g=document.getElementById('boss-ui-global');
+            g.style.transition="opacity 1s";g.style.opacity="0";
+            let p=en.el;
+            p.style.animation="none";
+            p.style.transition="all 1s";
+            p.style.top="60%";
             setTimeout(()=>{
-                showSub("Пурпулезка","В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!",4000);
+                p.style.animation="shake .1s infinite";
+                showSub("Пурпулезка","ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ ЭТО УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!",4000);
                 setTimeout(()=>{
-                    p.style.transform="scale(1.5) rotate(-20deg)";
-                    p.style.animation="shake .05s infinite";
-                    let f=document.getElementById('white-flash');
-                    f.style.display="block";
-                    setTimeout(()=>{f.style.opacity="1";},1000);
-                    setTimeout(runEndCredits,3000);
+                    showSub("Пурпулезка","В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!",4000);
+                    setTimeout(()=>{
+                        p.style.transform="scale(1.5) rotate(-20deg)";
+                        p.style.animation="shake .05s infinite";
+                        let f=document.getElementById('white-flash');
+                        f.style.display="block";
+                        setTimeout(()=>{f.style.opacity="1";},1000);
+                        setTimeout(runEndCredits,3000);
+                    },4500);
                 },4500);
-            },4500);
-        },1000);
+            },1000);
+        } else {
+            clearInterval(bossBlurInterval);
+            document.getElementById('red-screen-overlay').style.display="none";
+        }
+        removeEnemy(en);
     }
 }
 
@@ -429,9 +441,9 @@ function startPurpBoss(){
     let p=enemyData.find(e=>e.isFinal);
     let c=document.createElement('div');
     c.className='zombie-container';c.id='final-purp';
-    c.style.right="80px";c.style.top="180px";c.style.bottom="auto"; /* ниже */
+    c.style.right="80px";c.style.top="auto";c.style.bottom="15%"; // ниже
     c.style.width="520px";
-    c.style.animation="floatPurp 6s infinite ease-in-out";
+    c.style.animation="floatPurp 4s infinite ease-in-out"; // полёт Пурпулезки
     c.innerHTML=`<img src="${p.img}" style="width:100%" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">`;
     document.getElementById('game-container').appendChild(c);
     let obj={el:c,hp:p.hp,maxHp:p.hp,isBoss:true};
