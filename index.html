@@ -24,19 +24,21 @@
         #enemies-count { font-size:24px;text-shadow:3px 3px 0 #000; }
 
         #main-hare { position:absolute;bottom:25%;left:-20px;width:500px;z-index:50;transition:transform .3s; }
-        #heli-hare { position:absolute;bottom:10%;left:180px;width:320px;z-index:60;display:none; }
+        #heli-hare { position:absolute;bottom:8%;left:120px;width:1300px;z-index:60;display:none; } /* ×4 и ближе к ногам */
+
         .zombie-container { position:absolute;bottom:25%;right:-500px;width:450px;z-index:45;display:flex;flex-direction:column;align-items:center; }
         .zombie-hp-bar { width:90%;height:30px;background:red;border:5px solid #000;position:relative; }
         .zombie-hp-fill { height:100%;background:#00ff00;width:100%;transition:width .3s; }
-        .zombie-name { color:#fff;font-size:24px;-webkit-text-stroke:1px #000;margin-bottom:5px;font-weight:900; }
+        .zombie-name { color:#fff;font-size:28px;-webkit-text-stroke:4px #000;margin-bottom:5px;font-weight:900;letter-spacing:1px; } /* крупнее + толстая обводка */
 
         #boss-ui-global { position:fixed;top:90px;left:50%;transform:translateX(-50%);width:80%;z-index:1000;display:none;flex-direction:column;align-items:center;transition:opacity .5s; }
         #boss-hp-frame { width:100%;height:50px;background:#000;border:6px solid #fff;border-radius:10px;overflow:hidden; }
         #boss-hp-fill { width:100%;height:100%;background:#00ff00;transition:width .3s; }
-        #boss-hp-text { color:#fff;font-size:30px;margin-top:-45px;z-index:1001;position:relative;text-align:center; }
+        #boss-hp-text { color:#fff;font-size:36px;margin-top:-45px;z-index:1001;position:relative;text-align:center;-webkit-text-stroke:4px #000; }
 
         #tutorial-hint { position:fixed;top:220px;left:50%;transform:translateX(-50%);color:#fff;font-size:28px;-webkit-text-stroke:1.5px #000;z-index:2000;display:none;text-align:center; }
-        #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0.25);z-index:5;display:none;pointer-events:none; }
+        #red-screen-overlay { position:fixed;inset:0;background:rgba(180,0,0,0.25);z-index:5;display:none;pointer-events:none;transition:filter 1.2s, opacity 0.8s; }
+        #red-screen-overlay.active { display:block; }
         #white-flash { position:fixed;inset:0;background:#fff;z-index:10000;display:none;opacity:0;transition:opacity .5s; }
         #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
 
@@ -132,6 +134,7 @@
         <button class="admin-btn" onclick="addMoneyAdmin()">Деньжата +100К</button>
         <button class="admin-btn" onclick="toggleCurse()">Проклятие (Бессмертие)</button>
         <button class="admin-btn" onclick="skipWaveAdmin()">Пропустить Волну</button>
+        <button class="admin-btn" onclick="activateSorcerer()">Активировать Sorcerer</button>
         <button class="admin-btn" onclick="document.getElementById('admin-menu').classList.remove('show');document.getElementById('admin-menu').style.display='none'">Закрыть</button>
     </div>
 
@@ -196,7 +199,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// ВРАГИ — ВСЕ С ibb.co (оставил как было в предыдущей версии)
+// ВРАГИ — исправленные названия и HP
 // ────────────────────────────────────────────────
 const enemyData = [
     {name:"Зомби Заяц",hp:55,dmg:25,speed:6,start:1,end:5,img:"https://i.ibb.co/67QjYjbR/zombie-hare.png"},
@@ -204,18 +207,19 @@ const enemyData = [
     {name:"Малиновый Хыр",hp:780,dmg:110,speed:4,start:10,end:16,img:"https://i.ibb.co/8DDZLPqz/malinovyy-khyr.png"},
     {name:"Кровавый Бантик",hp:2590,dmg:340,speed:3,start:16,end:24,img:"https://i.ibb.co/0j1GyZdq/krovavyy-bantik.png"},
     {name:"Истинный Гость",hp:4567,dmg:567,speed:4,start:24,end:30,img:"https://i.ibb.co/5h1wkQSM/istinnyy-gost.png"},
-    {name:"Щеноричный Сдел",hp:8711,dmg:789,speed:4,start:30,end:37,img:"https://i.ibb.co/DHHsSGBd/shchenorichnyy-sdel.png"},
+    {name:"Щеноричный Хыр",hp:8711,dmg:789,speed:4,start:30,end:37,img:"https://i.ibb.co/DHHsSGBd/shchenorichnyy-sdel.png"}, // исправлено
     {name:"Shadow Hare",hp:19981,dmg:9191919919191919,speed:9,start:37,end:42,img:"https://i.ibb.co/391X22Gf/shadow-hare.png"},
-    {name:"The Nameless Hare",hp:28991,dmg:91919288282818181881818181,speed:19,start:42,end:43,isBoss:true,img:"https://i.ibb.co/7tj6bpCR/the-nameless-hare.png"},
+    {name:"The Nameless Hare",hp:159001,dmg:91919288282818181881818181,speed:19,start:42,end:43,isBoss:true,img:"https://i.ibb.co/7tj6bpCR/the-nameless-hare.png"},
     {name:"Zombie Father Hare",hp:21777,dmg:1671,speed:13,start:43,end:48,img:"https://i.ibb.co/BVSwbZHN/zombie-father-hare.png"},
     {name:"Инши",hp:24677,dmg:91919,speed:8,start:48,end:70,img:"https://i.ibb.co/Ldb9y7jB/inshi.png"},
-    {name:"Agetha Hare",hp:56781,dmg:291919191991991919199181818,speed:30,start:70,end:71,isBoss:true,img:"https://i.ibb.co/Fkw0NDB6/agetha-hare.png"},
-    {name:"Пурпулезка",hp:150000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://i.ibb.co/wZS6FJrz/purpulezka.png"}
+    {name:"Agetha Hare",hp:350000,dmg:291919191991991919199181818,speed:30,start:70,end:71,isBoss:true,img:"https://i.ibb.co/Fkw0NDB6/agetha-hare.png"},
+    {name:"Пурпулезка",hp:500000,dmg:10,speed:0,start:71,end:72,isFinal:true,img:"https://i.ibb.co/wZS6FJrz/purpulezka.png"}
 ];
 
 let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
 let hasHeli=false, adminTimer, isSorcerer=false, isCurse=false, isAutoClick=false;
 let currentEnemies=[], bossActive=false, purpTimer=100;
+let bossBlurInterval = null;
 
 function updateUI(){
     document.getElementById('m-val').innerText=money;
@@ -279,8 +283,13 @@ function toggleUI(show){
 }
 
 function createEnemy(){
-    let pool=enemyData.filter(e=>wave>=e.start&&wave<e.end);
-    let type=pool[Math.floor(Math.random()*pool.length)];
+    let pool = enemyData.filter(e=>wave >= e.start && wave < e.end);
+    
+    // Боссы по одному
+    if (wave === 42) pool = [enemyData.find(e => e.name === "The Nameless Hare")];
+    if (wave === 70) pool = [enemyData.find(e => e.name === "Agetha Hare")];
+
+    let type = pool[Math.floor(Math.random()*pool.length)];
     let c=document.createElement('div');
     c.className='zombie-container';
     c.innerHTML=`
@@ -296,6 +305,25 @@ function createEnemy(){
     if(type.isBoss||type.isFinal){setupBossUI(type);obj.pos=-600;}
     currentEnemies.push(obj);
     moveEnemy(obj);
+
+    // Красный экран + динамическое размытие для боссов
+    if (type.name === "The Nameless Hare" || type.name === "Agetha Hare") {
+        let overlay = document.getElementById('red-screen-overlay');
+        overlay.classList.add('active');
+        overlay.style.opacity = '0';
+        overlay.style.filter = 'blur(2px)';
+        setTimeout(() => { overlay.style.opacity = '0.35'; }, 100);
+
+        bossBlurInterval = setInterval(() => {
+            if (!isGameActive && !bossActive) {
+                clearInterval(bossBlurInterval);
+                return;
+            }
+            let dist = obj.el.getBoundingClientRect().left;
+            let blur = Math.max(2, Math.min(18, (window.innerWidth - dist) / 80));
+            overlay.style.filter = `blur(${blur}px)`;
+        }, 200);
+    }
 }
 
 function moveEnemy(o){
@@ -304,7 +332,7 @@ function moveEnemy(o){
         let step=(window.innerWidth/(o.speed*60));
         o.pos+=step;o.el.style.right=o.pos+"px";
         let r=o.el.getBoundingClientRect();
-        if(r.left<440){
+        if(r.left<100){ // подходят вплотную
             if(!isCurse)hp-=o.dmg;
             updateUI();
             if(hp<=0)gameOver();
@@ -387,35 +415,40 @@ function setupBossUI(t){
     document.getElementById('boss-name-text').innerText=`${t.name} — ${t.hp} ХП`;
     document.getElementById('boss-hp-text').innerText=t.hp+" ХП";
     document.getElementById('boss-hp-fill').style.width="100%";
-    if(t.name.includes("The Nameless Hare")){
-        document.getElementById('red-screen-overlay').style.display="block";
-    }
 }
 
 function updateBossHP(en){
-    if(en.hp<=0&&en.el.id=='final-purp'){
-        bossActive=false;
-        let g=document.getElementById('boss-ui-global');
-        g.style.transition="opacity 1s";g.style.opacity="0";
-        let p=en.el;
-        p.style.animation="none";
-        p.style.transition="all 1s";
-        p.style.top="60%";
-        setTimeout(()=>{
-            p.style.animation="shake .1s infinite";
-            showSub("Пурпулезка","ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ ЭТО УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!",4000);
+    if(en.hp<=0){
+        if(en.el.id=='final-purp'){
+            bossActive=false;
+            let g=document.getElementById('boss-ui-global');
+            g.style.transition="opacity 1s";g.style.opacity="0";
+            let p=en.el;
+            p.style.animation="none";
+            p.style.transition="all 1s";
+            p.style.top="60%";
             setTimeout(()=>{
-                showSub("Пурпулезка","В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!",4000);
+                p.style.animation="shake .1s infinite";
+                showSub("Пурпулезка","ТЫ СЧИТЕРИЛ! И Я ПРЕКРАСНО МОГУ ЭТО УВИДЕТЬ ПО ТВОЕМУ ХЛЕБАЛЬНИКУ!",4000);
                 setTimeout(()=>{
-                    p.style.transform="scale(1.5) rotate(-20deg)";
-                    p.style.animation="shake .05s infinite";
-                    let f=document.getElementById('white-flash');
-                    f.style.display="block";
-                    setTimeout(()=>{f.style.opacity="1";},1000);
-                    setTimeout(runEndCredits,3000);
+                    showSub("Пурпулезка","В СЛЕДУЮЩИЙ РАЗ, КОГДА БУДЕШЬ СПРАШИВАТЬ У СВОЕЙ МАМЫ КТО БОГ, ТО СКАЖИ ЕЙ МОЁ ИМЯЯЯЯ!",4000);
+                    setTimeout(()=>{
+                        p.style.transform="scale(1.5) rotate(-20deg)";
+                        p.style.animation="shake .05s infinite";
+                        let f=document.getElementById('white-flash');
+                        f.style.display="block";
+                        setTimeout(()=>{f.style.opacity="1";},1000);
+                        setTimeout(runEndCredits,3000);
+                    },4500);
                 },4500);
-            },4500);
-        },1000);
+            },1000);
+        } else {
+            // Для The Nameless Hare и Agetha Hare — убираем эффект
+            clearInterval(bossBlurInterval);
+            let overlay = document.getElementById('red-screen-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(()=>{overlay.classList.remove('active');},800);
+        }
     }
 }
 
@@ -642,4 +675,4 @@ function buyAmmo(){
 updateUI();
 </script>
 </body>
-  </html>
+</html>
