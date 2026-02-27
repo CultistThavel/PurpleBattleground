@@ -24,7 +24,7 @@
         #enemies-count { font-size:24px;text-shadow:3px 3px 0 #000; }
 
         #main-hare { position:absolute;bottom:25%;left:-20px;width:500px;z-index:50;transition:transform .3s; }
-        #heli-hare { position:absolute;bottom:5%;left:80px;width:1920px;z-index:60;display:none;animation:heliFly 2s infinite alternate ease-in-out; } /* ×6 + анимация полёта */
+        #heli-hare { position:absolute;bottom:12%;left:180px;width:250px;z-index:60;display:none;animation:heliFly 1.8s infinite alternate ease-in-out; } /* 2 раза меньше + полёт */
 
         .zombie-container { position:absolute;bottom:25%;right:-500px;width:450px;z-index:45;display:flex;flex-direction:column;align-items:center; }
         .zombie-hp-bar { width:90%;height:30px;background:red;border:5px solid #000;position:relative; }
@@ -63,7 +63,7 @@
         @keyframes shake { 0% { transform:translate(1px,1px) rotate(0deg); } 10% { transform:translate(-1px,-2px) rotate(-1deg); } 100% { transform:translate(1px,-2px) rotate(-1deg); } }
         @keyframes glowGreen { from { text-shadow:0 0 5px #0f0; } to { text-shadow:0 0 20px #0f0,0 0 35px #0f0; } }
         @keyframes glowYellow { from { text-shadow:0 0 10px #ff0; } to { text-shadow:0 0 30px #ff0,0 0 50px #ff0; } }
-        @keyframes heliFly { 0% { transform:translateY(0px); } 100% { transform:translateY(-40px); } } /* анимация полёта верто-зайца */
+        @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } } /* плавный полёт */
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
@@ -119,7 +119,7 @@
     <!-- Главный герой -->
     <img id="main-hare" src="https://i.ibb.co/MyrHnKYB/main-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
 
-    <!-- Верто-заяц -->
+    <!-- Верто-заяц (исправлен размер и позиция) -->
     <img id="heli-hare" src="https://i.ibb.co/sdX45DW8/heli-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
     
     <div id="floor"></div>
@@ -306,7 +306,7 @@ function moveEnemy(o){
         let step=(window.innerWidth/(o.speed*60));
         o.pos+=step;o.el.style.right=o.pos+"px";
         let r=o.el.getBoundingClientRect();
-        if(r.left<440){
+        if(r.left<100){ // только при реальном касании
             if(!isCurse)hp-=o.dmg;
             updateUI();
             if(hp<=0)gameOver();
@@ -366,6 +366,8 @@ function removeEnemy(e){
 function checkWaveEnd(){
     if(enemiesLeft<=0&&currentEnemies.length==0){
         isGameActive=false;
+        hp = maxHp; // ВОССТАНОВЛЕНИЕ ХП ПОСЛЕ ВОЛНЫ
+        updateUI();
         document.getElementById('tutorial-hint').style.display='none';
         wave++;
         document.getElementById('side-ui').style.opacity='0';
@@ -539,11 +541,6 @@ function activateSorcerer(){
             setTimeout(()=>{
                 alert.style.transform="translate(-50%,-50%) scale(0)";
             },2000);
-            // плавная анимация красного экрана
-            let overlay = document.getElementById('red-screen-overlay');
-            overlay.style.transition = "opacity 0.8s";
-            overlay.style.opacity = "0";
-            setTimeout(()=>{ overlay.style.display = "block"; overlay.style.opacity = "0.85"; }, 100);
         },600);
     };
 }
@@ -573,24 +570,6 @@ function castAbility(type){
             currentEnemies.forEach(e=>{e.hp-=9999999;updateEnemyVisual(e);});
             setTimeout(()=>document.getElementById('red-screen-overlay').style.display='none',800);
         },1200);
-        // новый Red Ball
-        let redBall = document.createElement('img');
-        redBall.src = "https://ibb.co/xqrHf7SM";
-        redBall.style.position = 'absolute';
-        redBall.style.left = '420px';
-        redBall.style.bottom = '35%';
-        redBall.style.width = '120px';
-        document.getElementById('game-container').appendChild(redBall);
-        let redPos = 420;
-        let redInt = setInterval(()=>{
-            redPos += 35;
-            redBall.style.left = redPos + "px";
-            if(redPos > window.innerWidth + 200){
-                clearInterval(redInt);
-                redBall.remove();
-            }
-        },16);
-        setTimeout(()=>{clearInterval(redInt);redBall.remove();},2000);
     }
 
     if(type==='blue'){
@@ -600,21 +579,19 @@ function castAbility(type){
             hare.style.bottom="25%";
             let b=document.createElement('img');
             b.src="https://i.ibb.co/rRLDmHxS/blue-ball.png";
-            b.style.position='absolute';b.style.left='200px';b.style.bottom='35%';b.style.width='180px'; // огромный
+            b.style.position='absolute';b.style.left='200px';b.style.bottom='35%';b.style.width='50px';
             document.getElementById('game-container').appendChild(b);
-            let sz=180;
-            let angle = -15; // улетает вверх не прямо
-            let blueInt = setInterval(()=>{
-                sz += 8;
-                b.style.width = sz + 'px';
-                b.style.bottom = (parseFloat(b.style.bottom) + 12) + '%';
-                b.style.left = (parseFloat(b.style.left) + angle) + 'px';
-                if(sz > 600) clearInterval(blueInt);
-            },80);
-            let dmgInt = setInterval(()=>{
-                currentEnemies.forEach(e=>{e.hp -= 1500;updateEnemyVisual(e);});
-            },1000);
-            setTimeout(()=>{clearInterval(dmgInt);b.remove();},12000);
+            let sz=50;
+            let gi=setInterval(()=>{sz+=10;b.style.width=sz+'px';if(sz>=400)clearInterval(gi);},100);
+            setTimeout(()=>{
+                let di=setInterval(()=>{
+                    currentEnemies.forEach(e=>{
+                        let d=Math.abs(e.el.getBoundingClientRect().left-b.getBoundingClientRect().left);
+                        if(d<300){e.hp-=1500/60;updateEnemyVisual(e);}
+                    });
+                },16);
+                setTimeout(()=>{clearInterval(di);b.remove();},12000);
+            },3000);
         },600);
     }
 
@@ -627,11 +604,11 @@ function castAbility(type){
         setTimeout(()=>s.style.opacity='1',100);
         let si=setInterval(()=>{
             currentEnemies.forEach(e=>{
-                let d = window.innerWidth - e.pos - 500;
-                if(d < 800) e.speed *= 0.3; // сильное замедление
-                if(d < 300) e.speed = 0;
+                let d=window.innerWidth-e.pos-500;
+                if(d<600)e.speed*=.05;
+                if(d<300)e.speed=0;
             });
-        },80);
+        },100);
         setTimeout(()=>{clearInterval(si);s.style.opacity='0';setTimeout(()=>s.remove(),500);},15000);
     }
 }
