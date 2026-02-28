@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 ULTIMATE CLEAN</title>
+    <title>Purple Battleground 1.6 - RELOAD SYSTEM</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -67,7 +67,6 @@
         @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } }
         @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(400px, -200px); } 50% { transform:translate(800px, 100px); } 75% { transform:translate(400px, 250px); } 100% { transform:translate(0,0); } }
         @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
-        @keyframes suckEffect { 0% { transform:scale(1); } 50% { transform:scale(0.8); } 100% { transform:scale(1); } }
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
@@ -95,15 +94,58 @@
         .heli-purchase { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:6px solid #000;border-radius:20px;padding:30px;text-align:center;color:#800080;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3000000; }
         .heli-purchase button { background:#00ff00;border:4px solid #000;color:#000;padding:10px 40px;font-size:24px;border-radius:15px;cursor:pointer;margin-top:20px; }
         #ammo-info { font-size:20px;color:#000;margin-top:5px; }
+
+        /* НОВАЯ КНОПКА СТРЕЛЬБЫ */
+        #shoot-button {
+            position:fixed;
+            bottom:60px;
+            right:60px;
+            width:200px;
+            height:200px;
+            background:#000;
+            border:8px solid #fff;
+            border-radius:50%;
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:10000;
+            cursor:pointer;
+            box-shadow:0 0 30px #fff;
+            transition:transform 0.1s;
+            overflow:hidden;
+        }
+        #shoot-button img {
+            width:120px;
+            height:120px;
+            filter:invert(1);
+        }
+        #shoot-button.reloading {
+            cursor:not-allowed;
+            opacity:0.8;
+        }
+        #shoot-button .reload-overlay {
+            position:absolute;
+            bottom:0;
+            left:0;
+            width:100%;
+            height:0%;
+            background:rgba(255,0,0,0.7);
+            transition:height 0.25s linear;
+            z-index:5;
+        }
+        #shoot-button .bullet-icon {
+            position:relative;
+            z-index:10;
+        }
     </style>
 </head>
-<body onclick="playerShoot(event)">
+<body>
 
 <div id="game-container">
     <div id="red-screen-overlay"></div>
     <div id="white-flash"></div>
     <div id="sorcerer-alert">Sorcerer Активирован</div>
-    <div id="tutorial-hint">Как Действовать: Тапайте по экрану как можно скорее, чтобы одолеть врагов.</div>
+    <div id="tutorial-hint">Нажимайте на кнопку с пулей, чтобы стрелять!</div>
     <div id="purp-timer">⏳ 100</div>
 
     <div id="boss-ui-global">
@@ -161,6 +203,12 @@
             <div id="cd-infinity" class="cd-overlay"></div>
         </div>
     </div>
+</div>
+
+<!-- НОВАЯ КНОПКА СТРЕЛЬБЫ -->
+<div id="shoot-button" onclick="handleShoot()">
+    <div class="reload-overlay" id="reload-overlay"></div>
+    <img src="https://i.ibb.co/Q70CBCKb/pulya.png" class="bullet-icon" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
 </div>
 
 <div id="subtitle-box">
@@ -229,6 +277,27 @@ let hasHeli=false, adminTimer, isSorcerer=false, isCurse=false;
 let currentEnemies=[], bossActive=false, purpTimer=100;
 let bossBlurInterval = null, waveInProgress = false;
 let blueBallActive = false;
+let canShoot = true; // для перезарядки
+
+// Новая функция стрельбы с перезарядкой
+function handleShoot() {
+    if((!isGameActive && !bossActive) || !waveInProgress) return;
+    if(!canShoot) return;
+    
+    // Запускаем перезарядку
+    canShoot = false;
+    let overlay = document.getElementById('reload-overlay');
+    overlay.style.height = '100%';
+    
+    // Стреляем
+    createBullet("main");
+    
+    // Через 250мс заканчиваем перезарядку
+    setTimeout(() => {
+        canShoot = true;
+        overlay.style.height = '0%';
+    }, 250);
+}
 
 function updateUI(){
     document.getElementById('m-val').innerText=money;
@@ -269,7 +338,7 @@ function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
 function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies=[];enemiesLeft=0;checkWaveEnd();}
 
-// ---------- ИГРОВАЯ ЛОГИКА (ПОЛНОСТЬЮ ОЧИЩЕНА) ----------
+// ---------- ИГРОВАЯ ЛОГИКА ----------
 function startBattle(){
     if(waveInProgress) return;
     if(wave==71){ startPurpBoss(); return; }
@@ -277,6 +346,10 @@ function startBattle(){
     isGameActive = true; 
     enemiesLeft = (wave===42 || wave===70) ? 1 : 20;
     toggleUI(false);
+    
+    // Показываем кнопку стрельбы
+    document.getElementById('shoot-button').style.display = 'flex';
+    
     if(wave<=3) document.getElementById('tutorial-hint').style.display='block';
     if(isSorcerer){
         document.getElementById('ability-container').style.display='flex';
@@ -303,6 +376,12 @@ function toggleUI(show){
     document.getElementById('wave-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.pointerEvents=show?"auto":"none";
+    
+    // Скрываем кнопку стрельбы в мирное время
+    if(show) {
+        document.getElementById('shoot-button').style.display = 'none';
+    }
+    
     if(!show){
         document.getElementById('tutorial-hint').style.display='none';
         document.getElementById('ability-container').classList.remove('active');
@@ -380,13 +459,11 @@ function startMoving(o){
         
         // Blue Ball притяжение (не для боссов)
         if(blueBallActive && !o.isBoss && !o.isFinal) {
-            // Притягиваем к шару (примерно в центр)
             let ballElement = document.querySelector('.blue-ball');
             if(ballElement) {
                 let ballRect = ballElement.getBoundingClientRect();
                 let enemyRect = o.el.getBoundingClientRect();
                 if(Math.abs(enemyRect.left - ballRect.left) < 500) {
-                    // Медленно притягиваем
                     if(enemyRect.left > ballRect.left) o.pos -= 2;
                     else o.pos += 2;
                 }
@@ -396,15 +473,13 @@ function startMoving(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // УРОН ИГРОКУ - ТОЛЬКО ОДИН РАЗ И С ОСТАНОВКОЙ ДВИЖЕНИЯ
+        // УРОН ИГРОКУ - ТОЛЬКО ОДИН РАЗ
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
                 if(!isCurse) hp -= o.dmg;
                 updateUI();
                 o.hasDamaged = true;
-                
-                // ВАЖНО: останавливаем интервал движения
                 clearInterval(o.moveInterval);
                 
                 if(hp <= 0) gameOver();
@@ -424,12 +499,7 @@ function startMoving(o){
     }, 16);
 }
 
-// ---------- СТРЕЛЬБА (ТОЛЬКО УРОН ВРАГАМ) ----------
-function playerShoot(e){
-    if((!isGameActive && !bossActive) || !waveInProgress) return;
-    createBullet("main");
-}
-
+// ---------- СТРЕЛЬБА ----------
 function createBullet(t){
     let b = document.createElement('img');
     b.src = "https://i.ibb.co/Q70CBCKb/pulya.png";
@@ -446,7 +516,6 @@ function createBullet(t){
             let er = e.el.getBoundingClientRect();
             let br = b.getBoundingClientRect();
             if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
-                // Урон ТОЛЬКО врагу
                 e.hp -= (t=="heli"? 100 : damage);
                 if(e.hp < 0) e.hp = 0;
                 
@@ -560,6 +629,7 @@ function updateBossHP(en){
 function startPurpBoss(){
     bossActive = true; waveInProgress = true;
     toggleUI(false);
+    document.getElementById('shoot-button').style.display = 'flex'; // показываем кнопку
     document.getElementById('purp-timer').style.display = 'block';
     purpTimer = 100;
     let p = enemyData.find(e => e.isFinal);
@@ -650,6 +720,7 @@ function gameOver(){
     document.getElementById('red-screen-overlay').style.background='rgba(255,0,0,0)';
     document.getElementById('game-container').style.filter='none';
     document.getElementById('main-header').style.top = '15px';
+    document.getElementById('shoot-button').style.display = 'none'; // скрываем кнопку
 }
 
 function respawn(){
@@ -727,13 +798,11 @@ function castAbility(type){
                 if(left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
             }, 16);
             
-            // Убиваем всех врагов
             currentEnemies.forEach(e => { 
                 e.hp = 0; 
                 clearInterval(e.moveInterval);
             });
             
-            // Очищаем врагов через секунду
             setTimeout(() => {
                 currentEnemies.filter(e => !e.isBoss && !e.isFinal).forEach(e => removeEnemy(e));
                 currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
@@ -765,15 +834,31 @@ function castAbility(type){
                 ball.style.left = '500px';
                 ball.style.width = '400px';
                 
-                // Урон 15000 в секунду
                 let dmgInt = setInterval(() => {
                     currentEnemies.forEach(e => { 
-                        if(!e.isBoss) { // Не притягиваем боссов, но урон наносим
-                            e.hp -= 1500; 
-                            if(e.hp < 0) e.hp = 0;
+                        e.hp -= 1500; 
+                        if(e.hp < 0) e.hp = 0;
+                        
+                        // Обновляем визуал для всех врагов
+                        if(!e.isBoss && !e.isFinal){
+                            let fill = e.el?.querySelector('.zombie-hp-fill');
+                            if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
+                            let txt = e.el?.querySelector('div[style*="top:3px"]');
+                            if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
                         } else {
-                            e.hp -= 1500; // Боссам тоже урон
-                            if(e.hp < 0) e.hp = 0;
+                            document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
+                            document.getElementById('boss-name-text').innerHTML = `${e.name} [${Math.floor(e.hp)}/${e.maxHp}]`;
+                        }
+                        
+                        if(e.hp <= 0){
+                            if(e.isBoss || e.isFinal) updateBossHP(e);
+                            else { 
+                                clearInterval(e.moveInterval);
+                                removeEnemy(e); 
+                                money += 150; 
+                                updateUI(); 
+                                checkWaveEnd(); 
+                            }
                         }
                     });
                 }, 100);
