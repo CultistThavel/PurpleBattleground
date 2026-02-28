@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - RELOAD SYSTEM</title>
+    <title>Purple Battleground 1.6 RELOAD SYSTEM</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -36,7 +36,7 @@
         #boss-hp-fill { width:100%;height:100%;background:#00ff00;transition:width .3s; }
         #boss-name-text { color:#fff;font-size:30px;margin-top:5px;text-shadow:3px 3px 0 #000; }
 
-        #tutorial-hint { position:fixed;top:220px;left:50%;transform:translateX(-50%);color:#ff0;font-size:32px;-webkit-text-stroke:2px #000;z-index:2000;display:none;text-align:center;width:80%; }
+        #tutorial-hint { position:fixed;top:220px;left:50%;transform:translateX(-50%);color:#fff;font-size:32px;-webkit-text-stroke:2px #000;z-index:2000;display:none;text-align:center;width:80%; }
         #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0);z-index:9999;pointer-events:none;transition:background 0.2s ease; }
         #white-flash { position:fixed;inset:0;background:#fff;z-index:10000;display:none;opacity:0;transition:opacity .5s; }
         #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
@@ -44,48 +44,6 @@
         .bullet { position:absolute;z-index:48;width:150px;pointer-events:none; }
 
         #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s; text-shadow:3px 3px 0 #000; }
-        
-        #shoot-btn { 
-            position:absolute; 
-            bottom:60px; 
-            right:60px; 
-            width:180px; 
-            height:180px; 
-            background:#000; 
-            border:8px solid #fff; 
-            border-radius:50%; 
-            z-index:1000; 
-            display:none; 
-            cursor:pointer;
-            box-shadow:0 10px 0 #333;
-            transition:all 0.1s ease;
-            overflow:hidden;
-        }
-        #shoot-btn.active { transform:scale(0.95); box-shadow:0 5px 0 #333; }
-        #shoot-btn.reloading { cursor:not-allowed; opacity:0.8; }
-        #shoot-btn-inner { 
-            width:100%; 
-            height:100%; 
-            border-radius:50%; 
-            background:#000;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:60px;
-            color:#fff;
-        }
-        #reload-overlay { 
-            position:absolute; 
-            bottom:0; 
-            left:0; 
-            width:100%; 
-            height:0%; 
-            background:#ff0000; 
-            transition:height 0.69s linear;
-            z-index:1001;
-            border-radius:0 0 90px 90px;
-        }
-
         #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:120px;background:#000;border:6px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:18px;cursor:pointer;z-index:100000;border-radius:20px;box-shadow:0 0 20px #fff; }
         #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:450px;background:rgba(0,0,0,.95);border:6px solid #fff;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px;opacity:0;transition:opacity .5s,transform .5s; }
         #admin-menu.show { opacity:1;transform:translateX(-50%) translateY(0); }
@@ -109,6 +67,8 @@
         @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } }
         @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(400px, -200px); } 50% { transform:translate(800px, 100px); } 75% { transform:translate(400px, 250px); } 100% { transform:translate(0,0); } }
         @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+        @keyframes suckEffect { 0% { transform:scale(1); } 50% { transform:scale(0.8); } 100% { transform:scale(1); } }
+        @keyframes cooldown { from { height:0%; } to { height:100%; } }
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
@@ -136,6 +96,48 @@
         .heli-purchase { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:6px solid #000;border-radius:20px;padding:30px;text-align:center;color:#800080;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3000000; }
         .heli-purchase button { background:#00ff00;border:4px solid #000;color:#000;padding:10px 40px;font-size:24px;border-radius:15px;cursor:pointer;margin-top:20px; }
         #ammo-info { font-size:20px;color:#000;margin-top:5px; }
+
+        /* Новая кнопка стрельбы */
+        #shoot-button {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 180px;
+            height: 180px;
+            background: #000;
+            border: 8px solid #fff;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+        #shoot-button img {
+            width: 100px;
+            height: 100px;
+            filter: invert(1);
+        }
+        #shoot-button .cooldown-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: rgba(255,0,0,0.8);
+            transition: height 0.735s linear;
+            z-index: -1;
+        }
+        #shoot-button.cooldown {
+            background: #8b0000;
+            pointer-events: none;
+        }
+        #shoot-button.cooldown .cooldown-overlay {
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -176,12 +178,6 @@
     <div id="floor"></div>
     <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
 
-    <!-- Новая кнопка стрельбы -->
-    <div id="shoot-btn" onclick="handleShoot()">
-        <div id="shoot-btn-inner">🔫</div>
-        <div id="reload-overlay"></div>
-    </div>
-
     <div id="admin-trigger">Админ Панель 1.6 🐢</div>
     <div id="admin-menu">
         <div style="display:flex;align-items:center;margin-bottom:20px;">
@@ -207,6 +203,12 @@
             <span class="text-label">Infinity</span>
             <div id="cd-infinity" class="cd-overlay"></div>
         </div>
+    </div>
+
+    <!-- Новая кнопка стрельбы -->
+    <div id="shoot-button" onclick="fireBullet()">
+        <img src="https://i.ibb.co/Q70CBCKb/pulya.png" alt="bullet">
+        <div class="cooldown-overlay"></div>
     </div>
 </div>
 
@@ -277,46 +279,92 @@ let currentEnemies=[], bossActive=false, purpTimer=100;
 let bossBlurInterval = null, waveInProgress = false;
 let blueBallActive = false;
 let canShoot = true;
-let heliLastShot = 0;
-
-// UI элементы
-const shootBtn = document.getElementById('shoot-btn');
-const reloadOverlay = document.getElementById('reload-overlay');
+let heliInterval = null;
 
 function updateUI(){
     document.getElementById('m-val').innerText=money;
     document.getElementById('hp-text').innerText="Ваша Шкала ХП: "+Math.max(0,Math.floor(hp));
     document.getElementById('hp-fill').style.width=(hp/maxHp)*100+"%";
     document.getElementById('wave-big').innerText=wave+" Волна";
-    document.getElementById('enemies-count').innerText="Осталось Врагов: "+enemiesLeft;
+    let countDisplay = document.getElementById('enemies-count');
+    if(bossActive && (wave===42 || wave===70 || wave===71)) {
+        countDisplay.style.opacity = '0';
+    } else {
+        countDisplay.style.opacity = '1';
+        countDisplay.innerText = "Осталось Врагов: "+enemiesLeft;
+    }
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
 }
 
 // ---------- НОВАЯ СИСТЕМА СТРЕЛЬБЫ ----------
-function handleShoot() {
-    if((!isGameActive && !bossActive) || !waveInProgress) return;
-    if(!canShoot) return;
+function fireBullet() {
+    if(!canShoot || (!isGameActive && !bossActive) || !waveInProgress) return;
     
-    // Анимация нажатия
-    shootBtn.classList.add('active');
-    setTimeout(() => shootBtn.classList.remove('active'), 100);
+    canShoot = false;
+    let btn = document.getElementById('shoot-button');
+    btn.classList.add('cooldown');
     
-    // Стреляем
+    // Создаем пулю
     createBullet("main");
     
-    // Перезарядка
-    canShoot = false;
-    shootBtn.classList.add('reloading');
-    reloadOverlay.style.height = '100%';
-    
+    // Перезарядка 735мс
     setTimeout(() => {
         canShoot = true;
-        shootBtn.classList.remove('reloading');
-        reloadOverlay.style.height = '0%';
-    }, 690);
+        btn.classList.remove('cooldown');
+    }, 735);
 }
 
-// ---------- ADMIN / SORCERER ----------
+// Модифицированная createBullet для поддержки новой системы
+function createBullet(t){
+    let b = document.createElement('img');
+    b.src = "https://i.ibb.co/Q70CBCKb/pulya.png";
+    b.className = 'bullet';
+    b.style.left = (t=="main"?"380px":"480px");
+    b.style.bottom = (t=="main"?"40%":"28%");
+    document.getElementById('game-container').appendChild(b);
+    let pos = (t=="main")? 380 : 480;
+    let interval = setInterval(() => {
+        pos += 40;
+        b.style.left = pos + "px";
+        currentEnemies.forEach(e => {
+            if(!e.el) return;
+            let er = e.el.getBoundingClientRect();
+            let br = b.getBoundingClientRect();
+            if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
+                let bulletDamage = t=="heli"? 1000 : damage; // Верто-заяц теперь 1000 урона
+                e.hp -= bulletDamage;
+                if(e.hp < 0) e.hp = 0;
+                
+                if(!e.isBoss && !e.isFinal){
+                    let fill = e.el.querySelector('.zombie-hp-fill');
+                    if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
+                    let txt = e.el.querySelector('div[style*="top:3px"]');
+                    if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
+                } else {
+                    document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
+                    document.getElementById('boss-name-text').innerHTML = `${e.name} [${Math.floor(e.hp)}/${e.maxHp}]`;
+                }
+                
+                if(e.hp <= 0){
+                    if(e.isBoss || e.isFinal) updateBossHP(e);
+                    else { 
+                        clearInterval(e.moveInterval);
+                        removeEnemy(e); 
+                        money += 150; 
+                        updateUI(); 
+                        checkWaveEnd(); 
+                    }
+                }
+                
+                clearInterval(interval);
+                b.remove();
+            }
+        });
+        if(pos > window.innerWidth + 200) { clearInterval(interval); b.remove(); }
+    }, 16);
+}
+
+// ADMIN
 function startAdminTimer(){ adminTimer = setTimeout(() => { document.getElementById('admin-notify').style.display = 'flex'; }, 5000); }
 function clearAdminTimer(){ clearTimeout(adminTimer); }
 document.getElementById('admin-notify-ok').onclick = () => {
@@ -346,21 +394,16 @@ function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
 function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies=[];enemiesLeft=0;checkWaveEnd();}
 
-// ---------- ИГРОВАЯ ЛОГИКА ----------
+// ИГРОВАЯ ЛОГИКА
 function startBattle(){
     if(waveInProgress) return;
     if(wave==71){ startPurpBoss(); return; }
-    
     waveInProgress = true;
     isGameActive = true; 
     enemiesLeft = (wave===42 || wave===70) ? 1 : 20;
-    
-    // Показываем кнопку стрельбы
-    shootBtn.style.display = 'block';
-    
     toggleUI(false);
     
-    // Тутор только для 1 волны
+    // Тутор только на 1 волне
     if(wave === 1) {
         document.getElementById('tutorial-hint').style.display='block';
     }
@@ -369,6 +412,10 @@ function startBattle(){
         document.getElementById('ability-container').style.display='flex';
         setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
     }
+    
+    // Показываем кнопку стрельбы
+    document.getElementById('shoot-button').style.display = 'flex';
+    
     spawnEnemies();
 }
 
@@ -390,14 +437,14 @@ function toggleUI(show){
     document.getElementById('wave-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.pointerEvents=show?"auto":"none";
-    
-    if(show){
-        // Скрываем кнопку стрельбы
-        shootBtn.style.display = 'none';
-        document.getElementById('tutorial-hint').style.display='none';
+    if(!show){
         document.getElementById('ability-container').classList.remove('active');
+    }
+    if(show){
         document.getElementById('main-header').style.top = '15px';
         waveInProgress = false;
+        // Прячем кнопку стрельбы в мирное время
+        document.getElementById('shoot-button').style.display = 'none';
     } else {
         if(bossActive) document.getElementById('main-header').style.top = '80px';
     }
@@ -466,15 +513,14 @@ function startMoving(o){
             if(dist < 300) step = 0;
         }
         
-        // Blue Ball притяжение (не для боссов)
         if(blueBallActive && !o.isBoss && !o.isFinal) {
             let ballElement = document.querySelector('.blue-ball');
             if(ballElement) {
                 let ballRect = ballElement.getBoundingClientRect();
                 let enemyRect = o.el.getBoundingClientRect();
-                if(Math.abs(enemyRect.left - ballRect.left) < 600) {
+                if(Math.abs(enemyRect.left - ballRect.left) < 500) {
                     if(enemyRect.left > ballRect.left) o.pos -= 3;
-                    else o.pos += 2;
+                    else o.pos += 3;
                 }
             }
         }
@@ -482,7 +528,6 @@ function startMoving(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // Урон игроку - только один раз
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
@@ -508,70 +553,6 @@ function startMoving(o){
     }, 16);
 }
 
-// ---------- СТРЕЛЬБА ----------
-function createBullet(t){
-    let b = document.createElement('img');
-    b.src = "https://i.ibb.co/Q70CBCKb/pulya.png";
-    b.className = 'bullet';
-    b.style.left = (t=="main"?"380px":"480px");
-    b.style.bottom = (t=="main"?"40%":"28%");
-    document.getElementById('game-container').appendChild(b);
-    let pos = (t=="main")? 380 : 480;
-    let interval = setInterval(() => {
-        pos += 40;
-        b.style.left = pos + "px";
-        currentEnemies.forEach(e => {
-            if(!e.el) return;
-            let er = e.el.getBoundingClientRect();
-            let br = b.getBoundingClientRect();
-            if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
-                // Урон только врагу
-                let bulletDamage = (t=="heli"? 1000 : damage); // Верто-заяц теперь 1000 урона
-                e.hp -= bulletDamage;
-                if(e.hp < 0) e.hp = 0;
-                
-                if(!e.isBoss && !e.isFinal){
-                    let fill = e.el.querySelector('.zombie-hp-fill');
-                    if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
-                    let txt = e.el.querySelector('div[style*="top:3px"]');
-                    if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
-                } else {
-                    document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
-                    document.getElementById('boss-name-text').innerHTML = `${e.name} [${Math.floor(e.hp)}/${e.maxHp}]`;
-                }
-                
-                if(e.hp <= 0){
-                    if(e.isBoss || e.isFinal) updateBossHP(e);
-                    else { 
-                        clearInterval(e.moveInterval);
-                        removeEnemy(e); 
-                        money += 150; 
-                        updateUI(); 
-                        checkWaveEnd(); 
-                    }
-                }
-                
-                clearInterval(interval);
-                b.remove();
-            }
-        });
-        if(pos > window.innerWidth + 200) { clearInterval(interval); b.remove(); }
-    }, 16);
-}
-
-// Верто-заяц теперь стреляет с той же скоростью (каждые 690 мс)
-function heliShoot() {
-    if(!hasHeli) return;
-    let now = Date.now();
-    if(now - heliLastShot > 690) {
-        heliLastShot = now;
-        if((isGameActive || bossActive) && waveInProgress) {
-            createBullet("heli");
-        }
-    }
-    requestAnimationFrame(heliShoot);
-}
-
 function removeEnemy(o){
     clearInterval(o.moveInterval);
     if(o.el) o.el.remove();
@@ -594,7 +575,6 @@ function checkWaveEnd(){
         if(bossBlurInterval) clearInterval(bossBlurInterval);
         wave++;
         toggleUI(true);
-        if(wave > 2) document.getElementById('tutorial-hint').style.display='none';
         document.getElementById('main-header').style.top = '15px';
     }
 }
@@ -610,6 +590,7 @@ function setupBossUI(t){
         document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0.3)';
     }
     document.getElementById('main-header').style.top = '80px';
+    updateUI(); // чтобы скрыть счетчик врагов
 }
 
 function updateBossHP(en){
@@ -645,11 +626,13 @@ function updateBossHP(en){
             document.getElementById('boss-ui-global').style.opacity = '0';
             setTimeout(() => document.getElementById('boss-ui-global').style.display = 'none', 400);
             document.getElementById('main-header').style.top = '15px';
+            bossActive = false;
+            updateUI();
         }
     }
 }
 
-// ---------- БИТВА С ПУРПУЛЕЗКОЙ ----------
+// БИТВА С ПУРПУЛЕЗКОЙ
 function startPurpBoss(){
     bossActive = true; waveInProgress = true;
     toggleUI(false);
@@ -743,7 +726,7 @@ function gameOver(){
     document.getElementById('red-screen-overlay').style.background='rgba(255,0,0,0)';
     document.getElementById('game-container').style.filter='none';
     document.getElementById('main-header').style.top = '15px';
-    shootBtn.style.display = 'none';
+    document.getElementById('shoot-button').style.display = 'none';
 }
 
 function respawn(){
@@ -757,7 +740,7 @@ function respawn(){
     currentEnemies = [];
 }
 
-// ---------- МАГАЗИН ----------
+// МАГАЗИН
 function openShop(){document.getElementById('shop-overlay').style.display='flex';}
 function closeShop(){document.getElementById('shop-overlay').style.display='none';}
 
@@ -769,7 +752,13 @@ function buyHeli(){
         div.className = 'heli-purchase';
         div.innerHTML = 'Вы успешно приобрёли Верто-Зайца, теперь он на вашей стороне.<br><button onclick="this.parentElement.remove()">Ок.</button>';
         document.body.appendChild(div);
-        heliShoot(); // запускаем цикл стрельбы верто-зайца
+        
+        // Верто-заяц стреляет с той же скоростью 735мс
+        if(heliInterval) clearInterval(heliInterval);
+        heliInterval = setInterval(() => { 
+            if((isGameActive||bossActive) && hasHeli) createBullet("heli"); 
+        }, 735);
+        
         updateUI();
     }
 }
@@ -788,7 +777,7 @@ function buyAmmo(){
     }
 }
 
-// ---------- СПОСОБНОСТИ SORCERER ----------
+// СПОСОБНОСТИ SORCERER
 function castAbility(type){
     if((!isGameActive && !bossActive) || !isSorcerer) return;
     let cd = document.getElementById('cd-'+type);
@@ -857,7 +846,7 @@ function castAbility(type){
                 ball.style.left = '500px';
                 ball.style.width = '400px';
                 
-                // Урон 15000 в секунду
+                // Урон 15000 в секунду - ИСПРАВЛЕНО: убираем лишние проверки
                 let dmgInt = setInterval(() => {
                     currentEnemies.forEach(e => { 
                         e.hp -= 1500; 
