@@ -65,7 +65,7 @@
         @keyframes glowGreen { from { text-shadow:0 0 5px #0f0; } to { text-shadow:0 0 20px #0f0,0 0 35px #0f0; } }
         @keyframes glowYellow { from { text-shadow:0 0 10px #ff0; } to { text-shadow:0 0 30px #ff0,0 0 50px #ff0; } }
         @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } }
-        @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(300px, -120px); } 50% { transform:translate(500px, 50px); } 75% { transform:translate(200px, 150px); } 100% { transform:translate(0,0); } }
+        @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(300px, -150px); } 50% { transform:translate(600px, 80px); } 75% { transform:translate(300px, 200px); } 100% { transform:translate(0,0); } }
         @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
@@ -207,7 +207,7 @@
 <div id="final-credits"></div>
 
 <script>
-// ---------- Enemy Data (все ID сохранены) ----------
+// ---------- Enemy Data (все ID восстановлены) ----------
 const enemyData = [
     {name:"Зомби Заяц",hp:88,dmg:20, speedVal:7, start:1,end:5,img:"https://i.ibb.co/67QjYjbR/zombie-hare.png"},
     {name:"Раб Пурпулезки",hp:510,dmg:60, speedVal:6, start:5,end:12,img:"https://i.ibb.co/BHmN5CZr/raby-purpu.png"},
@@ -267,13 +267,13 @@ function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
 function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies=[];enemiesLeft=0;checkWaveEnd();}
 
-// ---------- ИГРОВАЯ ЛОГИКА ----------
+// ---------- ИГРОВАЯ ЛОГИКА (полная переработка) ----------
 function startBattle(){
     if(waveInProgress) return;
     if(wave==71){ startPurpBoss(); return; }
     waveInProgress = true;
     isGameActive = true; 
-    enemiesLeft = (wave===42 || wave===70) ? 1 : 20; // теперь 20 врагов на волне
+    enemiesLeft = (wave===42 || wave===70) ? 1 : 20; // 20 врагов в обычных волнах
     toggleUI(false);
     if(wave<=3) document.getElementById('tutorial-hint').style.display='block';
     if(isSorcerer){
@@ -361,7 +361,7 @@ function moveEnemy(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // Урон игроку - ТОЛЬКО ПРИ КАСАНИИ
+        // УРОН ИГРОКУ - ТОЛЬКО ОДИН РАЗ
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
@@ -386,12 +386,12 @@ function moveEnemy(o){
     }, 16);
 }
 
+// ---------- СТРЕЛЬБА (УРОН ТОЛЬКО ВРАГАМ) ----------
 function playerShoot(e){
     if((!isGameActive && !bossActive) || !waveInProgress) return;
     createBullet("main");
 }
 
-// ---------- ФИКС СТРЕЛЬБЫ: урон ТОЛЬКО врагам, себе НИКАК ----------
 function createBullet(t){
     let b = document.createElement('img');
     b.src = "https://i.ibb.co/Q70CBCKb/pulya.png";
@@ -400,26 +400,18 @@ function createBullet(t){
     b.style.bottom = (t=="main"?"40%":"28%");
     document.getElementById('game-container').appendChild(b);
     let pos = (t=="main")? 380 : 480;
-    let alreadyHit = false; // защита от множественного попадания
-    
     let interval = setInterval(() => {
         pos += 40;
         b.style.left = pos + "px";
-        
-        // Проверка столкновения с каждым врагом
         currentEnemies.forEach(e => {
-            if(!e.el || alreadyHit) return;
+            if(!e.el) return;
             let er = e.el.getBoundingClientRect();
             let br = b.getBoundingClientRect();
-            
             if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
-                alreadyHit = true; // предотвращаем множественные попадания
-                
-                // Урон только врагу
+                // Урон ТОЛЬКО врагу
                 e.hp -= (t=="heli"? 100 : damage);
                 if(e.hp < 0) e.hp = 0;
                 
-                // Обновление визуала
                 if(!e.isBoss && !e.isFinal){
                     let fill = e.el.querySelector('.zombie-hp-fill');
                     if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
@@ -432,19 +424,13 @@ function createBullet(t){
                 
                 if(e.hp <= 0){
                     if(e.isBoss || e.isFinal) updateBossHP(e);
-                    else { 
-                        money += 150; 
-                        removeEnemy(e); 
-                        updateUI(); 
-                        checkWaveEnd(); 
-                    }
+                    else { removeEnemy(e); money += 150; updateUI(); checkWaveEnd(); }
                 }
                 
                 clearInterval(interval);
                 b.remove();
             }
         });
-        
         if(pos > window.innerWidth + 200) { clearInterval(interval); b.remove(); }
     }, 16);
 }
@@ -575,7 +561,7 @@ function purpKillPlayer(){
     },4500);
 }
 
-function runEndCredits(){ 
+function runEndCredits(){
     let b=document.getElementById('final-credits');
     b.style.display="flex";
     const l=["Эй...","Не уходи...","О!","Я думал, что потерял тебя...","Слушай...","Я хочу тебя предупредить...","Они уже здесь, и идут за тобой...","Тебе надо скатываться..."];
@@ -600,7 +586,7 @@ function runEndCredits(){
     n();
 }
 
-function showSub(n,t,d){ 
+function showSub(n,t,d){
     let box=document.getElementById('subtitle-box');
     document.getElementById('sub-name').innerText=n;
     document.getElementById('sub-text').innerText=t;
@@ -659,7 +645,7 @@ function buyAmmo(){
     }
 }
 
-// ---------- СПОСОБНОСТИ SORCERER ----------
+// ---------- СПОСОБНОСТИ SORCERER (УРОН ИСПРАВЛЕН) ----------
 function castAbility(type){
     if((!isGameActive && !bossActive) || !isSorcerer) return;
     let cd = document.getElementById('cd-'+type);
@@ -690,12 +676,16 @@ function castAbility(type){
         setTimeout(() => {
             let fly = setInterval(() => {
                 let left = parseInt(ball.style.left) || 300;
-                ball.style.left = (left + 80) + 'px';
+                ball.style.left = (left + 60) + 'px';
                 if(left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
             }, 16);
             
-            // ОГРОМНЫЙ УРОН 99M
-            currentEnemies.forEach(e => { e.hp -= 99999999; if(e.hp < 0) e.hp = 0; });
+            // Red Ball убивает всех врагов на своём пути
+            currentEnemies.forEach(e => { e.hp = 0; });
+            // Принудительно удаляем всех обычных врагов
+            currentEnemies.filter(e => !e.isBoss && !e.isFinal).forEach(e => removeEnemy(e));
+            // Боссам тоже урон
+            currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
             
             setTimeout(() => {
                 document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0)';
@@ -717,11 +707,15 @@ function castAbility(type){
             document.getElementById('game-container').appendChild(ball);
             
             setTimeout(() => {
+                ball.style.left = '500px';
                 ball.style.width = '400px';
                 
                 // Урон 15000 в секунду (1500 за 100мс)
                 let dmgInt = setInterval(() => {
-                    currentEnemies.forEach(e => { e.hp -= 1500; if(e.hp < 0) e.hp = 0; });
+                    currentEnemies.forEach(e => { 
+                        e.hp -= 1500; 
+                        if(e.hp < 0) e.hp = 0; 
+                    });
                 }, 100);
                 
                 setTimeout(() => {
