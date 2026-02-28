@@ -65,8 +65,8 @@
         @keyframes glowGreen { from { text-shadow:0 0 5px #0f0; } to { text-shadow:0 0 20px #0f0,0 0 35px #0f0; } }
         @keyframes glowYellow { from { text-shadow:0 0 10px #ff0; } to { text-shadow:0 0 30px #ff0,0 0 50px #ff0; } }
         @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } }
-        @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(300px, -150px); } 50% { transform:translate(500px, 50px); } 75% { transform:translate(200px, 200px); } 100% { transform:translate(0,0); } }
-        @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(720deg); } }
+        @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(300px, -120px); } 50% { transform:translate(500px, 50px); } 75% { transform:translate(200px, 150px); } 100% { transform:translate(0,0); } }
+        @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
@@ -88,7 +88,7 @@
 
         #purp-timer { position:absolute;top:300px;left:30px;color:#fff;font-size:50px;text-shadow:4px 4px 0 #f0f;display:none;z-index:200; }
 
-        .red-ball { position:absolute;width:180px;height:180px;z-index:20000;pointer-events:none; animation:redBallSpin 0.3s infinite linear; }
+        .red-ball { position:absolute;width:180px;height:180px;z-index:20000;pointer-events:none; animation:redBallSpin 0.5s infinite linear; }
         .blue-ball { position:absolute;width:50px;z-index:15000;pointer-events:none; transition:width 1s, left 0.5s, bottom 0.5s; animation:floatBlueBall 8s infinite alternate ease-in-out; }
         .damage-notify { position:fixed;top:20%;left:50%;transform:translateX(-50%);color:#f00;font-size:50px;font-weight:900;text-shadow:2px 2px 0 #fff;z-index:2000000;opacity:0;transition:opacity 0.5s, transform 1s;pointer-events:none; }
         .heli-purchase { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:6px solid #000;border-radius:20px;padding:30px;text-align:center;color:#800080;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3000000; }
@@ -125,7 +125,7 @@
 
     <div class="wave-ui" id="wave-ui">
         <h1 id="wave-big">1 Волна</h1>
-        <div id="enemies-count">Осталось Врагов: 10</div>
+        <div id="enemies-count">Осталось Врагов: 20</div>
     </div>
 
     <img id="main-hare" src="https://i.ibb.co/MyrHnKYB/main-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
@@ -180,7 +180,7 @@
             </div>
             <h2 style="font-size:30px;margin:0;">Верто-Заяц</h2>
             <p style="font-size:16px;text-align:center;">Отличный Напарник, всегда успешно помогает, всегда готов отбиваться от врагов вместе с вами. Рекомендуется для покупки.</p>
-            <div style="font-size:28px;font-weight:900;color:#d00;margin:10px;">3500 Монет</div>
+            <div style="font-size:28px;font-weight:900;color:#d00;margin:10px;">10000 Монет</div>
             <button class="btn-buy" onclick="buyHeli()">Приобрести</button>
         </div>
         <div class="shop-item">
@@ -207,7 +207,7 @@
 <div id="final-credits"></div>
 
 <script>
-// ---------- Enemy Data ----------
+// ---------- Enemy Data (все ID сохранены) ----------
 const enemyData = [
     {name:"Зомби Заяц",hp:88,dmg:20, speedVal:7, start:1,end:5,img:"https://i.ibb.co/67QjYjbR/zombie-hare.png"},
     {name:"Раб Пурпулезки",hp:510,dmg:60, speedVal:6, start:5,end:12,img:"https://i.ibb.co/BHmN5CZr/raby-purpu.png"},
@@ -223,10 +223,10 @@ const enemyData = [
     {name:"Пурпулезка",hp:550000,dmg:10, finalDmg:991919191919, speedVal:0, start:71,end:72,isFinal:true,img:"https://i.ibb.co/wZS6FJrz/purpulezka.png"}
 ];
 
-let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=10, isGameActive=false;
+let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=20, isGameActive=false;
 let hasHeli=false, adminTimer, isSorcerer=false, isCurse=false;
 let currentEnemies=[], bossActive=false, purpTimer=100;
-let bossBlurInterval = null, waveInProgress = false, spawnInterval = null;
+let bossBlurInterval = null, waveInProgress = false;
 
 function updateUI(){
     document.getElementById('m-val').innerText=money;
@@ -271,25 +271,23 @@ function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies
 function startBattle(){
     if(waveInProgress) return;
     if(wave==71){ startPurpBoss(); return; }
-    
     waveInProgress = true;
     isGameActive = true; 
-    enemiesLeft = (wave===42 || wave===70) ? 1 : 10;
+    enemiesLeft = (wave===42 || wave===70) ? 1 : 20; // теперь 20 врагов на волне
     toggleUI(false);
-    
     if(wave<=3) document.getElementById('tutorial-hint').style.display='block';
     if(isSorcerer){
         document.getElementById('ability-container').style.display='flex';
         setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
     }
-    
-    // Очищаем предыдущий интервал если был
-    if(spawnInterval) clearInterval(spawnInterval);
-    
+    spawnEnemies();
+}
+
+function spawnEnemies(){
     let spawned = 0;
-    spawnInterval = setInterval(() => {
+    let interval = setInterval(() => {
         if(!isGameActive || spawned >= enemiesLeft) { 
-            if(spawned >= enemiesLeft) clearInterval(spawnInterval);
+            if(spawned >= enemiesLeft) clearInterval(interval);
             return; 
         }
         createEnemy();
@@ -310,7 +308,6 @@ function toggleUI(show){
     if(show){
         document.getElementById('main-header').style.top = '15px';
         waveInProgress = false;
-        if(spawnInterval) clearInterval(spawnInterval);
     } else {
         if(bossActive) document.getElementById('main-header').style.top = '80px';
     }
@@ -355,7 +352,6 @@ function moveEnemy(o){
     let baseSpeed = (window.innerWidth / (o.speed * 60));
     let it=setInterval(() => {
         if((!isGameActive && !bossActive) || !o.el) { clearInterval(it); return; }
-        
         let step = baseSpeed;
         if(window.infinityActive){
             let dist = window.innerWidth - o.pos - 500;
@@ -365,14 +361,13 @@ function moveEnemy(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // УРОН ИГРОКУ - ТОЛЬКО ОДИН РАЗ
+        // Урон игроку - ТОЛЬКО ПРИ КАСАНИИ
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
-            if(rect.left < 150) {
+            if(rect.left < 120) {
                 if(!isCurse) hp -= o.dmg;
                 updateUI();
-                o.hasDamaged = true; // КЛЮЧЕВАЯ СТРОКА - блокирует повторный урон
-                
+                o.hasDamaged = true;
                 if(hp <= 0) gameOver();
                 if(!o.isBoss && !o.isFinal) { 
                     removeEnemy(o); 
@@ -382,7 +377,6 @@ function moveEnemy(o){
             }
         }
         
-        // Эффект Agetha
         if(o.isBoss && o.name=='Agetha Hare' && o.el){
             let rect = o.el.getBoundingClientRect();
             let dist = Math.max(0, rect.left - 100);
@@ -397,6 +391,7 @@ function playerShoot(e){
     createBullet("main");
 }
 
+// ---------- ФИКС СТРЕЛЬБЫ: урон ТОЛЬКО врагам, себе НИКАК ----------
 function createBullet(t){
     let b = document.createElement('img');
     b.src = "https://i.ibb.co/Q70CBCKb/pulya.png";
@@ -405,18 +400,26 @@ function createBullet(t){
     b.style.bottom = (t=="main"?"40%":"28%");
     document.getElementById('game-container').appendChild(b);
     let pos = (t=="main")? 380 : 480;
+    let alreadyHit = false; // защита от множественного попадания
+    
     let interval = setInterval(() => {
         pos += 40;
         b.style.left = pos + "px";
+        
+        // Проверка столкновения с каждым врагом
         currentEnemies.forEach(e => {
-            if(!e.el) return;
+            if(!e.el || alreadyHit) return;
             let er = e.el.getBoundingClientRect();
             let br = b.getBoundingClientRect();
+            
             if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
-                // Урон ТОЛЬКО врагу
+                alreadyHit = true; // предотвращаем множественные попадания
+                
+                // Урон только врагу
                 e.hp -= (t=="heli"? 100 : damage);
                 if(e.hp < 0) e.hp = 0;
                 
+                // Обновление визуала
                 if(!e.isBoss && !e.isFinal){
                     let fill = e.el.querySelector('.zombie-hp-fill');
                     if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
@@ -429,13 +432,19 @@ function createBullet(t){
                 
                 if(e.hp <= 0){
                     if(e.isBoss || e.isFinal) updateBossHP(e);
-                    else { removeEnemy(e); money += 150; updateUI(); checkWaveEnd(); }
+                    else { 
+                        money += 150; 
+                        removeEnemy(e); 
+                        updateUI(); 
+                        checkWaveEnd(); 
+                    }
                 }
                 
                 clearInterval(interval);
                 b.remove();
             }
         });
+        
         if(pos > window.innerWidth + 200) { clearInterval(interval); b.remove(); }
     }, 16);
 }
@@ -450,8 +459,6 @@ function removeEnemy(o){
 function checkWaveEnd(){
     if(enemiesLeft <= 0 && currentEnemies.length == 0){
         isGameActive = false; bossActive = false; waveInProgress = false;
-        if(spawnInterval) clearInterval(spawnInterval);
-        
         hp = maxHp; updateUI();
         document.getElementById('tutorial-hint').style.display='none';
         document.getElementById('boss-ui-global').style.transition='opacity 0.5s';
@@ -485,7 +492,6 @@ function updateBossHP(en){
     if(en.hp <= 0){
         if(en.isFinal){
             bossActive = false; waveInProgress = false;
-            if(spawnInterval) clearInterval(spawnInterval);
             document.getElementById('boss-ui-global').style.opacity = "0";
             let p = en.el;
             p.style.animation = "none";
@@ -532,7 +538,7 @@ function startPurpBoss(){
     c.style.animation = "floatPurp 4s infinite ease-in-out";
     c.innerHTML = `<div class="zombie-name" style="color:gold;">${p.name}</div><img src="${p.img}" style="width:100%" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">`;
     document.getElementById('game-container').appendChild(c);
-    let obj = {el:c, hp:p.hp, maxHp:p.hp, isBoss:true, isFinal:true, dmg:p.finalDmg, name:p.name, hasDamaged:false};
+    let obj = {el:c, hp:p.hp, maxHp:p.hp, isBoss:true, isFinal:true, dmg:p.finalDmg, name:p.name};
     currentEnemies.push(obj); setupBossUI(p);
     showSub("Пурпулезка","ХАХА! СЮРПРИЗ! ДУМАЛ, ЧТО УНИЧТОЖИТЬ МОИХ ЗАЙЦЕВ БЫЛО ЛУЧШЕЕ РЕШЕНИЕ?",6000);
     setTimeout(() => showSub("Пурпулезка","ХАХ! ИДИОТ! НАОБОРОТ ХУЖЕ! НО РАЗ МЫ ВСТРЕТИЛИСЬ, ДУМАЮ, МНЕ СТОИТ ЧЕРЕЗ 100 СЕКУНД РАЗВАЛИТЬ ТВОЮ КАБИНУ! ДАЮ ТЕБЕ РОВНО 100 СЕКУНД, ЧТОБЫ ТЫ СДЕЛАЛ СВОИ ПОСЛЕДНИЕ ВДОХИ. ПОЭТОМУ УДАЧИ, ЧТОБЫ УМЕРЕТЬ!",6000),7000);
@@ -569,7 +575,7 @@ function purpKillPlayer(){
     },4500);
 }
 
-function runEndCredits(){
+function runEndCredits(){ 
     let b=document.getElementById('final-credits');
     b.style.display="flex";
     const l=["Эй...","Не уходи...","О!","Я думал, что потерял тебя...","Слушай...","Я хочу тебя предупредить...","Они уже здесь, и идут за тобой...","Тебе надо скатываться..."];
@@ -594,7 +600,7 @@ function runEndCredits(){
     n();
 }
 
-function showSub(n,t,d){
+function showSub(n,t,d){ 
     let box=document.getElementById('subtitle-box');
     document.getElementById('sub-name').innerText=n;
     document.getElementById('sub-text').innerText=t;
@@ -605,7 +611,6 @@ function showSub(n,t,d){
 
 function gameOver(){
     isGameActive=false; bossActive=false; waveInProgress=false;
-    if(spawnInterval) clearInterval(spawnInterval);
     document.getElementById('tutorial-hint').style.display='none';
     document.getElementById('lose-screen').style.display="flex";
     document.getElementById('purp-timer').style.display='none';
@@ -628,8 +633,8 @@ function openShop(){document.getElementById('shop-overlay').style.display='flex'
 function closeShop(){document.getElementById('shop-overlay').style.display='none';}
 
 function buyHeli(){
-    if(money>=3500 && !hasHeli){
-        money-=3500; hasHeli=true;
+    if(money>=10000 && !hasHeli){
+        money-=10000; hasHeli=true;
         document.getElementById('heli-hare').style.display='block';
         let div = document.createElement('div');
         div.className = 'heli-purchase';
@@ -685,26 +690,12 @@ function castAbility(type){
         setTimeout(() => {
             let fly = setInterval(() => {
                 let left = parseInt(ball.style.left) || 300;
-                ball.style.left = (left + 100) + 'px';
+                ball.style.left = (left + 80) + 'px';
                 if(left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
             }, 16);
             
-            // ОГРОМНЫЙ УРОН ВСЕМ ВРАГАМ
-            currentEnemies.forEach(e => { 
-                e.hp -= 99999999; 
-                if(e.hp < 0) e.hp = 0; 
-                
-                // Обновляем визуал
-                if(!e.isBoss && !e.isFinal){
-                    let fill = e.el.querySelector('.zombie-hp-fill');
-                    if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
-                    let txt = e.el.querySelector('div[style*="top:3px"]');
-                    if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
-                } else {
-                    document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
-                    document.getElementById('boss-name-text').innerHTML = `${e.name} [${Math.floor(e.hp)}/${e.maxHp}]`;
-                }
-            });
+            // ОГРОМНЫЙ УРОН 99M
+            currentEnemies.forEach(e => { e.hp -= 99999999; if(e.hp < 0) e.hp = 0; });
             
             setTimeout(() => {
                 document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0)';
@@ -726,24 +717,11 @@ function castAbility(type){
             document.getElementById('game-container').appendChild(ball);
             
             setTimeout(() => {
-                ball.style.width = '450px';
+                ball.style.width = '400px';
                 
-                // Урон 1500 * 10 = 15000 в секунду
+                // Урон 15000 в секунду (1500 за 100мс)
                 let dmgInt = setInterval(() => {
-                    currentEnemies.forEach(e => { 
-                        e.hp -= 1500; 
-                        if(e.hp < 0) e.hp = 0;
-                        
-                        if(!e.isBoss && !e.isFinal){
-                            let fill = e.el.querySelector('.zombie-hp-fill');
-                            if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
-                            let txt = e.el.querySelector('div[style*="top:3px"]');
-                            if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
-                        } else {
-                            document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
-                            document.getElementById('boss-name-text').innerHTML = `${e.name} [${Math.floor(e.hp)}/${e.maxHp}]`;
-                        }
-                    });
+                    currentEnemies.forEach(e => { e.hp -= 1500; if(e.hp < 0) e.hp = 0; });
                 }, 100);
                 
                 setTimeout(() => {
