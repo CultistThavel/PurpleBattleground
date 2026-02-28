@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 RELOADED</title>
+    <title>Purple Battleground 1.6 - RELOAD SYSTEM</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
-        #game-container { position:relative;width:100vw;height:100vh; }
+        #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
         #floor { position:absolute;bottom:0;width:100%;height:40%;background:#60646b;border-top:12px solid #000;z-index:10; }
 
         .header-center { position:absolute;top:15px;left:5%;width:90%;display:flex;flex-direction:column;align-items:center;z-index:100;transition:opacity .5s,transform .5s; }
@@ -44,6 +44,48 @@
         .bullet { position:absolute;z-index:48;width:150px;pointer-events:none; }
 
         #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s; text-shadow:3px 3px 0 #000; }
+        
+        #shoot-btn { 
+            position:absolute; 
+            bottom:60px; 
+            right:60px; 
+            width:180px; 
+            height:180px; 
+            background:#000; 
+            border:8px solid #fff; 
+            border-radius:50%; 
+            z-index:1000; 
+            display:none; 
+            cursor:pointer;
+            box-shadow:0 10px 0 #333;
+            transition:all 0.1s ease;
+            overflow:hidden;
+        }
+        #shoot-btn.active { transform:scale(0.95); box-shadow:0 5px 0 #333; }
+        #shoot-btn.reloading { cursor:not-allowed; opacity:0.8; }
+        #shoot-btn-inner { 
+            width:100%; 
+            height:100%; 
+            border-radius:50%; 
+            background:#000;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:60px;
+            color:#fff;
+        }
+        #reload-overlay { 
+            position:absolute; 
+            bottom:0; 
+            left:0; 
+            width:100%; 
+            height:0%; 
+            background:#ff0000; 
+            transition:height 0.69s linear;
+            z-index:1001;
+            border-radius:0 0 90px 90px;
+        }
+
         #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:120px;background:#000;border:6px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:18px;cursor:pointer;z-index:100000;border-radius:20px;box-shadow:0 0 20px #fff; }
         #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:450px;background:rgba(0,0,0,.95);border:6px solid #fff;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px;opacity:0;transition:opacity .5s,transform .5s; }
         #admin-menu.show { opacity:1;transform:translateX(-50%) translateY(0); }
@@ -67,7 +109,6 @@
         @keyframes heliFly { 0% { transform:translateY(0); } 100% { transform:translateY(-35px); } }
         @keyframes floatBlueBall { 0% { transform:translate(0,0); } 25% { transform:translate(400px, -200px); } 50% { transform:translate(800px, 100px); } 75% { transform:translate(400px, 250px); } 100% { transform:translate(0,0); } }
         @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
-        @keyframes cooldownFill { from { height:0%; } to { height:100%; } }
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
@@ -95,39 +136,6 @@
         .heli-purchase { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:6px solid #000;border-radius:20px;padding:30px;text-align:center;color:#800080;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3000000; }
         .heli-purchase button { background:#00ff00;border:4px solid #000;color:#000;padding:10px 40px;font-size:24px;border-radius:15px;cursor:pointer;margin-top:20px; }
         #ammo-info { font-size:20px;color:#000;margin-top:5px; }
-
-        /* Новая кнопка стрельбы */
-        #shoot-btn { 
-            position:fixed; 
-            bottom:60px; 
-            right:60px; 
-            width:180px; 
-            height:180px; 
-            background:#000; 
-            border:8px solid #fff; 
-            border-radius:50%; 
-            z-index:10000; 
-            display:none; 
-            justify-content:center; 
-            align-items:center; 
-            cursor:pointer;
-            box-shadow:0 10px 0 #333;
-            transition:all 0.1s;
-            overflow:hidden;
-        }
-        #shoot-btn.active { transform:scale(0.95); box-shadow:0 5px 0 #333; }
-        #shoot-btn img { width:100px; height:100px; filter:invert(1); }
-        #shoot-cooldown { 
-            position:absolute; 
-            bottom:0; 
-            left:0; 
-            width:100%; 
-            height:0%; 
-            background:rgba(255,0,0,0.8); 
-            transition:height 0.45s linear;
-            z-index:10001;
-        }
-        #shoot-btn.disabled { pointer-events:none; }
     </style>
 </head>
 <body>
@@ -168,6 +176,12 @@
     <div id="floor"></div>
     <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
 
+    <!-- Новая кнопка стрельбы -->
+    <div id="shoot-btn" onclick="handleShoot()">
+        <div id="shoot-btn-inner">🔫</div>
+        <div id="reload-overlay"></div>
+    </div>
+
     <div id="admin-trigger">Админ Панель 1.6 🐢</div>
     <div id="admin-menu">
         <div style="display:flex;align-items:center;margin-bottom:20px;">
@@ -194,12 +208,6 @@
             <div id="cd-infinity" class="cd-overlay"></div>
         </div>
     </div>
-</div>
-
-<!-- Новая кнопка стрельбы -->
-<div id="shoot-btn" onclick="fireBullet()">
-    <img src="https://i.ibb.co/Q70CBCKb/pulya.png" alt="bullet">
-    <div id="shoot-cooldown"></div>
 </div>
 
 <div id="subtitle-box">
@@ -269,6 +277,11 @@ let currentEnemies=[], bossActive=false, purpTimer=100;
 let bossBlurInterval = null, waveInProgress = false;
 let blueBallActive = false;
 let canShoot = true;
+let heliLastShot = 0;
+
+// UI элементы
+const shootBtn = document.getElementById('shoot-btn');
+const reloadOverlay = document.getElementById('reload-overlay');
 
 function updateUI(){
     document.getElementById('m-val').innerText=money;
@@ -277,6 +290,30 @@ function updateUI(){
     document.getElementById('wave-big').innerText=wave+" Волна";
     document.getElementById('enemies-count').innerText="Осталось Врагов: "+enemiesLeft;
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
+}
+
+// ---------- НОВАЯ СИСТЕМА СТРЕЛЬБЫ ----------
+function handleShoot() {
+    if((!isGameActive && !bossActive) || !waveInProgress) return;
+    if(!canShoot) return;
+    
+    // Анимация нажатия
+    shootBtn.classList.add('active');
+    setTimeout(() => shootBtn.classList.remove('active'), 100);
+    
+    // Стреляем
+    createBullet("main");
+    
+    // Перезарядка
+    canShoot = false;
+    shootBtn.classList.add('reloading');
+    reloadOverlay.style.height = '100%';
+    
+    setTimeout(() => {
+        canShoot = true;
+        shootBtn.classList.remove('reloading');
+        reloadOverlay.style.height = '0%';
+    }, 690);
 }
 
 // ---------- ADMIN / SORCERER ----------
@@ -313,17 +350,25 @@ function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies
 function startBattle(){
     if(waveInProgress) return;
     if(wave==71){ startPurpBoss(); return; }
+    
     waveInProgress = true;
     isGameActive = true; 
     enemiesLeft = (wave===42 || wave===70) ? 1 : 20;
+    
+    // Показываем кнопку стрельбы
+    shootBtn.style.display = 'block';
+    
     toggleUI(false);
-    if(wave===1) document.getElementById('tutorial-hint').style.display='block';
+    
+    // Тутор только для 1 волны
+    if(wave === 1) {
+        document.getElementById('tutorial-hint').style.display='block';
+    }
+    
     if(isSorcerer){
         document.getElementById('ability-container').style.display='flex';
         setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
     }
-    // Показываем кнопку стрельбы
-    document.getElementById('shoot-btn').style.display = 'flex';
     spawnEnemies();
 }
 
@@ -345,15 +390,14 @@ function toggleUI(show){
     document.getElementById('wave-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.opacity=op;
     document.getElementById('start-btn-ui').style.pointerEvents=show?"auto":"none";
-    if(!show){
+    
+    if(show){
+        // Скрываем кнопку стрельбы
+        shootBtn.style.display = 'none';
         document.getElementById('tutorial-hint').style.display='none';
         document.getElementById('ability-container').classList.remove('active');
-    }
-    if(show){
         document.getElementById('main-header').style.top = '15px';
         waveInProgress = false;
-        // Прячем кнопку стрельбы
-        document.getElementById('shoot-btn').style.display = 'none';
     } else {
         if(bossActive) document.getElementById('main-header').style.top = '80px';
     }
@@ -430,7 +474,7 @@ function startMoving(o){
                 let enemyRect = o.el.getBoundingClientRect();
                 if(Math.abs(enemyRect.left - ballRect.left) < 600) {
                     if(enemyRect.left > ballRect.left) o.pos -= 3;
-                    else o.pos += 1;
+                    else o.pos += 2;
                 }
             }
         }
@@ -438,7 +482,7 @@ function startMoving(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // УРОН ИГРОКУ - ТОЛЬКО ОДИН РАЗ
+        // Урон игроку - только один раз
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
@@ -464,27 +508,7 @@ function startMoving(o){
     }, 16);
 }
 
-// ---------- НОВАЯ СИСТЕМА СТРЕЛЬБЫ ----------
-function fireBullet(){
-    if((!isGameActive && !bossActive) || !waveInProgress || !canShoot) return;
-    
-    canShoot = false;
-    let btn = document.getElementById('shoot-btn');
-    let cooldown = document.getElementById('shoot-cooldown');
-    btn.classList.add('disabled');
-    cooldown.style.height = '100%';
-    
-    // Создаем пулю
-    createBullet("main");
-    
-    // Перезарядка 450мс
-    setTimeout(() => {
-        canShoot = true;
-        btn.classList.remove('disabled');
-        cooldown.style.height = '0%';
-    }, 450);
-}
-
+// ---------- СТРЕЛЬБА ----------
 function createBullet(t){
     let b = document.createElement('img');
     b.src = "https://i.ibb.co/Q70CBCKb/pulya.png";
@@ -501,8 +525,9 @@ function createBullet(t){
             let er = e.el.getBoundingClientRect();
             let br = b.getBoundingClientRect();
             if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
-                // Урон ТОЛЬКО врагу
-                e.hp -= (t=="heli"? 100 : damage);
+                // Урон только врагу
+                let bulletDamage = (t=="heli"? 1000 : damage); // Верто-заяц теперь 1000 урона
+                e.hp -= bulletDamage;
                 if(e.hp < 0) e.hp = 0;
                 
                 if(!e.isBoss && !e.isFinal){
@@ -532,6 +557,19 @@ function createBullet(t){
         });
         if(pos > window.innerWidth + 200) { clearInterval(interval); b.remove(); }
     }, 16);
+}
+
+// Верто-заяц теперь стреляет с той же скоростью (каждые 690 мс)
+function heliShoot() {
+    if(!hasHeli) return;
+    let now = Date.now();
+    if(now - heliLastShot > 690) {
+        heliLastShot = now;
+        if((isGameActive || bossActive) && waveInProgress) {
+            createBullet("heli");
+        }
+    }
+    requestAnimationFrame(heliShoot);
 }
 
 function removeEnemy(o){
@@ -616,7 +654,6 @@ function startPurpBoss(){
     bossActive = true; waveInProgress = true;
     toggleUI(false);
     document.getElementById('purp-timer').style.display = 'block';
-    document.getElementById('shoot-btn').style.display = 'flex'; // показываем кнопку
     purpTimer = 100;
     let p = enemyData.find(e => e.isFinal);
     let c = document.createElement('div');
@@ -706,7 +743,7 @@ function gameOver(){
     document.getElementById('red-screen-overlay').style.background='rgba(255,0,0,0)';
     document.getElementById('game-container').style.filter='none';
     document.getElementById('main-header').style.top = '15px';
-    document.getElementById('shoot-btn').style.display = 'none';
+    shootBtn.style.display = 'none';
 }
 
 function respawn(){
@@ -732,7 +769,7 @@ function buyHeli(){
         div.className = 'heli-purchase';
         div.innerHTML = 'Вы успешно приобрёли Верто-Зайца, теперь он на вашей стороне.<br><button onclick="this.parentElement.remove()">Ок.</button>';
         document.body.appendChild(div);
-        setInterval(() => { if((isGameActive||bossActive) && hasHeli) createBullet("heli"); }, 150);
+        heliShoot(); // запускаем цикл стрельбы верто-зайца
         updateUI();
     }
 }
