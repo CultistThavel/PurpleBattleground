@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - FINAL PERFECT</title>
+    <title>Purple Battleground 1.6 - ABSOLUTE FINAL</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -340,7 +340,7 @@ function createBullet(t){
         pos += 40;
         b.style.left = pos + "px";
         
-        // Проходим по копии массива, чтобы избежать проблем с удалением
+        // Проходим по копии массива
         [...currentEnemies].forEach(e => {
             if(!e || !e.el) return;
             let er = e.el.getBoundingClientRect();
@@ -363,9 +363,9 @@ function createBullet(t){
                     if(e.isBoss || e.isFinal) {
                         updateBossHP(e);
                     } else { 
+                        // Полностью удаляем врага
                         clearInterval(e.moveInterval);
                         if(e.el) e.el.remove();
-                        // Удаляем из массива
                         const index = currentEnemies.indexOf(e);
                         if (index > -1) currentEnemies.splice(index, 1);
                         money += e.reward || 85; 
@@ -570,7 +570,7 @@ function startMoving(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // Когда враг касается игрока - наносим урон и УДАЛЯЕМ его (засчитываем как убитого для волны)
+        // Когда враг касается игрока - наносим урон и УДАЛЯЕМ его
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
@@ -580,14 +580,18 @@ function startMoving(o){
                 
                 clearInterval(o.moveInterval);
                 
-                // ВАЖНО: враг касается - он удаляется и засчитывается в счетчик волны
-                if(!o.isBoss && !o.isFinal) { 
-                    if(o.el) o.el.remove();
-                    const index = currentEnemies.indexOf(o);
-                    if (index > -1) currentEnemies.splice(index, 1);
+                // ВАЖНО: полностью удаляем врага из игры и из массива
+                if(o.el) o.el.remove();
+                const index = currentEnemies.indexOf(o);
+                if (index > -1) currentEnemies.splice(index, 1);
+                
+                // Уменьшаем счетчик врагов
+                if(!o.isBoss && !o.isFinal) {
                     enemiesLeft--;
-                    checkWaveEnd(); 
                 }
+                
+                // Проверяем завершение волны
+                checkWaveEnd();
                 
                 if(hp <= 0) gameOver();
             }
