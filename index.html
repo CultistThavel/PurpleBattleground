@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - SAFE MODE</title>
+    <title>Purple Battleground 1.6 - BULLETPROOF</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -287,7 +287,7 @@ let bossBlurInterval = null, waveInProgress = false;
 let blueBallActive = false;
 let canShoot = true;
 let heliInterval = null;
-let safetyTimer = null; // Таймер безопасности
+let safetyTimer = null; // Страховочный таймер
 
 // Элементы UI
 const shootButton = document.getElementById('shoot-button');
@@ -312,52 +312,22 @@ function updateUI(){
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
 }
 
-// ---------- БЕЗОПАСНЫЙ ПЕРЕХОД В МИРНЫЙ РЕЖИМ ----------
-function safeTransitionToMenu() {
-    // Отменяем предыдущий таймер безопасности
-    if(safetyTimer) {
-        clearTimeout(safetyTimer);
-        safetyTimer = null;
-    }
+// ---------- СТРАХОВОЧНЫЙ ТАЙМЕР ----------
+function startSafetyTimer() {
+    if(safetyTimer) clearTimeout(safetyTimer);
     
-    // Проверяем, не босс ли это (42, 70, 71 волны)
-    if(wave === 42 || wave === 70 || wave === 71) {
-        return; // Не трогаем боссов
-    }
-    
-    // Проверяем условия для перехода
-    if(enemiesLeft <= 0 && currentEnemies.length === 0) {
-        // Уже всё чисто - переходим сразу
-        forceEndWave();
-    } else {
-        // Запускаем таймер безопасности на 2 секунды
-        safetyTimer = setTimeout(() => {
-            // Принудительно завершаем волну
+    // Запускаем таймер на 2 секунды
+    safetyTimer = setTimeout(() => {
+        // Проверяем, действительно ли врагов нет
+        if(currentEnemies.length === 0 && (enemiesLeft <= 0 || waveInProgress)) {
+            console.log("Страховочный таймер сработал!");
             forceEndWave();
-        }, 2000);
-    }
+        }
+    }, 2000);
 }
 
 function forceEndWave() {
-    if(safetyTimer) {
-        clearTimeout(safetyTimer);
-        safetyTimer = null;
-    }
-    
-    // Не трогаем боссов
-    if(wave === 42 || wave === 70 || wave === 71) {
-        return;
-    }
-    
-    // Очищаем всех врагов
-    currentEnemies.forEach(e => {
-        clearInterval(e.moveInterval);
-        if(e.el) e.el.remove();
-    });
-    currentEnemies = [];
-    enemiesLeft = 0;
-    
-    // Завершаем волну
+    // Принудительно завершаем волну
     isGameActive = false; 
     bossActive = false; 
     waveInProgress = false;
@@ -438,7 +408,6 @@ function createBullet(t){
                         enemiesLeft--;
                         updateUI(); 
                         checkWaveEnd(); 
-                        safeTransitionToMenu(); // Запускаем безопасный переход
                     }
                 }
                 
@@ -520,6 +489,11 @@ function toggleUI(show){
             clearInterval(heliInterval);
             heliInterval = null;
         }
+        
+        if(safetyTimer) {
+            clearTimeout(safetyTimer);
+            safetyTimer = null;
+        }
     } else {
         if(bossActive) document.getElementById('main-header').style.top = '80px';
     }
@@ -589,7 +563,7 @@ function startMoving(o){
             if(dist < 300) step = 0;
         }
         
-        // Blue Ball - ТОЛЬКО ПРИТЯЖЕНИЕ И УРОН ВРАГАМ, БЕЗ УРОНА ИГРОКУ
+        // Blue Ball - ТОЛЬКО ПРИТЯЖЕНИЕ, БЕЗ УРОНА
         if(blueBallActive) {
             let ballElement = document.querySelector('.blue-ball');
             if(ballElement && !o.isBoss && !o.isFinal) {
@@ -598,36 +572,6 @@ function startMoving(o){
                 if(Math.abs(enemyRect.left - ballRect.left) < 600) {
                     if(enemyRect.left > ballRect.left) o.pos -= 4;
                     else o.pos += 3;
-                }
-            }
-            
-            // Урон только врагам, НЕ ИГРОКУ
-            o.hp -= 15;
-            if(o.hp < 0) o.hp = 0;
-            
-            if(!o.isBoss && !o.isFinal){
-                let fill = o.el.querySelector('.zombie-hp-fill');
-                if(fill) fill.style.width = (o.hp/o.maxHp)*100 + "%";
-                let txt = o.el.querySelector('div[style*="top:3px"]');
-                if(txt) txt.innerText = Math.max(0,Math.floor(o.hp)) + " ХП";
-            } else {
-                document.getElementById('boss-hp-fill').style.width = (o.hp/o.maxHp)*100 + "%";
-                document.getElementById('boss-name-text').innerHTML = `${o.name} [${Math.floor(o.hp)}/${o.maxHp}]`;
-            }
-            
-            if(o.hp <= 0){
-                clearInterval(o.moveInterval);
-                if(o.isBoss || o.isFinal) {
-                    updateBossHP(o);
-                } else { 
-                    if(o.el) o.el.remove();
-                    const index = currentEnemies.indexOf(o);
-                    if (index > -1) currentEnemies.splice(index, 1);
-                    money += o.reward; 
-                    enemiesLeft--;
-                    updateUI(); 
-                    checkWaveEnd(); 
-                    safeTransitionToMenu();
                 }
             }
         }
@@ -654,7 +598,6 @@ function startMoving(o){
                 }
                 
                 checkWaveEnd();
-                safeTransitionToMenu(); // Запускаем безопасный переход
                 
                 if(hp <= 0) gameOver();
             }
@@ -670,9 +613,9 @@ function startMoving(o){
 }
 
 function checkWaveEnd(){
-    if(enemiesLeft <= 0 && currentEnemies.length === 0){
-        // Запускаем безопасный переход
-        safeTransitionToMenu();
+    // Запускаем страховочный таймер при любом подозрении на завершение
+    if(enemiesLeft <= 0 && currentEnemies.length === 0) {
+        startSafetyTimer();
     }
 }
 
@@ -837,6 +780,11 @@ function gameOver(){
         clearInterval(heliInterval);
         heliInterval = null;
     }
+    
+    if(safetyTimer) {
+        clearTimeout(safetyTimer);
+        safetyTimer = null;
+    }
 }
 
 function respawn(){
@@ -966,7 +914,6 @@ function castAbility(type){
                 currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
                 updateUI();
                 checkWaveEnd();
-                safeTransitionToMenu();
             }, 100);
             
             setTimeout(() => {
@@ -991,8 +938,39 @@ function castAbility(type){
             ball.style.width = '400px';
             document.getElementById('game-container').appendChild(ball);
             
+            // Урон врагам от синего шара (без урона игроку)
+            let dmgInterval = setInterval(() => {
+                if(!blueBallActive) {
+                    clearInterval(dmgInterval);
+                    return;
+                }
+                [...currentEnemies].forEach(e => {
+                    if(!e.isBoss && !e.isFinal) {
+                        e.hp -= 1500; // 15000 в секунду
+                        if(e.hp < 0) e.hp = 0;
+                        
+                        let fill = e.el.querySelector('.zombie-hp-fill');
+                        if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
+                        let txt = e.el.querySelector('div[style*="top:3px"]');
+                        if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
+                        
+                        if(e.hp <= 0){
+                            clearInterval(e.moveInterval);
+                            if(e.el) e.el.remove();
+                            const index = currentEnemies.indexOf(e);
+                            if (index > -1) currentEnemies.splice(index, 1);
+                            money += e.reward; 
+                            enemiesLeft--;
+                            updateUI(); 
+                            checkWaveEnd();
+                        }
+                    }
+                });
+            }, 100);
+            
             setTimeout(() => {
                 blueBallActive = false;
+                clearInterval(dmgInterval);
                 ball.remove();
             }, 15000);
         }, 600);
