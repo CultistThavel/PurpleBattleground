@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - WAVE FIXED</title>
+    <title>Purple Battleground 1.6 - FINAL PERFECT</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -570,6 +570,7 @@ function startMoving(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
+        // Когда враг касается игрока - наносим урон и УДАЛЯЕМ его (засчитываем как убитого для волны)
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
@@ -579,7 +580,7 @@ function startMoving(o){
                 
                 clearInterval(o.moveInterval);
                 
-                if(hp <= 0) gameOver();
+                // ВАЖНО: враг касается - он удаляется и засчитывается в счетчик волны
                 if(!o.isBoss && !o.isFinal) { 
                     if(o.el) o.el.remove();
                     const index = currentEnemies.indexOf(o);
@@ -587,6 +588,8 @@ function startMoving(o){
                     enemiesLeft--;
                     checkWaveEnd(); 
                 }
+                
+                if(hp <= 0) gameOver();
             }
         }
         
