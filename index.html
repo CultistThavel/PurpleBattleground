@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - BULLETPROOF</title>
+    <title>Purple Battleground 1.6 - ABSOLUTE VICTORY</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -99,6 +99,7 @@
         .red-ball { position:absolute;width:180px;height:180px;z-index:20000;pointer-events:none; animation:redBallSpin 0.5s infinite linear; }
         .blue-ball { position:absolute;width:400px;z-index:15000;pointer-events:none; animation:floatBlueBall 3s infinite alternate ease-in-out; }
         .damage-notify { position:fixed;top:20%;left:50%;transform:translateX(-50%);color:#f00;font-size:50px;font-weight:900;text-shadow:2px 2px 0 #fff;z-index:2000000;opacity:0;transition:opacity 0.5s, transform 1s;pointer-events:none; }
+        .admin-notify-blue { position:fixed;top:20%;left:50%;transform:translateX(-50%);color:#00f;font-size:50px;font-weight:900;text-shadow:2px 2px 0 #fff;z-index:2000000;opacity:0;transition:opacity 0.5s, transform 1s;pointer-events:none; }
         .heli-purchase { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:6px solid #000;border-radius:20px;padding:30px;text-align:center;color:#800080;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3000000; }
         .heli-purchase button { background:#00ff00;border:4px solid #000;color:#000;padding:10px 40px;font-size:24px;border-radius:15px;cursor:pointer;margin-top:20px; }
         #ammo-info { font-size:20px;color:#000;margin-top:5px; }
@@ -287,7 +288,7 @@ let bossBlurInterval = null, waveInProgress = false;
 let blueBallActive = false;
 let canShoot = true;
 let heliInterval = null;
-let safetyTimer = null; // Страховочный таймер
+let safetyTimer = null;
 
 // Элементы UI
 const shootButton = document.getElementById('shoot-button');
@@ -301,7 +302,7 @@ function updateUI(){
     document.getElementById('hp-fill').style.width=(hp/maxHp)*100+"%";
     waveBig.innerText = wave + " Волна";
     
-    // Обновляем счетчик врагов (прячем при боссах)
+    // Счетчик врагов показываем всегда, кроме боссов
     if(bossActive || (wave >= 42 && wave <= 43) || (wave >= 70 && wave <= 71)) {
         enemiesCount.style.display = 'none';
     } else {
@@ -316,9 +317,7 @@ function updateUI(){
 function startSafetyTimer() {
     if(safetyTimer) clearTimeout(safetyTimer);
     
-    // Запускаем таймер на 2 секунды
     safetyTimer = setTimeout(() => {
-        // Проверяем, действительно ли врагов нет
         if(currentEnemies.length === 0 && (enemiesLeft <= 0 || waveInProgress)) {
             console.log("Страховочный таймер сработал!");
             forceEndWave();
@@ -327,7 +326,6 @@ function startSafetyTimer() {
 }
 
 function forceEndWave() {
-    // Принудительно завершаем волну
     isGameActive = false; 
     bossActive = false; 
     waveInProgress = false;
@@ -563,7 +561,7 @@ function startMoving(o){
             if(dist < 300) step = 0;
         }
         
-        // Blue Ball - ТОЛЬКО ПРИТЯЖЕНИЕ, БЕЗ УРОНА
+        // Blue Ball - только притяжение
         if(blueBallActive) {
             let ballElement = document.querySelector('.blue-ball');
             if(ballElement && !o.isBoss && !o.isFinal) {
@@ -579,7 +577,6 @@ function startMoving(o){
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
         
-        // Когда враг касается игрока
         if(!o.hasDamaged && o.el) {
             let rect = o.el.getBoundingClientRect();
             if(rect.left < 120) {
@@ -613,7 +610,7 @@ function startMoving(o){
 }
 
 function checkWaveEnd(){
-    // Запускаем страховочный таймер при любом подозрении на завершение
+    // Запускаем страховочный таймер при подозрении на завершение
     if(enemiesLeft <= 0 && currentEnemies.length === 0) {
         startSafetyTimer();
     }
@@ -863,7 +860,32 @@ function activateSorcerer(){
 
 function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
-function skipWaveAdmin(){currentEnemies.forEach(e=>e.el.remove());currentEnemies=[];enemiesLeft=0;checkWaveEnd();}
+
+// ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОПУСКА ВОЛНЫ
+function skipWaveAdmin(){
+    // Очищаем всех врагов
+    currentEnemies.forEach(e => {
+        clearInterval(e.moveInterval);
+        if(e.el) e.el.remove();
+    });
+    currentEnemies = [];
+    enemiesLeft = 0;
+    
+    // Показываем синее уведомление
+    let notify = document.createElement('div');
+    notify.className = 'admin-notify-blue';
+    notify.innerText = 'Пропущена Волна.';
+    document.body.appendChild(notify);
+    setTimeout(() => { notify.style.opacity = '1'; notify.style.transform = 'translateX(-50%) translateY(-30px)'; }, 10);
+    setTimeout(() => { 
+        notify.style.opacity = '0'; 
+        notify.style.transform = 'translateX(-50%) translateY(-80px)'; 
+        setTimeout(() => notify.remove(), 2000); 
+    }, 2000);
+    
+    // Завершаем волну
+    checkWaveEnd();
+}
 
 // ---------- СПОСОБНОСТИ SORCERER ----------
 function castAbility(type){
@@ -938,7 +960,6 @@ function castAbility(type){
             ball.style.width = '400px';
             document.getElementById('game-container').appendChild(ball);
             
-            // Урон врагам от синего шара (без урона игроку)
             let dmgInterval = setInterval(() => {
                 if(!blueBallActive) {
                     clearInterval(dmgInterval);
@@ -946,7 +967,7 @@ function castAbility(type){
                 }
                 [...currentEnemies].forEach(e => {
                     if(!e.isBoss && !e.isFinal) {
-                        e.hp -= 1500; // 15000 в секунду
+                        e.hp -= 1500;
                         if(e.hp < 0) e.hp = 0;
                         
                         let fill = e.el.querySelector('.zombie-hp-fill');
