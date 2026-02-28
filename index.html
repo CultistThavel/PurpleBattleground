@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - PERFECT FINAL</title>
+    <title>Purple Battleground 1.6 - WAVE FIXED</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -26,7 +26,7 @@
         #main-hare { position:absolute;bottom:25%;left:-20px;width:500px;z-index:50;transition:transform 0.2s ease, bottom 0.3s ease; }
         #heli-hare { position:absolute;bottom:12%;left:180px;width:250px;z-index:60;display:none;animation:heliFly 1.8s infinite alternate ease-in-out; }
 
-        .zombie-container { position:absolute;bottom:25%;right:-500px;width:450px;z-index:45;display:flex;flex-direction:column;align-items:center;transition:all 0.3s ease; }
+        .zombie-container { position:absolute;bottom:25%;right:-500px;width:450px;z-index:45;display:flex;flex-direction:column;align-items:center; }
         .zombie-hp-bar { width:90%;height:30px;background:red;border:5px solid #000;position:relative; }
         .zombie-hp-fill { height:100%;background:#00ff00;width:100%;transition:width .3s; }
         .zombie-name { color:#fff;font-size:24px;-webkit-text-stroke:1px #000;margin-bottom:5px;font-weight:900; }
@@ -339,8 +339,10 @@ function createBullet(t){
     let interval = setInterval(() => {
         pos += 40;
         b.style.left = pos + "px";
-        currentEnemies.forEach(e => {
-            if(!e.el) return;
+        
+        // Проходим по копии массива, чтобы избежать проблем с удалением
+        [...currentEnemies].forEach(e => {
+            if(!e || !e.el) return;
             let er = e.el.getBoundingClientRect();
             let br = b.getBoundingClientRect();
             if(br.right > er.left-50 && br.left < er.right+50 && br.top < er.bottom+50 && br.bottom > er.top-50) {
@@ -377,6 +379,7 @@ function createBullet(t){
                 b.remove();
             }
         });
+        
         if(pos > window.innerWidth + 200) { clearInterval(interval); b.remove(); }
     }, 16);
 }
@@ -385,14 +388,23 @@ function createBullet(t){
 function startBattle(){
     if(waveInProgress) return;
     if(wave >= 71){ startPurpBoss(); return; }
+    
     waveInProgress = true;
     isGameActive = true; 
-    enemiesLeft = (wave === 42 || wave === 70) ? 1 : 20;
+    
+    // Устанавливаем правильное количество врагов
+    if(wave === 42 || wave === 70) {
+        enemiesLeft = 1;
+    } else {
+        enemiesLeft = 20;
+    }
     
     shootButton.style.display = 'flex';
     
     if(wave === 1) {
         tutorialHint.style.display = 'block';
+    } else {
+        tutorialHint.style.display = 'none';
     }
     
     toggleUI(false);
@@ -461,7 +473,6 @@ function createEnemy(){
             <div class="zombie-name" style="color:gold;">${type.name}</div>
             <img src="${type.img}" style="width:100%; ${type.isBoss?'transform:scale(1.3);':''}" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
         `;
-        enemiesLeft = 1;
     } else {
         c.innerHTML=`
             <div class="zombie-name">${type.name}</div>
@@ -526,7 +537,7 @@ function startMoving(o){
                     }
                 }
                 // Урон всем (и боссам тоже)
-                o.hp -= 15; // 1500 за 100мс = 15000 в секунду
+                o.hp -= 15;
                 if(o.hp < 0) o.hp = 0;
                 
                 if(!o.isBoss && !o.isFinal){
@@ -589,9 +600,7 @@ function startMoving(o){
 }
 
 function checkWaveEnd(){
-    console.log('checkWaveEnd', enemiesLeft, currentEnemies.length);
     if(enemiesLeft <= 0 && currentEnemies.length === 0){
-        console.log('Волна завершена!');
         isGameActive = false; 
         bossActive = false; 
         waveInProgress = false;
@@ -888,7 +897,8 @@ function castAbility(type){
                 if(left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
             }, 16);
             
-            currentEnemies.forEach(e => { 
+            // Убиваем всех врагов
+            [...currentEnemies].forEach(e => { 
                 e.hp = 0; 
                 clearInterval(e.moveInterval);
             });
