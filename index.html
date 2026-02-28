@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - ABSOLUTE VICTORY</title>
+    <title>Purple Battleground 1.6 - FINAL MASTER</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -302,7 +302,6 @@ function updateUI(){
     document.getElementById('hp-fill').style.width=(hp/maxHp)*100+"%";
     waveBig.innerText = wave + " Волна";
     
-    // Счетчик врагов показываем всегда, кроме боссов
     if(bossActive || (wave >= 42 && wave <= 43) || (wave >= 70 && wave <= 71)) {
         enemiesCount.style.display = 'none';
     } else {
@@ -313,19 +312,24 @@ function updateUI(){
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
 }
 
-// ---------- СТРАХОВОЧНЫЙ ТАЙМЕР ----------
+// ---------- СТРАХОВОЧНЫЙ ТАЙМЕР (ГАРАНТИРОВАННОЕ ЗАВЕРШЕНИЕ) ----------
 function startSafetyTimer() {
     if(safetyTimer) clearTimeout(safetyTimer);
     
     safetyTimer = setTimeout(() => {
-        if(currentEnemies.length === 0 && (enemiesLeft <= 0 || waveInProgress)) {
-            console.log("Страховочный таймер сработал!");
-            forceEndWave();
-        }
+        console.log("Страховочный таймер сработал! Принудительное завершение волны.");
+        forceEndWave();
     }, 2000);
 }
 
 function forceEndWave() {
+    // Очищаем всех оставшихся врагов
+    currentEnemies.forEach(e => {
+        clearInterval(e.moveInterval);
+        if(e.el) e.el.remove();
+    });
+    currentEnemies = [];
+    
     isGameActive = false; 
     bossActive = false; 
     waveInProgress = false;
@@ -345,6 +349,11 @@ function forceEndWave() {
     updateUI();
     toggleUI(true);
     document.getElementById('main-header').style.top = '15px';
+    
+    if(safetyTimer) {
+        clearTimeout(safetyTimer);
+        safetyTimer = null;
+    }
 }
 
 // ---------- НОВАЯ СИСТЕМА СТРЕЛЬБЫ ----------
@@ -405,7 +414,11 @@ function createBullet(t){
                         money += e.reward || 85; 
                         enemiesLeft--;
                         updateUI(); 
-                        checkWaveEnd(); 
+                        
+                        // Если врагов не осталось, запускаем таймер
+                        if(enemiesLeft <= 0 && currentEnemies.length === 0) {
+                            startSafetyTimer();
+                        }
                     }
                 }
                 
@@ -561,7 +574,6 @@ function startMoving(o){
             if(dist < 300) step = 0;
         }
         
-        // Blue Ball - только притяжение
         if(blueBallActive) {
             let ballElement = document.querySelector('.blue-ball');
             if(ballElement && !o.isBoss && !o.isFinal) {
@@ -594,7 +606,10 @@ function startMoving(o){
                     enemiesLeft--;
                 }
                 
-                checkWaveEnd();
+                // Если врагов не осталось, запускаем таймер
+                if(enemiesLeft <= 0 && currentEnemies.length === 0) {
+                    startSafetyTimer();
+                }
                 
                 if(hp <= 0) gameOver();
             }
@@ -607,13 +622,6 @@ function startMoving(o){
             document.getElementById('game-container').style.filter = `blur(${blur}px)`;
         }
     }, 16);
-}
-
-function checkWaveEnd(){
-    // Запускаем страховочный таймер при подозрении на завершение
-    if(enemiesLeft <= 0 && currentEnemies.length === 0) {
-        startSafetyTimer();
-    }
 }
 
 function setupBossUI(t){
@@ -671,7 +679,10 @@ function updateBossHP(en){
             setTimeout(() => document.getElementById('boss-ui-global').style.display = 'none', 400);
             document.getElementById('main-header').style.top = '15px';
             
-            checkWaveEnd();
+            // После убийства босса запускаем таймер
+            if(currentEnemies.length === 0) {
+                startSafetyTimer();
+            }
         }
     }
 }
@@ -861,9 +872,7 @@ function activateSorcerer(){
 function addMoneyAdmin(){money+=100000;updateUI();}
 function toggleCurse(){isCurse=!isCurse;maxHp=isCurse?999999999999:350;hp=maxHp;updateUI();}
 
-// ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОПУСКА ВОЛНЫ
 function skipWaveAdmin(){
-    // Очищаем всех врагов
     currentEnemies.forEach(e => {
         clearInterval(e.moveInterval);
         if(e.el) e.el.remove();
@@ -871,7 +880,6 @@ function skipWaveAdmin(){
     currentEnemies = [];
     enemiesLeft = 0;
     
-    // Показываем синее уведомление
     let notify = document.createElement('div');
     notify.className = 'admin-notify-blue';
     notify.innerText = 'Пропущена Волна.';
@@ -883,8 +891,8 @@ function skipWaveAdmin(){
         setTimeout(() => notify.remove(), 2000); 
     }, 2000);
     
-    // Завершаем волну
-    checkWaveEnd();
+    // Запускаем таймер для гарантированного завершения
+    startSafetyTimer();
 }
 
 // ---------- СПОСОБНОСТИ SORCERER ----------
@@ -935,7 +943,10 @@ function castAbility(type){
                 });
                 currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
                 updateUI();
-                checkWaveEnd();
+                
+                if(currentEnemies.length === 0) {
+                    startSafetyTimer();
+                }
             }, 100);
             
             setTimeout(() => {
@@ -983,7 +994,10 @@ function castAbility(type){
                             money += e.reward; 
                             enemiesLeft--;
                             updateUI(); 
-                            checkWaveEnd();
+                            
+                            if(currentEnemies.length === 0) {
+                                startSafetyTimer();
+                            }
                         }
                     }
                 });
