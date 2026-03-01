@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - MASTERPIECE</title>
+    <title>Purple Battleground 1.6 - ABSOLUTE FINAL</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -20,7 +20,7 @@
         #shop-btn { width:180px;height:180px;background:#fff;border:10px solid #000;border-radius:35px;font-size:110px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:10px 10px 0 #000; }
 
         .wave-ui { position:absolute;top:200px;right:40px;text-align:right;color:#fff;z-index:100;transition:opacity .5s; }
-        #wave-big { font-size:80px;margin:0;-webkit-text-stroke:3px #000; }
+        #wave-big { font-size:80px;margin:0;-webkit-text-stroke:3px #000; display:block; }
         #enemy-counter { font-size:24px;text-shadow:3px 3px 0 #000; color:#fff; display:none; }
 
         #main-hare, #king-hare { position:absolute;bottom:25%;left:-20px;width:500px;z-index:50;transition:transform 0.2s ease, bottom 0.3s ease; }
@@ -321,7 +321,6 @@ let heliInterval = null;
 let activeCharacter = 'default';
 let spawnInterval = null;
 let startCooldown = false;
-let abilityCooldown = false; // 2 секунды между способностями
 
 // Элементы UI
 const shootButton = document.getElementById('shoot-button');
@@ -350,7 +349,7 @@ function updateUI() {
 }
 
 // --------------------------------------------------------------
-// 2. НОВАЯ ЛОГИКА ВОЛН
+// 2. ЛОГИКА ВОЛН
 // --------------------------------------------------------------
 function handleStartBattle() {
     if (startCooldown) return;
@@ -562,19 +561,12 @@ function showKingAbilities() {
     setTimeout(() => abilityContainer.classList.add('active'), 50);
 }
 
-async function castKingAbility(type) {
+function castKingAbility(type) {
     if ((!isGameActive && !bossActive) || !isKingOfCurses) return;
-    if (abilityCooldown) return; // Проверка 2-секундного кулдауна
     
     let cdId = type === 'scratches' ? 'cd-king1' : (type === 'fuga' ? 'cd-king2' : 'cd-king3');
     let cd = document.getElementById(cdId);
     if (!cd || cd.style.height !== '0%' && cd.style.height !== '') return;
-    
-    // Устанавливаем 2-секундный кулдаун между способностями
-    abilityCooldown = true;
-    setTimeout(() => {
-        abilityCooldown = false;
-    }, 2000);
     
     cd.style.height = '100%';
     let time = 15000;
@@ -633,7 +625,6 @@ async function castKingAbility(type) {
                             enemiesLeft--;
                             enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
                             updateUI();
-                            // НЕ вызываем endWave здесь, только если врагов действительно 0
                             if (currentEnemies.length === 0 && !bossActive && waveInProgress) {
                                 endWave();
                             }
@@ -836,7 +827,7 @@ async function castKingAbility(type) {
 }
 
 // --------------------------------------------------------------
-// 5. СПОСОБНОСТИ SORCERER (ВОССТАНОВЛЕНЫ)
+// 5. СПОСОБНОСТИ SORCERER (ПОЛНОСТЬЮ ВОССТАНОВЛЕНЫ)
 // --------------------------------------------------------------
 function showSorcererAbilities() {
     abilityContainer.innerHTML = `
@@ -857,18 +848,11 @@ function showSorcererAbilities() {
     setTimeout(() => abilityContainer.classList.add('active'), 50);
 }
 
-async function castSorcererAbility(type) {
+function castSorcererAbility(type) {
     if ((!isGameActive && !bossActive) || !isSorcerer) return;
-    if (abilityCooldown) return; // 2-секундный кулдаун между способностями
     
     let cd = document.getElementById('cd-' + type);
     if (!cd || cd.style.height !== '0%' && cd.style.height !== '') return;
-    
-    // Устанавливаем 2-секундный кулдаун
-    abilityCooldown = true;
-    setTimeout(() => {
-        abilityCooldown = false;
-    }, 2000);
     
     cd.style.height = '100%';
     let time = 15000;
@@ -882,10 +866,12 @@ async function castSorcererAbility(type) {
     let hare = mainHare;
     
     if (type === 'red') {
+        // Красный экран через 200мс
         setTimeout(() => {
             document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0.7)';
         }, 200);
         
+        // Шар в лапах
         let ball = document.createElement('img');
         ball.src = 'https://i.ibb.co/xqrHf7SM/red-ball.png';
         ball.className = 'red-ball';
@@ -893,20 +879,24 @@ async function castSorcererAbility(type) {
         ball.style.bottom = '30%';
         document.getElementById('game-container').appendChild(ball);
         
+        // Через 2 секунды улетает
         setTimeout(() => {
             let fly = setInterval(() => {
                 let left = parseInt(ball.style.left) || 300;
                 ball.style.left = (left + 60) + 'px';
-                if (left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
+                if (left > window.innerWidth + 200) {
+                    clearInterval(fly);
+                    ball.remove();
+                }
             }, 16);
             
-            // Наносим урон, но не завершаем волну принудительно
+            // Урон всем врагам
             [...currentEnemies].forEach(e => {
                 e.hp -= 9999999;
                 if (e.hp < 0) e.hp = 0;
             });
             
-            // Проверяем смерти
+            // Проверка смертей
             setTimeout(() => {
                 const deadEnemies = currentEnemies.filter(e => e.hp <= 0 && !e.isBoss && !e.isFinal);
                 deadEnemies.forEach(e => {
@@ -918,7 +908,6 @@ async function castSorcererAbility(type) {
                     enemiesLeft--;
                 });
                 
-                // Обновляем боссов
                 currentEnemies.forEach(e => {
                     if (e.hp <= 0 && (e.isBoss || e.isFinal)) {
                         updateBossHP(e);
@@ -933,6 +922,7 @@ async function castSorcererAbility(type) {
                 }
             }, 100);
             
+            // Убираем красный экран
             setTimeout(() => {
                 document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0)';
             }, 200);
@@ -1507,6 +1497,7 @@ function addMoneyAdmin() { money += 100000; updateUI(); }
 function toggleCurse() { isCurse = !isCurse; maxHp = isCurse ? 999999999999 : 350; hp = maxHp; updateUI(); }
 
 function skipWaveAdmin() {
+    // Очищаем всех врагов
     currentEnemies.forEach(e => {
         clearInterval(e.moveInterval);
         if (e.el) e.el.remove();
@@ -1514,6 +1505,7 @@ function skipWaveAdmin() {
     currentEnemies = [];
     enemiesLeft = 0;
     
+    // Показываем уведомление
     let notify = document.createElement('div');
     notify.className = 'admin-notify-blue';
     notify.innerText = 'Пропущена Волна.';
@@ -1525,7 +1517,7 @@ function skipWaveAdmin() {
         setTimeout(() => notify.remove(), 2000);
     }, 2000);
     
-    // Принудительно завершаем волну
+    // Принудительно завершаем волну (увеличит wave на 1)
     if (waveInProgress) {
         endWave();
     }
