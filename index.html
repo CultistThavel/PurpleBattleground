@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - ULTIMATE FINAL</title>
+    <title>Purple Battleground 1.6 - MASTERPIECE</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -321,6 +321,7 @@ let heliInterval = null;
 let activeCharacter = 'default';
 let spawnInterval = null;
 let startCooldown = false;
+let abilityCooldown = false; // 2 секунды между способностями
 
 // Элементы UI
 const shootButton = document.getElementById('shoot-button');
@@ -374,6 +375,7 @@ function startBattle() {
     
     shootButton.style.display = 'flex';
     
+    // Показываем счетчик врагов
     waveBig.style.display = 'none';
     enemyCounter.style.display = 'block';
     enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
@@ -560,12 +562,19 @@ function showKingAbilities() {
     setTimeout(() => abilityContainer.classList.add('active'), 50);
 }
 
-function castKingAbility(type) {
+async function castKingAbility(type) {
     if ((!isGameActive && !bossActive) || !isKingOfCurses) return;
+    if (abilityCooldown) return; // Проверка 2-секундного кулдауна
     
     let cdId = type === 'scratches' ? 'cd-king1' : (type === 'fuga' ? 'cd-king2' : 'cd-king3');
     let cd = document.getElementById(cdId);
     if (!cd || cd.style.height !== '0%' && cd.style.height !== '') return;
+    
+    // Устанавливаем 2-секундный кулдаун между способностями
+    abilityCooldown = true;
+    setTimeout(() => {
+        abilityCooldown = false;
+    }, 2000);
     
     cd.style.height = '100%';
     let time = 15000;
@@ -624,6 +633,7 @@ function castKingAbility(type) {
                             enemiesLeft--;
                             enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
                             updateUI();
+                            // НЕ вызываем endWave здесь, только если врагов действительно 0
                             if (currentEnemies.length === 0 && !bossActive && waveInProgress) {
                                 endWave();
                             }
@@ -826,7 +836,7 @@ function castKingAbility(type) {
 }
 
 // --------------------------------------------------------------
-// 5. СПОСОБНОСТИ SORCERER
+// 5. СПОСОБНОСТИ SORCERER (ВОССТАНОВЛЕНЫ)
 // --------------------------------------------------------------
 function showSorcererAbilities() {
     abilityContainer.innerHTML = `
@@ -847,8 +857,148 @@ function showSorcererAbilities() {
     setTimeout(() => abilityContainer.classList.add('active'), 50);
 }
 
-function castSorcererAbility(type) {
-    // Функция полностью идентична предыдущей версии
+async function castSorcererAbility(type) {
+    if ((!isGameActive && !bossActive) || !isSorcerer) return;
+    if (abilityCooldown) return; // 2-секундный кулдаун между способностями
+    
+    let cd = document.getElementById('cd-' + type);
+    if (!cd || cd.style.height !== '0%' && cd.style.height !== '') return;
+    
+    // Устанавливаем 2-секундный кулдаун
+    abilityCooldown = true;
+    setTimeout(() => {
+        abilityCooldown = false;
+    }, 2000);
+    
+    cd.style.height = '100%';
+    let time = 15000;
+    let s = Date.now();
+    let int = setInterval(() => {
+        let e = Date.now() - s;
+        cd.style.height = Math.max(0, 100 - (e / time * 100)) + '%';
+        if (e >= time) clearInterval(int);
+    }, 100);
+    
+    let hare = mainHare;
+    
+    if (type === 'red') {
+        setTimeout(() => {
+            document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0.7)';
+        }, 200);
+        
+        let ball = document.createElement('img');
+        ball.src = 'https://i.ibb.co/xqrHf7SM/red-ball.png';
+        ball.className = 'red-ball';
+        ball.style.left = '300px';
+        ball.style.bottom = '30%';
+        document.getElementById('game-container').appendChild(ball);
+        
+        setTimeout(() => {
+            let fly = setInterval(() => {
+                let left = parseInt(ball.style.left) || 300;
+                ball.style.left = (left + 60) + 'px';
+                if (left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
+            }, 16);
+            
+            // Наносим урон, но не завершаем волну принудительно
+            [...currentEnemies].forEach(e => {
+                e.hp -= 9999999;
+                if (e.hp < 0) e.hp = 0;
+            });
+            
+            // Проверяем смерти
+            setTimeout(() => {
+                const deadEnemies = currentEnemies.filter(e => e.hp <= 0 && !e.isBoss && !e.isFinal);
+                deadEnemies.forEach(e => {
+                    clearInterval(e.moveInterval);
+                    if (e.el) e.el.remove();
+                    const index = currentEnemies.indexOf(e);
+                    if (index > -1) currentEnemies.splice(index, 1);
+                    money += e.reward || 85;
+                    enemiesLeft--;
+                });
+                
+                // Обновляем боссов
+                currentEnemies.forEach(e => {
+                    if (e.hp <= 0 && (e.isBoss || e.isFinal)) {
+                        updateBossHP(e);
+                    }
+                });
+                
+                enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
+                updateUI();
+                
+                if (currentEnemies.length === 0 && !bossActive && waveInProgress) {
+                    endWave();
+                }
+            }, 100);
+            
+            setTimeout(() => {
+                document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0)';
+            }, 200);
+        }, 2000);
+    }
+    
+    if (type === 'blue') {
+        blueBallActive = true;
+        
+        hare.style.bottom = "45%";
+        setTimeout(() => {
+            hare.style.bottom = "25%";
+            
+            let ball = document.createElement('img');
+            ball.src = 'https://i.ibb.co/3yt8P5rx/blue-ball.png';
+            ball.className = 'blue-ball';
+            ball.style.left = '380px';
+            ball.style.bottom = '30%';
+            ball.style.width = '400px';
+            document.getElementById('game-container').appendChild(ball);
+            
+            let dmgInterval = setInterval(() => {
+                if (!blueBallActive) {
+                    clearInterval(dmgInterval);
+                    return;
+                }
+                [...currentEnemies].forEach(e => {
+                    if (!e.isBoss && !e.isFinal) {
+                        e.hp -= 1500;
+                        if (e.hp < 0) e.hp = 0;
+                        
+                        let fill = e.el.querySelector('.zombie-hp-fill');
+                        if (fill) fill.style.width = (e.hp / e.maxHp) * 100 + "%";
+                        let txt = e.el.querySelector('div[style*="top:3px"]');
+                        if (txt) txt.innerText = Math.max(0, Math.floor(e.hp)) + " ХП";
+                        
+                        if (e.hp <= 0) {
+                            clearInterval(e.moveInterval);
+                            if (e.el) e.el.remove();
+                            const index = currentEnemies.indexOf(e);
+                            if (index > -1) currentEnemies.splice(index, 1);
+                            money += e.reward;
+                            enemiesLeft--;
+                            enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
+                            updateUI();
+                            
+                            if (currentEnemies.length === 0 && waveInProgress) {
+                                endWave();
+                            }
+                        }
+                    }
+                });
+            }, 100);
+            
+            setTimeout(() => {
+                blueBallActive = false;
+                clearInterval(dmgInterval);
+                ball.remove();
+            }, 15000);
+        }, 600);
+    }
+    
+    if (type === 'infinity') {
+        window.infinityActive = true;
+        setTimeout(() => { window.infinityActive = false; }, 15000);
+    }
 }
 
 // --------------------------------------------------------------
@@ -1375,7 +1525,10 @@ function skipWaveAdmin() {
         setTimeout(() => notify.remove(), 2000);
     }, 2000);
     
-    endWave();
+    // Принудительно завершаем волну
+    if (waveInProgress) {
+        endWave();
+    }
 }
 
 updateUI();
