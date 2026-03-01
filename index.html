@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - ABSOLUTE FINAL FIX</title>
+    <title>Purple Battleground 1.6 - PERFECT WAVE SYSTEM</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -302,6 +302,7 @@ function updateUI(){
     document.getElementById('hp-fill').style.width=(hp/maxHp)*100+"%";
     waveBig.innerText = wave + " Волна";
     
+    // Счетчик врагов показываем всегда, кроме боссов
     if(bossActive || (wave >= 42 && wave <= 43) || (wave >= 70 && wave <= 71)) {
         enemiesCount.style.display = 'none';
     } else {
@@ -312,14 +313,14 @@ function updateUI(){
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
 }
 
-// ---------- СТРАХОВОЧНЫЙ ТАЙМЕР (ГАРАНТИРОВАННОЕ ЗАВЕРШЕНИЕ) ----------
+// ---------- СТРАХОВОЧНЫЙ ТАЙМЕР (ТОЛЬКО ДЛЯ БАГОВ) ----------
 function startSafetyTimer() {
     if(safetyTimer) clearTimeout(safetyTimer);
     
     safetyTimer = setTimeout(() => {
         console.log("Страховочный таймер сработал! Принудительное завершение волны.");
         forceEndWave();
-    }, 2000);
+    }, 3000); // 3 секунды как запасной вариант
 }
 
 function forceEndWave() {
@@ -329,6 +330,36 @@ function forceEndWave() {
         if(e.el) e.el.remove();
     });
     currentEnemies = [];
+    
+    isGameActive = false; 
+    bossActive = false; 
+    waveInProgress = false;
+    hp = maxHp; 
+    
+    tutorialHint.style.display='none';
+    document.getElementById('boss-ui-global').style.transition='opacity 0.5s';
+    document.getElementById('boss-ui-global').style.opacity='0';
+    setTimeout(() => document.getElementById('boss-ui-global').style.display='none', 500);
+    document.getElementById('purp-timer').style.display='none';
+    document.getElementById('game-container').style.filter='none';
+    document.getElementById('red-screen-overlay').style.background='rgba(255,0,0,0)';
+    
+    if(bossBlurInterval) clearInterval(bossBlurInterval);
+    
+    wave++;
+    updateUI();
+    toggleUI(true);
+    document.getElementById('main-header').style.top = '15px';
+    
+    if(safetyTimer) {
+        clearTimeout(safetyTimer);
+        safetyTimer = null;
+    }
+}
+
+// ---------- ФУНКЦИЯ ЗАВЕРШЕНИЯ ВОЛНЫ (МГНОВЕННО) ----------
+function endWave() {
+    console.log("Волна завершена мгновенно!");
     
     isGameActive = false; 
     bossActive = false; 
@@ -417,9 +448,9 @@ function createBullet(t){
                         enemiesLeft--;
                         updateUI(); 
                         
-                        // Если врагов не осталось, запускаем таймер
-                        if(currentEnemies.length === 0) {
-                            startSafetyTimer();
+                        // ЕСЛИ ВРАГОВ НЕ ОСТАЛОСЬ - МГНОВЕННО ЗАВЕРШАЕМ ВОЛНУ
+                        if(currentEnemies.length === 0 && !bossActive) {
+                            endWave();
                         }
                     }
                 }
@@ -562,11 +593,10 @@ function createEnemy(){
 }
 
 function startMoving(o){
-    if(!o) return; // Защита от undefined
+    if(!o) return;
     
     let baseSpeed = (window.innerWidth / (o.speed * 60));
     o.moveInterval = setInterval(() => {
-        // Проверяем, существует ли еще объект
         if(!o || !o.el || (!isGameActive && !bossActive)) { 
             clearInterval(o.moveInterval); 
             return; 
@@ -605,7 +635,6 @@ function startMoving(o){
                 
                 if(o.el) o.el.remove();
                 
-                // Удаляем из массива
                 const index = currentEnemies.indexOf(o);
                 if (index > -1) currentEnemies.splice(index, 1);
                 
@@ -613,9 +642,9 @@ function startMoving(o){
                     enemiesLeft--;
                 }
                 
-                // Если врагов не осталось, запускаем таймер
-                if(currentEnemies.length === 0) {
-                    startSafetyTimer();
+                // ЕСЛИ ВРАГОВ НЕ ОСТАЛОСЬ - МГНОВЕННО ЗАВЕРШАЕМ ВОЛНУ
+                if(currentEnemies.length === 0 && !bossActive) {
+                    endWave();
                 }
                 
                 if(hp <= 0) gameOver();
@@ -686,9 +715,9 @@ function updateBossHP(en){
             setTimeout(() => document.getElementById('boss-ui-global').style.display = 'none', 400);
             document.getElementById('main-header').style.top = '15px';
             
-            // После убийства босса запускаем таймер
+            // После убийства босса проверяем, остались ли враги
             if(currentEnemies.length === 0) {
-                startSafetyTimer();
+                endWave();
             }
         }
     }
@@ -898,8 +927,8 @@ function skipWaveAdmin(){
         setTimeout(() => notify.remove(), 2000); 
     }, 2000);
     
-    // Запускаем таймер для гарантированного завершения
-    startSafetyTimer();
+    // Мгновенно завершаем волну
+    endWave();
 }
 
 // ---------- СПОСОБНОСТИ SORCERER ----------
@@ -951,8 +980,8 @@ function castAbility(type){
                 currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
                 updateUI();
                 
-                if(currentEnemies.length === 0) {
-                    startSafetyTimer();
+                if(currentEnemies.length === 0 && !bossActive) {
+                    endWave();
                 }
             }, 100);
             
@@ -1002,8 +1031,8 @@ function castAbility(type){
                             enemiesLeft--;
                             updateUI(); 
                             
-                            if(currentEnemies.length === 0) {
-                                startSafetyTimer();
+                            if(currentEnemies.length === 0 && !bossActive) {
+                                endWave();
                             }
                         }
                     }
