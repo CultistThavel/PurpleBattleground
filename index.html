@@ -313,8 +313,10 @@ function updateUI(){
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
 }
 
-// ---------- МГНОВЕННОЕ ЗАВЕРШЕНИЕ ВОЛНЫ ----------
+// ---------- ЗАВЕРШЕНИЕ ВОЛНЫ ----------
 function endWave() {
+    if(!waveInProgress && !bossActive) return; // Не завершаем, если волна не активна
+    
     console.log("Волна завершена!");
     
     // Очищаем всех оставшихся врагов
@@ -411,8 +413,8 @@ function createBullet(t){
                         enemiesLeft--;
                         updateUI(); 
                         
-                        // Если врагов не осталось - МГНОВЕННО завершаем волну
-                        if(currentEnemies.length === 0 && !bossActive) {
+                        // Если врагов не осталось И волна активна - завершаем
+                        if(currentEnemies.length === 0 && !bossActive && waveInProgress) {
                             endWave();
                         }
                     }
@@ -605,8 +607,8 @@ function startMoving(o){
                     enemiesLeft--;
                 }
                 
-                // Если врагов не осталось - МГНОВЕННО завершаем волну
-                if(currentEnemies.length === 0 && !bossActive) {
+                // Если врагов не осталось И волна активна - завершаем
+                if(currentEnemies.length === 0 && !bossActive && waveInProgress) {
                     endWave();
                 }
                 
@@ -678,8 +680,8 @@ function updateBossHP(en){
             setTimeout(() => document.getElementById('boss-ui-global').style.display = 'none', 400);
             document.getElementById('main-header').style.top = '15px';
             
-            // После убийства босса - МГНОВЕННО завершаем волну
-            if(currentEnemies.length === 0) {
+            // После убийства босса - завершаем волну
+            if(currentEnemies.length === 0 && waveInProgress) {
                 endWave();
             }
         }
@@ -943,7 +945,7 @@ function castAbility(type){
                 currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
                 updateUI();
                 
-                if(currentEnemies.length === 0) {
+                if(currentEnemies.length === 0 && waveInProgress) {
                     endWave();
                 }
             }, 100);
@@ -994,7 +996,7 @@ function castAbility(type){
                             enemiesLeft--;
                             updateUI(); 
                             
-                            if(currentEnemies.length === 0) {
+                            if(currentEnemies.length === 0 && waveInProgress) {
                                 endWave();
                             }
                         }
