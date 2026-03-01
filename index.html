@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - FINAL MASTER</title>
+    <title>Purple Battleground 1.6 - ABSOLUTE FINAL FIX</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -385,6 +385,7 @@ function createBullet(t){
         pos += 40;
         b.style.left = pos + "px";
         
+        // Проходим по копии массива
         [...currentEnemies].forEach(e => {
             if(!e || !e.el) return;
             let er = e.el.getBoundingClientRect();
@@ -409,6 +410,7 @@ function createBullet(t){
                     } else { 
                         clearInterval(e.moveInterval);
                         if(e.el) e.el.remove();
+                        // Удаляем из массива
                         const index = currentEnemies.indexOf(e);
                         if (index > -1) currentEnemies.splice(index, 1);
                         money += e.reward || 85; 
@@ -416,7 +418,7 @@ function createBullet(t){
                         updateUI(); 
                         
                         // Если врагов не осталось, запускаем таймер
-                        if(enemiesLeft <= 0 && currentEnemies.length === 0) {
+                        if(currentEnemies.length === 0) {
                             startSafetyTimer();
                         }
                     }
@@ -560,9 +562,12 @@ function createEnemy(){
 }
 
 function startMoving(o){
+    if(!o) return; // Защита от undefined
+    
     let baseSpeed = (window.innerWidth / (o.speed * 60));
     o.moveInterval = setInterval(() => {
-        if((!isGameActive && !bossActive) || !o.el) { 
+        // Проверяем, существует ли еще объект
+        if(!o || !o.el || (!isGameActive && !bossActive)) { 
             clearInterval(o.moveInterval); 
             return; 
         }
@@ -599,6 +604,8 @@ function startMoving(o){
                 clearInterval(o.moveInterval);
                 
                 if(o.el) o.el.remove();
+                
+                // Удаляем из массива
                 const index = currentEnemies.indexOf(o);
                 if (index > -1) currentEnemies.splice(index, 1);
                 
@@ -607,7 +614,7 @@ function startMoving(o){
                 }
                 
                 // Если врагов не осталось, запускаем таймер
-                if(enemiesLeft <= 0 && currentEnemies.length === 0) {
+                if(currentEnemies.length === 0) {
                     startSafetyTimer();
                 }
                 
