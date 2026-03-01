@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - DRAGABLE ADMIN</title>
+    <title>Purple Battleground 1.6 - PERFECT UI</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -47,73 +47,21 @@
 
         .bullet { position:absolute;z-index:48;width:150px;pointer-events:none; }
 
-        #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s; text-shadow:3px 3px 0 #000; }
-        
-        /* ПЕРЕДВИГАЕМАЯ АДМИН-ПАНЕЛЬ */
-        #admin-trigger {
-            position: fixed;
-            top: 20px;
-            left: 85%;
-            width: 120px;
-            height: 120px;
-            background: #000;
-            border: 6px solid #fff;
-            color: #fff;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            cursor: move; /* меняем на move */
-            z-index: 100000;
-            border-radius: 20px;
-            box-shadow: 0 0 20px #fff;
-            user-select: none;
-            touch-action: none; /* для мобильных устройств */
+        #start-btn-ui { 
+            position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s, background 0.3s; text-shadow:3px 3px 0 #000; 
         }
-        
-        #admin-menu {
-            position: fixed;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 450px;
-            background: rgba(0,0,0,.95);
-            border: 6px solid #fff;
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-            z-index: 100001;
-            color: #fff;
-            border-radius: 20px;
-            opacity: 0;
-            transition: opacity .5s, transform .5s;
+        #start-btn-ui.cooldown {
+            background: rgba(0,0,0,0.33);
+            pointer-events: none;
+            box-shadow: none;
+            border-color: #666;
         }
-        #admin-menu.show { 
-            opacity: 1; 
-            transform: translateX(-50%) translateY(0); 
-        }
-        
-        .admin-btn { 
-            width:100%;
-            padding:15px;
-            margin:10px 0;
-            background:#111;
-            border:2px solid #fff;
-            color:#fff;
-            font-size:18px;
-            cursor:pointer;
-            font-weight:900;
-            border-radius:10px;
-        }
-        
-        .king-icon, #sorcerer-icon { 
-            width:60px;
-            height:60px;
-            margin-right:15px;
-            cursor:pointer;
-            transition:filter .3s; 
-            border-radius:10px;
-        }
+
+        #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:120px;background:#000;border:6px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:18px;cursor:pointer;z-index:100000;border-radius:20px;box-shadow:0 0 20px #fff; }
+        #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:450px;background:rgba(0,0,0,.95);border:6px solid #fff;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px;opacity:0;transition:opacity .5s,transform .5s; }
+        #admin-menu.show { opacity:1;transform:translateX(-50%) translateY(0); }
+        .admin-btn { width:100%;padding:15px;margin:10px 0;background:#111;border:2px solid #fff;color:#fff;font-size:18px;cursor:pointer;font-weight:900;border-radius:10px; }
+        .king-icon, #sorcerer-icon { width:60px;height:60px;margin-right:15px;cursor:pointer;transition:filter .3s; border-radius:10px; }
         .king-icon:hover, #sorcerer-icon:hover { filter:drop-shadow(0 0 15px #ff0); }
         .king-icon:hover { filter:drop-shadow(0 0 15px #f00); }
 
@@ -180,49 +128,12 @@
         }
         @keyframes cooldown { from { height: 100%; } to { height: 0%; } }
 
-        .admin-notify-blue, .admin-notify-red, .damage-notify { 
-            position:fixed; 
-            top:20%; 
-            left:50%; 
-            transform:translateX(-50%); 
-            font-size:50px; 
-            font-weight:900; 
-            text-shadow:2px 2px 0 #fff; 
-            z-index:2000000; 
-            opacity:0; 
-            transition:opacity 0.5s, transform 1s; 
-            pointer-events:none; 
-        }
+        .admin-notify-blue, .admin-notify-red { position:fixed; top:20%; left:50%; transform:translateX(-50%); font-size:50px; font-weight:900; text-shadow:2px 2px 0 #fff; z-index:2000000; opacity:0; transition:opacity 0.5s, transform 1s; pointer-events:none; }
         .admin-notify-blue { color:#00f; }
         .admin-notify-red { color:#f00; }
-        .damage-notify { color:#f00; }
-        
-        .heli-purchase { 
-            position:fixed; 
-            top:50%; 
-            left:50%; 
-            transform:translate(-50%,-50%); 
-            background:#fff; 
-            border:6px solid #000; 
-            border-radius:20px; 
-            padding:30px; 
-            text-align:center; 
-            color:#800080; 
-            font-size:28px; 
-            font-weight:900; 
-            text-shadow:2px 2px 0 #000; 
-            z-index:3000000; 
-        }
-        .heli-purchase button { 
-            background:#00ff00; 
-            border:4px solid #000; 
-            color:#000; 
-            padding:10px 40px; 
-            font-size:24px; 
-            border-radius:15px; 
-            cursor:pointer; 
-            margin-top:20px; 
-        }
+        .damage-notify { position:fixed; top:20%; left:50%; transform:translateX(-50%); color:#f00; font-size:50px; font-weight:900; text-shadow:2px 2px 0 #fff; z-index:2000000; opacity:0; transition:opacity 0.5s, transform 1s; pointer-events:none; }
+        .heli-purchase { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; border:6px solid #000; border-radius:20px; padding:30px; text-align:center; color:#800080; font-size:28px; font-weight:900; text-shadow:2px 2px 0 #000; z-index:3000000; }
+        .heli-purchase button { background:#00ff00; border:4px solid #000; color:#000; padding:10px 40px; font-size:24px; border-radius:15px; cursor:pointer; margin-top:20px; }
         #ammo-info { font-size:20px; color:#000; margin-top:5px; }
     </style>
 </head>
@@ -256,7 +167,7 @@
 
     <div class="wave-ui" id="wave-ui">
         <h1 id="wave-big">1 Волна</h1>
-        <div id="enemies-count">Осталось Врагов: 20</div>
+        <div id="enemies-count" style="display: none;">Количество Врагов: 20</div>
     </div>
 
     <img id="main-hare" src="https://i.ibb.co/MyrHnKYB/main-hare.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
@@ -267,7 +178,6 @@
     <div id="floor"></div>
     <div id="start-btn-ui" onclick="event.stopPropagation(); startBattle()">Начать Перестрелку</div>
 
-    <!-- ПЕРЕДВИГАЕМАЯ АДМИН-ПАНЕЛЬ -->
     <div id="admin-trigger">Админ Панель 1.6 🐢</div>
     <div id="admin-menu">
         <div style="display:flex; align-items:center; margin-bottom:20px; gap:10px; flex-wrap:wrap;">
@@ -276,7 +186,6 @@
                 <span style="color:#ff0;font-size:28px;font-weight:900;text-shadow:0 0 10px #ff0,0 0 20px #ff0;animation:glowYellow 2s infinite alternate;">Sorcerer</span>
             </div>
             <div style="display:flex; align-items:center;">
-                <!-- НОВЫЙ ЗНАЧОК KING OF CURSES -->
                 <img class="king-icon" src="https://i.ibb.co/FLFQwxgG/file-0000000038707243ba37edbc00dd3dad.jpg" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer" onclick="activateKingOfCurses()">
                 <span style="color:#f00;font-size:28px;font-weight:900;text-shadow:0 0 10px #f00,0 0 20px #f00;animation:glowRed 2s infinite alternate;">King Of Curses <span style="font-size:18px;">(Тыкните на значок.)</span></span>
             </div>
@@ -382,6 +291,7 @@ let canShoot = true;
 let heliInterval = null;
 let activeCharacter = 'default';
 let spawnInterval = null;
+let cooldownTimer = null;
 
 // Элементы UI
 const shootButton = document.getElementById('shoot-button');
@@ -393,95 +303,24 @@ const mainHare = document.getElementById('main-hare');
 const kingHare = document.getElementById('king-hare');
 const sorcererAlert = document.getElementById('sorcerer-alert');
 const kingAlert = document.getElementById('king-alert');
-const adminTrigger = document.getElementById('admin-trigger');
-const adminMenu = document.getElementById('admin-menu');
+const startBtn = document.getElementById('start-btn-ui');
 
-// --------------------------------------------------------------
-// 2. ПЕРЕДВИЖЕНИЕ АДМИН-ПАНЕЛИ
-// --------------------------------------------------------------
-let offsetX = 0, offsetY = 0, mouseX = 0, mouseY = 0, isDragging = false;
-
-adminTrigger.addEventListener('mousedown', startDrag);
-adminTrigger.addEventListener('touchstart', startDrag, { passive: false });
-document.addEventListener('mousemove', drag);
-document.addEventListener('touchmove', drag, { passive: false });
-document.addEventListener('mouseup', stopDrag);
-document.addEventListener('touchend', stopDrag);
-
-function startDrag(e) {
-    e.preventDefault();
-    isDragging = true;
-    
-    if (e.type === 'touchstart') {
-        mouseX = e.touches[0].clientX;
-        mouseY = e.touches[0].clientY;
-    } else {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    }
-    
-    const rect = adminTrigger.getBoundingClientRect();
-    offsetX = mouseX - rect.left;
-    offsetY = mouseY - rect.top;
-}
-
-function drag(e) {
-    if (!isDragging) return;
-    e.preventDefault();
-    
-    let clientX, clientY;
-    if (e.type === 'touchmove') {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
-    } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-    }
-    
-    const newX = clientX - offsetX;
-    const newY = clientY - offsetY;
-    
-    // Ограничиваем, чтобы элемент не уходил за пределы экрана
-    const maxX = window.innerWidth - adminTrigger.offsetWidth;
-    const maxY = window.innerHeight - adminTrigger.offsetHeight;
-    
-    adminTrigger.style.left = Math.max(0, Math.min(maxX, newX)) + 'px';
-    adminTrigger.style.top = Math.max(0, Math.min(maxY, newY)) + 'px';
-}
-
-function stopDrag() {
-    isDragging = false;
-}
-
-// Клик по админ-панели открывает меню (если не было перемещения)
-adminTrigger.addEventListener('click', (e) => {
-    if (!isDragging) {
-        adminMenu.style.display = 'flex';
-        setTimeout(() => adminMenu.classList.add('show'), 10);
-    }
-});
-
-// --------------------------------------------------------------
-// 3. ФУНКЦИИ ОБНОВЛЕНИЯ UI
-// --------------------------------------------------------------
 function updateUI() {
     document.getElementById('m-val').innerText = money;
     document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + Math.max(0, Math.floor(hp));
     document.getElementById('hp-fill').style.width = (hp / maxHp) * 100 + "%";
-    waveBig.innerText = wave + " Волна";
     
-    if (bossActive || (wave >= 42 && wave <= 43) || (wave >= 70 && wave <= 71)) {
+    // В мирном режиме показываем только Волна: X
+    if (!isGameActive && !bossActive) {
+        waveBig.innerText = wave + " Волна";
         enemiesCount.style.display = 'none';
-    } else {
-        enemiesCount.style.display = 'block';
-        enemiesCount.innerText = "Осталось Врагов: " + enemiesLeft;
     }
     
     document.getElementById('ammo-info').innerText = `Урон Вашего Оружия: ${damage}`;
 }
 
 // --------------------------------------------------------------
-// 4. ЛОГИКА ВОЛН
+// 2. ЛОГИКА ВОЛН
 // --------------------------------------------------------------
 function startBattle() {
     if (waveInProgress) return;
@@ -509,7 +348,11 @@ function startBattle() {
         tutorialHint.style.display = 'none';
     }
     
-    updateUI();
+    // Показываем счетчик врагов
+    waveBig.style.display = 'none';
+    enemiesCount.style.display = 'block';
+    enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
+    
     toggleUI(false);
     
     if (activeCharacter === 'sorcerer') {
@@ -530,9 +373,7 @@ function startBattle() {
 }
 
 function startSpawning() {
-    if (spawnInterval) {
-        clearInterval(spawnInterval);
-    }
+    if (spawnInterval) clearInterval(spawnInterval);
     
     let spawned = 0;
     
@@ -579,6 +420,7 @@ function endWave() {
     isGameActive = false;
     bossActive = false;
     waveInProgress = false;
+    
     hp = maxHp;
     
     tutorialHint.style.display = 'none';
@@ -595,13 +437,41 @@ function endWave() {
     }
     
     wave++;
+    
+    // Возвращаем отображение волны и прячем счетчик врагов
+    waveBig.style.display = 'block';
+    enemiesCount.style.display = 'none';
+    
     updateUI();
     toggleUI(true);
     document.getElementById('main-header').style.top = '15px';
+    
+    // Запускаем 3-секундный кулдаун для кнопки
+    startCooldown();
+}
+
+function startCooldown() {
+    if (cooldownTimer) clearTimeout(cooldownTimer);
+    
+    startBtn.classList.add('cooldown');
+    startBtn.innerText = '3 ⌛️';
+    
+    let secondsLeft = 3;
+    cooldownTimer = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+            startBtn.innerText = secondsLeft + ' ⌛️';
+        } else {
+            clearInterval(cooldownTimer);
+            startBtn.classList.remove('cooldown');
+            startBtn.innerText = 'Начать Перестрелку';
+            cooldownTimer = null;
+        }
+    }, 1000);
 }
 
 // --------------------------------------------------------------
-// 5. ФУНКЦИИ ПЕРСОНАЖЕЙ
+// 3. ФУНКЦИИ ПЕРСОНАЖЕЙ
 // --------------------------------------------------------------
 function activateSorcerer() {
     if (activeCharacter === 'sorcerer') return;
@@ -647,7 +517,7 @@ function activateKingOfCurses() {
 }
 
 // --------------------------------------------------------------
-// 6. СПОСОБНОСТИ KING OF CURSES
+// 4. СПОСОБНОСТИ KING OF CURSES
 // --------------------------------------------------------------
 function showKingAbilities() {
     abilityContainer.innerHTML = `
@@ -731,6 +601,7 @@ function castKingAbility(type) {
                             money += e.reward || 85;
                             enemiesLeft--;
                             updateUI();
+                            enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
                             if (currentEnemies.length === 0 && !bossActive && waveInProgress) {
                                 endWave();
                             }
@@ -823,6 +694,7 @@ function castKingAbility(type) {
                             }
                         });
                         updateUI();
+                        enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
                         if (currentEnemies.length === 0 && !bossActive && waveInProgress) endWave();
                         
                         setTimeout(() => {
@@ -862,6 +734,7 @@ function castKingAbility(type) {
                                     }
                                 });
                                 updateUI();
+                                enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
                                 if (fireDamage >= 3000) {
                                     clearInterval(fireInterval);
                                     fire.remove();
@@ -911,6 +784,7 @@ function castKingAbility(type) {
                             money += e.reward || 85;
                             enemiesLeft--;
                             updateUI();
+                            enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
                             if (currentEnemies.length === 0 && !bossActive && waveInProgress) endWave();
                         }
                     }
@@ -930,7 +804,7 @@ function castKingAbility(type) {
 }
 
 // --------------------------------------------------------------
-// 7. СПОСОБНОСТИ SORCERER
+// 5. СПОСОБНОСТИ SORCERER
 // --------------------------------------------------------------
 function showSorcererAbilities() {
     abilityContainer.innerHTML = `
@@ -952,11 +826,11 @@ function showSorcererAbilities() {
 }
 
 function castSorcererAbility(type) {
-    // Здесь код способностей Sorcerer (сокращено для экономии места)
+    // Здесь код способностей Sorcerer (оставлен как в предыдущей версии)
 }
 
 // --------------------------------------------------------------
-// 8. СИСТЕМА СТРЕЛЬБЫ
+// 6. СИСТЕМА СТРЕЛЬБЫ
 // --------------------------------------------------------------
 function fireBullet() {
     if (!isGameActive && !bossActive) return;
@@ -1015,6 +889,7 @@ function createBullet(t) {
                         money += e.reward || 85;
                         enemiesLeft--;
                         updateUI();
+                        enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
                         
                         if (currentEnemies.length === 0 && !bossActive && waveInProgress) {
                             endWave();
@@ -1035,7 +910,7 @@ function createBullet(t) {
 }
 
 // --------------------------------------------------------------
-// 9. СОЗДАНИЕ И ДВИЖЕНИЕ ВРАГОВ
+// 7. ДВИЖЕНИЕ ВРАГОВ
 // --------------------------------------------------------------
 function createEnemy() {
     let pool = enemyData.filter(e => wave >= e.start && wave < e.end);
@@ -1136,6 +1011,8 @@ function startMoving(o) {
                     enemiesLeft--;
                 }
                 
+                enemiesCount.innerText = "Количество Врагов: " + enemiesLeft;
+                
                 if (currentEnemies.length === 0 && !bossActive && waveInProgress) {
                     endWave();
                 }
@@ -1153,9 +1030,6 @@ function startMoving(o) {
     }, 16);
 }
 
-// --------------------------------------------------------------
-// 10. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// --------------------------------------------------------------
 function setupBossUI(t) {
     bossActive = true;
     let g = document.getElementById('boss-ui-global');
@@ -1347,6 +1221,10 @@ function gameOver(){
     document.getElementById('main-header').style.top = '15px';
     shootButton.style.display = 'none';
     
+    // Возвращаем отображение волны
+    waveBig.style.display = 'block';
+    enemiesCount.style.display = 'none';
+    
     hideAbilities();
     
     if (heliInterval) {
@@ -1370,6 +1248,10 @@ function respawn(){
         if (e.el) e.el.remove();
     });
     currentEnemies = [];
+    
+    // Возвращаем отображение волны
+    waveBig.style.display = 'block';
+    enemiesCount.style.display = 'none';
 }
 
 // ---------- МАГАЗИН ----------
@@ -1423,32 +1305,20 @@ function buyAmmo() {
 }
 
 // ---------- ADMIN ----------
-function startAdminTimer() { 
-    adminTimer = setTimeout(() => { 
-        document.getElementById('admin-notify').style.display = 'flex'; 
-    }, 5000); 
-}
-
-function clearAdminTimer() { 
-    clearTimeout(adminTimer); 
-}
-
+function startAdminTimer() { adminTimer = setTimeout(() => { document.getElementById('admin-notify').style.display = 'flex'; }, 5000); }
+function clearAdminTimer() { clearTimeout(adminTimer); }
 document.getElementById('admin-notify-ok').onclick = () => {
     document.getElementById('admin-notify').style.display = 'none';
-    adminTrigger.style.display = 'flex';
+    document.getElementById('admin-trigger').style.display = 'flex';
+};
+document.getElementById('admin-trigger').onclick = () => {
+    let menu = document.getElementById('admin-menu');
+    menu.style.display = 'flex';
+    setTimeout(() => menu.classList.add('show'), 10);
 };
 
-function addMoneyAdmin() { 
-    money += 100000; 
-    updateUI(); 
-}
-
-function toggleCurse() { 
-    isCurse = !isCurse; 
-    maxHp = isCurse ? 999999999999 : 350; 
-    hp = maxHp; 
-    updateUI(); 
-}
+function addMoneyAdmin() { money += 100000; updateUI(); }
+function toggleCurse() { isCurse = !isCurse; maxHp = isCurse ? 999999999999 : 350; hp = maxHp; updateUI(); }
 
 function skipWaveAdmin() {
     currentEnemies.forEach(e => {
@@ -1462,10 +1332,7 @@ function skipWaveAdmin() {
     notify.className = 'admin-notify-blue';
     notify.innerText = 'Пропущена Волна.';
     document.body.appendChild(notify);
-    setTimeout(() => { 
-        notify.style.opacity = '1'; 
-        notify.style.transform = 'translateX(-50%) translateY(-30px)'; 
-    }, 10);
+    setTimeout(() => { notify.style.opacity = '1'; notify.style.transform = 'translateX(-50%) translateY(-30px)'; }, 10);
     setTimeout(() => {
         notify.style.opacity = '0';
         notify.style.transform = 'translateX(-50%) translateY(-80px)';
@@ -1475,7 +1342,6 @@ function skipWaveAdmin() {
     endWave();
 }
 
-// Инициализация
 updateUI();
 </script>
 </body>
