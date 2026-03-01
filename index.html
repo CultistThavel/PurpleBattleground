@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - PERFECT WAVES</title>
+    <title>Purple Battleground 1.6 - KING OF CURSES</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -40,17 +40,26 @@
 
         #red-screen-overlay { position:fixed;inset:0;background:rgba(255,0,0,0);z-index:9999;pointer-events:none;transition:background 0.2s ease; }
         #white-flash { position:fixed;inset:0;background:#fff;z-index:10000;display:none;opacity:0;transition:opacity .5s; }
-        #sorcerer-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#0000ff;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
+        #king-alert { position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);color:#ff0000;font-size:60px;font-weight:900;-webkit-text-stroke:2px #fff;z-index:200000;transition:transform .5s cubic-bezier(.175,.885,.32,1.275);pointer-events:none; }
 
         .bullet { position:absolute;z-index:48;width:150px;pointer-events:none; }
 
         #start-btn-ui { position:absolute;bottom:240px;right:60px;background:#ccff00;color:#fff;padding:35px 70px;border:8px solid #fff;border-radius:45px;font-size:45px;z-index:100;cursor:pointer;box-shadow:0 10px 0 #77aa00;transition:opacity .4s; text-shadow:3px 3px 0 #000; }
         #admin-trigger { position:fixed;top:20px;left:85%;width:120px;height:120px;background:#000;border:6px solid #fff;color:#fff;display:none;justify-content:center;align-items:center;font-size:18px;cursor:pointer;z-index:100000;border-radius:20px;box-shadow:0 0 20px #fff; }
-        #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:450px;background:rgba(0,0,0,.95);border:6px solid #fff;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px;opacity:0;transition:opacity .5s,transform .5s; }
+        #admin-menu { position:fixed;top:10%;left:50%;transform:translateX(-50%);width:500px;background:rgba(0,0,0,.95);border:6px solid #fff;display:none;flex-direction:column;padding:20px;z-index:100001;color:#fff;border-radius:20px;opacity:0;transition:opacity .5s,transform .5s; }
         #admin-menu.show { opacity:1;transform:translateX(-50%) translateY(0); }
         .admin-btn { width:100%;padding:15px;margin:10px 0;background:#111;border:2px solid #fff;color:#fff;font-size:18px;cursor:pointer;font-weight:900;border-radius:10px; }
-        #sorcerer-icon { width:60px;height:60px;margin-right:15px;cursor:pointer;transition:filter .3s; }
+        
+        .king-selector { display:flex;align-items:center;margin-bottom:20px;cursor:pointer;background:#330000;padding:15px;border-radius:15px;border:2px solid #ff0000;transition:all 0.3s; }
+        .king-selector:hover { background:#660000;transform:scale(1.02); }
+        #king-icon { width:60px;height:60px;margin-right:15px;border-radius:10px; }
+        .king-text { color:#ff0000;font-size:28px;font-weight:900;text-shadow:0 0 10px #ff0000,0 0 20px #ff0000;animation:glowRed 2s infinite alternate; }
+        .king-hint { color:#ff6666;font-size:18px;margin-left:10px; }
+        
+        #sorcerer-icon { width:60px;height:60px;margin-right:15px;cursor:pointer;transition:filter .3s;border-radius:10px; }
         #sorcerer-icon:hover { filter:drop-shadow(0 0 15px #ff0); }
+
+        @keyframes glowRed { from { text-shadow:0 0 5px #f00; } to { text-shadow:0 0 20px #f00,0 0 35px #f00; } }
 
         #subtitle-box { position:fixed;bottom:50px;left:50%;transform:translateX(-50%) translateY(300px);width:85%;background:#fff;border:8px solid #000;padding:25px;z-index:9000;transition:transform .5s;border-radius:15px;display:none; }
         #subtitle-box.active { transform:translateX(-50%) translateY(0); }
@@ -75,11 +84,14 @@
             100% { transform: translate(100px, 100px); }
         }
         @keyframes redBallSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+        @keyframes dashMove { 0% { transform:translateX(0); } 100% { transform:translateX(2000px); } }
+        @keyframes fugaCharge { 0% { transform:scale(1); } 50% { transform:scale(1.5); } 100% { transform:scale(1); } }
+        @keyframes explosionGrow { 0% { transform:scale(0); opacity:0; } 50% { transform:scale(2); opacity:1; } 100% { transform:scale(0); opacity:0; } }
 
         #ability-container { position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);display:none;gap:40px;z-index:100;transition:bottom .6s,opacity .6s; }
         #ability-container.active { bottom:160px;opacity:1; }
         .ability-cube { width:180px;height:180px;background:rgba(0,0,0,.47);border:6px solid #fff;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;cursor:pointer;position:relative;border-radius:20px; }
-        .ability-cube .text-label { font-size:30px;font-weight:900;color:#fff;text-shadow:2px 2px #000; }
+        .ability-cube .text-label { font-size:24px;font-weight:900;color:#fff;text-shadow:2px 2px #000;text-align:center;padding:10px; }
         .cd-overlay { position:absolute;bottom:0;left:0;width:100%;height:0%;background:rgba(255,0,0,.6);z-index:1;border-radius:0 0 15px 15px;transition:height .1s linear; }
 
         #shop-overlay { position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1000;display:none;justify-content:center;align-items:center; }
@@ -96,8 +108,7 @@
 
         #purp-timer { position:absolute;top:300px;left:30px;color:#fff;font-size:50px;text-shadow:4px 4px 0 #f0f;display:none;z-index:200; }
 
-        .red-ball { position:absolute;width:180px;height:180px;z-index:20000;pointer-events:none; animation:redBallSpin 0.5s infinite linear; }
-        .blue-ball { position:absolute;width:400px;z-index:15000;pointer-events:none; animation:floatBlueBall 3s infinite alternate ease-in-out; }
+        .king-activated { position:fixed;top:20%;left:50%;transform:translateX(-50%);color:#ff0000;font-size:50px;font-weight:900;text-shadow:2px 2px 0 #fff;z-index:2000000;opacity:0;transition:opacity 0.5s, transform 1s;pointer-events:none; }
         .damage-notify { position:fixed;top:20%;left:50%;transform:translateX(-50%);color:#f00;font-size:50px;font-weight:900;text-shadow:2px 2px 0 #fff;z-index:2000000;opacity:0;transition:opacity 0.5s, transform 1s;pointer-events:none; }
         .admin-notify-blue { position:fixed;top:20%;left:50%;transform:translateX(-50%);color:#00f;font-size:50px;font-weight:900;text-shadow:2px 2px 0 #fff;z-index:2000000;opacity:0;transition:opacity 0.5s, transform 1s;pointer-events:none; }
         .heli-purchase { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:6px solid #000;border-radius:20px;padding:30px;text-align:center;color:#800080;font-size:28px;font-weight:900;text-shadow:2px 2px 0 #000;z-index:3000000; }
@@ -147,6 +158,12 @@
             from { height: 100%; }
             to { height: 0%; }
         }
+        
+        .dash-effect { position:absolute;width:300px;z-index:20000;animation:dashMove 0.5s linear forwards; }
+        .fuga-charge { position:absolute;width:200px;z-index:20000;animation:fugaCharge 4s ease-in-out; }
+        .explosion-effect { position:absolute;width:600px;z-index:20000;animation:explosionGrow 0.5s ease-out forwards; }
+        .fire-effect { position:absolute;width:400px;z-index:15000;opacity:0.8; }
+        .blue-aura { position:absolute;width:300px;z-index:20000; }
     </style>
 </head>
 <body>
@@ -154,7 +171,7 @@
 <div id="game-container">
     <div id="red-screen-overlay"></div>
     <div id="white-flash"></div>
-    <div id="sorcerer-alert">Sorcerer Активирован</div>
+    <div id="king-alert">King Of Curses Activated</div>
     <div id="tutorial-hint">Для продолжения игры, нам нужно обучить вас сражаться против врагов. Нажмите на чёрную круглую кнопку, которая расположена у вас на экране в нижнем правом углу.</div>
     <div id="purp-timer">⏳ 100</div>
 
@@ -193,6 +210,13 @@
             <img id="sorcerer-icon" src="https://i.ibb.co/KpR8FDxQ/sorcerer-icon.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer" onclick="activateSorcerer()">
             <span style="color:#ff0;font-size:28px;font-weight:900;text-shadow:0 0 10px #ff0,0 0 20px #ff0;animation:glowYellow 2s infinite alternate;">Sorcerer (жми на иконку)</span>
         </div>
+        
+        <div class="king-selector" onclick="activateKingOfCurses()">
+            <img id="king-icon" src="https://i.ibb.co/mV3qKgkp/king-icon.png" crossorigin="anonymous" loading="lazy" referrerpolicy="no-referrer">
+            <span class="king-text">King Of Curses</span>
+            <span class="king-hint">(Тыкните на значок.)</span>
+        </div>
+        
         <button class="admin-btn" onclick="addMoneyAdmin()">Деньжата +100К</button>
         <button class="admin-btn" onclick="toggleCurse()">Проклятие (Бессмертие)</button>
         <button class="admin-btn" onclick="skipWaveAdmin()">Пропустить Волну</button>
@@ -200,17 +224,17 @@
     </div>
 
     <div id="ability-container">
-        <div class="ability-cube" onclick="castAbility('red')">
-            <span class="text-label">Red Ball</span>
-            <div id="cd-red" class="cd-overlay"></div>
+        <div class="ability-cube" onclick="castKingAbility('scratches')">
+            <span class="text-label">Cursed Scratches</span>
+            <div id="cd-scratches" class="cd-overlay"></div>
         </div>
-        <div class="ability-cube" onclick="castAbility('blue')">
-            <span class="text-label">Blue Ball</span>
-            <div id="cd-blue" class="cd-overlay"></div>
+        <div class="ability-cube" onclick="castKingAbility('fuga')">
+            <span class="text-label">Fuga</span>
+            <div id="cd-fuga" class="cd-overlay"></div>
         </div>
-        <div class="ability-cube" onclick="castAbility('infinity')">
-            <span class="text-label">Infinity</span>
-            <div id="cd-infinity" class="cd-overlay"></div>
+        <div class="ability-cube" onclick="castKingAbility('aura')">
+            <span class="text-label">Blue Aura</span>
+            <div id="cd-aura" class="cd-overlay"></div>
         </div>
     </div>
 
@@ -282,7 +306,7 @@ const enemyData = [
 ];
 
 let money=0, hp=350, maxHp=350, damage=40, ammoPrice=250, wave=1, enemiesLeft=20, isGameActive=false;
-let hasHeli=false, adminTimer, isSorcerer=false, isCurse=false;
+let hasHeli=false, adminTimer, isSorcerer=false, isKing=false, isCurse=false;
 let currentEnemies=[], bossActive=false, purpTimer=100;
 let bossBlurInterval = null, waveInProgress = false;
 let blueBallActive = false;
@@ -453,7 +477,11 @@ function startBattle(){
     
     toggleUI(false);
     
-    if(isSorcerer){
+    // Показываем способности для King если активен
+    if(isKing){
+        document.getElementById('ability-container').style.display='flex';
+        setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
+    } else if(isSorcerer) {
         document.getElementById('ability-container').style.display='flex';
         setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
     }
@@ -493,6 +521,10 @@ function toggleUI(show){
         tutorialHint.style.display = 'none';
         document.getElementById('main-header').style.top = '15px';
         waveInProgress = false;
+        
+        // Прячем способности
+        document.getElementById('ability-container').classList.remove('active');
+        setTimeout(() => document.getElementById('ability-container').style.display='none', 600);
         
         if(heliInterval) {
             clearInterval(heliInterval);
@@ -568,23 +600,6 @@ function startMoving(o){
         }
         
         let step = baseSpeed;
-        if(window.infinityActive){
-            let dist = window.innerWidth - o.pos - 500;
-            if(dist < 600) step *= 0.1;
-            if(dist < 300) step = 0;
-        }
-        
-        if(blueBallActive) {
-            let ballElement = document.querySelector('.blue-ball');
-            if(ballElement && !o.isBoss && !o.isFinal) {
-                let ballRect = ballElement.getBoundingClientRect();
-                let enemyRect = o.el.getBoundingClientRect();
-                if(Math.abs(enemyRect.left - ballRect.left) < 600) {
-                    if(enemyRect.left > ballRect.left) o.pos -= 4;
-                    else o.pos += 3;
-                }
-            }
-        }
         
         o.pos += step;
         if(o.el) o.el.style.right = o.pos + "px";
@@ -785,6 +800,10 @@ function gameOver(){
     document.getElementById('main-header').style.top = '15px';
     shootButton.style.display = 'none';
     
+    // Прячем способности
+    document.getElementById('ability-container').classList.remove('active');
+    setTimeout(() => document.getElementById('ability-container').style.display='none', 600);
+    
     if(heliInterval) {
         clearInterval(heliInterval);
         heliInterval = null;
@@ -860,10 +879,43 @@ document.getElementById('admin-trigger').onclick = () => {
 function activateSorcerer(){
     if(isSorcerer) return;
     isSorcerer = true;
+    isKing = false;
     document.getElementById('main-hare').src = "https://i.ibb.co/5gLfm3VW/sorcerer-form.png";
     let alert = document.getElementById('sorcerer-alert');
     alert.style.transform = "translate(-50%,-50%) scale(1)";
     setTimeout(() => alert.style.transform = "translate(-50%,-50%) scale(0)", 2000);
+    
+    // Показываем уведомление
+    let notify = document.createElement('div');
+    notify.className = 'admin-notify-blue';
+    notify.innerText = 'Sorcerer Activated';
+    document.body.appendChild(notify);
+    setTimeout(() => { notify.style.opacity = '1'; notify.style.transform = 'translateX(-50%) translateY(-30px)'; }, 10);
+    setTimeout(() => { notify.style.opacity = '0'; notify.style.transform = 'translateX(-50%) translateY(-80px)'; setTimeout(()=>notify.remove(), 2000); }, 2000);
+    
+    if(isGameActive || bossActive){
+        document.getElementById('ability-container').style.display='flex';
+        setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
+    }
+}
+
+function activateKingOfCurses(){
+    if(isKing) return;
+    isKing = true;
+    isSorcerer = false;
+    document.getElementById('main-hare').src = "https://i.ibb.co/GQCPp3b3/king-form.png";
+    let alert = document.getElementById('king-alert');
+    alert.style.transform = "translate(-50%,-50%) scale(1)";
+    setTimeout(() => alert.style.transform = "translate(-50%,-50%) scale(0)", 2000);
+    
+    // Показываем уведомление
+    let notify = document.createElement('div');
+    notify.className = 'king-activated';
+    notify.innerText = 'King Of Curses Activated';
+    document.body.appendChild(notify);
+    setTimeout(() => { notify.style.opacity = '1'; notify.style.transform = 'translateX(-50%) translateY(-30px)'; }, 10);
+    setTimeout(() => { notify.style.opacity = '0'; notify.style.transform = 'translateX(-50%) translateY(-80px)'; setTimeout(()=>notify.remove(), 2000); }, 2000);
+    
     if(isGameActive || bossActive){
         document.getElementById('ability-container').style.display='flex';
         setTimeout(()=>document.getElementById('ability-container').classList.add('active'),50);
@@ -896,90 +948,39 @@ function skipWaveAdmin(){
     endWave();
 }
 
-// ---------- СПОСОБНОСТИ SORCERER ----------
-function castAbility(type){
-    if((!isGameActive && !bossActive) || !isSorcerer) return;
-    let cd = document.getElementById('cd-'+type);
-    if(cd.style.height !== '0%' && cd.style.height !== '') return;
-    cd.style.height = '100%';
-    let time = 15000;
-    let s = Date.now();
-    let int = setInterval(() => {
-        let e = Date.now() - s;
-        cd.style.height = Math.max(0, 100 - (e/time*100)) + '%';
-        if(e >= time) clearInterval(int);
-    }, 100);
-
-    if(type === 'red'){
-        setTimeout(() => {
-            document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0.7)';
-        }, 200);
-        
-        let ball = document.createElement('img');
-        ball.src = 'https://i.ibb.co/xqrHf7SM/red-ball.png';
-        ball.className = 'red-ball';
-        ball.style.left = '300px';
-        ball.style.bottom = '30%';
-        document.getElementById('game-container').appendChild(ball);
-        
-        setTimeout(() => {
-            let fly = setInterval(() => {
-                let left = parseInt(ball.style.left) || 300;
-                ball.style.left = (left + 60) + 'px';
-                if(left > window.innerWidth + 200) { clearInterval(fly); ball.remove(); }
-            }, 16);
-            
-            [...currentEnemies].forEach(e => { 
-                e.hp = 0; 
-                clearInterval(e.moveInterval);
-            });
-            
-            setTimeout(() => {
-                const nonBosses = currentEnemies.filter(e => !e.isBoss && !e.isFinal);
-                nonBosses.forEach(e => {
-                    if(e.el) e.el.remove();
-                    const index = currentEnemies.indexOf(e);
-                    if (index > -1) currentEnemies.splice(index, 1);
-                    enemiesLeft--;
-                });
-                currentEnemies.forEach(e => { if(e.hp <=0) updateBossHP(e); });
-                updateUI();
-                
-                if(currentEnemies.length === 0 && waveInProgress) {
-                    endWave();
-                }
-            }, 100);
-            
-            setTimeout(() => {
-                document.getElementById('red-screen-overlay').style.background = 'rgba(255,0,0,0)';
-            }, 200);
-        }, 2000);
-    }
-
-    if(type === 'blue'){
-        blueBallActive = true;
+// ---------- СПОСОБНОСТИ KING OF CURSES ----------
+function castKingAbility(type){
+    if((!isGameActive && !bossActive) || !isKing) return;
+    
+    if(type === 'scratches'){
+        let cd = document.getElementById('cd-scratches');
+        if(cd.style.height !== '0%' && cd.style.height !== '') return;
+        cd.style.height = '100%';
+        let time = 10000; // 10 секунд перезарядка
+        let s = Date.now();
+        let int = setInterval(() => {
+            let e = Date.now() - s;
+            cd.style.height = Math.max(0, 100 - (e/time*100)) + '%';
+            if(e >= time) clearInterval(int);
+        }, 100);
         
         let hare = document.getElementById('main-hare');
         hare.style.bottom = "45%";
         setTimeout(() => {
             hare.style.bottom = "25%";
             
-            let ball = document.createElement('img');
-            ball.src = 'https://i.ibb.co/3yt8P5rx/blue-ball.png';
-            ball.className = 'blue-ball';
-            ball.style.left = '380px';
-            ball.style.bottom = '30%';
-            ball.style.width = '400px';
-            document.getElementById('game-container').appendChild(ball);
+            let scratch = document.createElement('img');
+            scratch.src = "https://i.ibb.co/0yV9qKqX/scratch.png";
+            scratch.className = 'dash-effect';
+            scratch.style.left = '400px';
+            scratch.style.bottom = '30%';
+            document.getElementById('game-container').appendChild(scratch);
             
+            // Наносим урон всем врагам на пути
             let dmgInterval = setInterval(() => {
-                if(!blueBallActive) {
-                    clearInterval(dmgInterval);
-                    return;
-                }
                 [...currentEnemies].forEach(e => {
                     if(!e.isBoss && !e.isFinal) {
-                        e.hp -= 1500;
+                        e.hp -= 1200;
                         if(e.hp < 0) e.hp = 0;
                         
                         let fill = e.el.querySelector('.zombie-hp-fill');
@@ -1005,17 +1006,219 @@ function castAbility(type){
             }, 100);
             
             setTimeout(() => {
-                blueBallActive = false;
                 clearInterval(dmgInterval);
-                ball.remove();
-            }, 15000);
+                scratch.remove();
+            }, 500);
         }, 600);
     }
-
-    if(type === 'infinity'){
-        window.infinityActive = true;
-        setTimeout(() => { window.infinityActive = false; }, 15000);
+    
+    if(type === 'fuga'){
+        let cd = document.getElementById('cd-fuga');
+        if(cd.style.height !== '0%' && cd.style.height !== '') return;
+        cd.style.height = '100%';
+        let time = 20000; // 20 секунд перезарядка
+        let s = Date.now();
+        let int = setInterval(() => {
+            let e = Date.now() - s;
+            cd.style.height = Math.max(0, 100 - (e/time*100)) + '%';
+            if(e >= time) clearInterval(int);
+        }, 100);
+        
+        let hare = document.getElementById('main-hare');
+        hare.style.bottom = "40%";
+        
+        // Заряжает 4 секунды
+        let charge = document.createElement('img');
+        charge.src = "https://i.ibb.co/d4RMBPsH/fuga-charge.png";
+        charge.className = 'fuga-charge';
+        charge.style.left = '350px';
+        charge.style.bottom = '30%';
+        document.getElementById('game-container').appendChild(charge);
+        
+        setTimeout(() => {
+            charge.remove();
+            hare.style.bottom = "25%";
+            
+            // Бросает объект
+            let fugaBall = document.createElement('img');
+            fugaBall.src = "https://i.ibb.co/CKz1By6w/fuga-ball.png";
+            fugaBall.style.position = 'absolute';
+            fugaBall.style.left = '400px';
+            fugaBall.style.bottom = '30%';
+            fugaBall.style.width = '100px';
+            fugaBall.style.transition = 'left 0.3s linear';
+            document.getElementById('game-container').appendChild(fugaBall);
+            
+            setTimeout(() => {
+                fugaBall.style.left = window.innerWidth + 'px';
+                
+                setTimeout(() => {
+                    fugaBall.remove();
+                    
+                    // Взрыв
+                    let explosion = document.createElement('img');
+                    explosion.src = "https://i.ibb.co/CKz1By6w/explosion.png";
+                    explosion.className = 'explosion-effect';
+                    explosion.style.left = (window.innerWidth - 300) + 'px';
+                    explosion.style.bottom = '30%';
+                    document.getElementById('game-container').appendChild(explosion);
+                    
+                    // Наносим урон взрывом 50000
+                    [...currentEnemies].forEach(e => {
+                        e.hp -= 50000;
+                        if(e.hp < 0) e.hp = 0;
+                        
+                        if(!e.isBoss && !e.isFinal){
+                            let fill = e.el.querySelector('.zombie-hp-fill');
+                            if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
+                            let txt = e.el.querySelector('div[style*="top:3px"]');
+                            if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
+                        } else {
+                            document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
+                            document.getElementById('boss-name-text').innerHTML = `${e.name} [${Math.floor(e.hp)}/${e.maxHp}]`;
+                        }
+                        
+                        if(e.hp <= 0){
+                            if(e.isBoss || e.isFinal) {
+                                updateBossHP(e);
+                            } else {
+                                clearInterval(e.moveInterval);
+                                if(e.el) e.el.remove();
+                                const index = currentEnemies.indexOf(e);
+                                if (index > -1) currentEnemies.splice(index, 1);
+                                money += e.reward; 
+                                enemiesLeft--;
+                            }
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        explosion.remove();
+                        
+                        // Огонь после взрыва
+                        let fire = document.createElement('img');
+                        fire.src = "https://i.ibb.co/4RJQJvqM/fire.png";
+                        fire.className = 'fire-effect';
+                        fire.style.left = (window.innerWidth - 200) + 'px';
+                        fire.style.bottom = '30%';
+                        document.getElementById('game-container').appendChild(fire);
+                        
+                        // Огонь наносит 500 урона в секунду в течение 5 секунд
+                        let fireInterval = setInterval(() => {
+                            [...currentEnemies].forEach(e => {
+                                e.hp -= 500;
+                                if(e.hp < 0) e.hp = 0;
+                                
+                                if(!e.isBoss && !e.isFinal){
+                                    let fill = e.el.querySelector('.zombie-hp-fill');
+                                    if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
+                                    let txt = e.el.querySelector('div[style*="top:3px"]');
+                                    if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
+                                } else {
+                                    document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
+                                }
+                                
+                                if(e.hp <= 0){
+                                    if(e.isBoss || e.isFinal) {
+                                        updateBossHP(e);
+                                    } else {
+                                        clearInterval(e.moveInterval);
+                                        if(e.el) e.el.remove();
+                                        const index = currentEnemies.indexOf(e);
+                                        if (index > -1) currentEnemies.splice(index, 1);
+                                        money += e.reward; 
+                                        enemiesLeft--;
+                                    }
+                                }
+                            });
+                            
+                            updateUI();
+                            if(currentEnemies.length === 0 && waveInProgress) endWave();
+                        }, 1000);
+                        
+                        setTimeout(() => {
+                            clearInterval(fireInterval);
+                            fire.remove();
+                        }, 5000);
+                        
+                    }, 500);
+                    
+                }, 300);
+            }, 100);
+        }, 4000);
     }
+    
+    if(type === 'aura'){
+        let cd = document.getElementById('cd-aura');
+        if(cd.style.height !== '0%' && cd.style.height !== '') return;
+        cd.style.height = '100%';
+        let time = 12000; // 12 секунд перезарядка
+        let s = Date.now();
+        let int = setInterval(() => {
+            let e = Date.now() - s;
+            cd.style.height = Math.max(0, 100 - (e/time*100)) + '%';
+            if(e >= time) clearInterval(int);
+        }, 100);
+        
+        let hare = document.getElementById('main-hare');
+        hare.style.bottom = "45%";
+        setTimeout(() => {
+            hare.style.bottom = "25%";
+            
+            let aura = document.createElement('img');
+            aura.src = "https://i.ibb.co/NgRsPXgT/blue-aura.png";
+            aura.className = 'blue-aura';
+            aura.style.left = '400px';
+            aura.style.bottom = '30%';
+            document.getElementById('game-container').appendChild(aura);
+            
+            // Наносим урон
+            [...currentEnemies].forEach(e => {
+                e.hp -= 1200;
+                if(e.hp < 0) e.hp = 0;
+                
+                if(!e.isBoss && !e.isFinal){
+                    let fill = e.el.querySelector('.zombie-hp-fill');
+                    if(fill) fill.style.width = (e.hp/e.maxHp)*100 + "%";
+                    let txt = e.el.querySelector('div[style*="top:3px"]');
+                    if(txt) txt.innerText = Math.max(0,Math.floor(e.hp)) + " ХП";
+                } else {
+                    document.getElementById('boss-hp-fill').style.width = (e.hp/e.maxHp)*100 + "%";
+                }
+                
+                if(e.hp <= 0){
+                    if(e.isBoss || e.isFinal) {
+                        updateBossHP(e);
+                    } else {
+                        clearInterval(e.moveInterval);
+                        if(e.el) e.el.remove();
+                        const index = currentEnemies.indexOf(e);
+                        if (index > -1) currentEnemies.splice(index, 1);
+                        money += e.reward; 
+                        enemiesLeft--;
+                    }
+                }
+            });
+            
+            updateUI();
+            
+            setTimeout(() => {
+                aura.style.transition = 'bottom 1s';
+                aura.style.bottom = '10%';
+                setTimeout(() => aura.remove(), 1000);
+            }, 500);
+            
+            if(currentEnemies.length === 0 && waveInProgress) endWave();
+        }, 600);
+    }
+}
+
+// ---------- Sorcerer способности (для совместимости) ----------
+function castAbility(type){
+    if((!isGameActive && !bossActive) || !isSorcerer) return;
+    
+    // Здесь можно добавить старые способности Sorcerer если нужно
+    // Пока просто заглушка
 }
 
 updateUI();
