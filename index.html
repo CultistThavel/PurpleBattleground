@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Purple Battleground 1.6 - GITHUB RELEASE</title>
+    <title>Purple Battleground 1.6 - RELEASE CANDIDATE</title>
     <style>
         body, html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#3d4147;font-family:'Arial Black',sans-serif;user-select:none;touch-action:manipulation; }
         #game-container { position:relative;width:100vw;height:100vh;cursor:crosshair;transition:filter 0.2s ease; }
@@ -285,7 +285,7 @@
 
 <script>
 // --------------------------------------------------------------
-// 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ИСПРАВЛЕНО)
+// 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // --------------------------------------------------------------
 const enemyData = [
     {name:"Зомби Заяц",hp:88,dmg:20, speedVal:7, start:1,end:5,img:"https://i.ibb.co/67QjYjbR/zombie-hare.png", reward:85},
@@ -327,6 +327,7 @@ let heliInterval = null;
 let activeCharacter = 'default';
 let spawnInterval = null;
 let startCooldown = false;
+let waveCompleted = false; // Флаг для предотвращения множественного завершения
 
 // Элементы UI
 const shootButton = document.getElementById('shoot-button');
@@ -345,12 +346,13 @@ function updateUI() {
     document.getElementById('hp-text').innerText = "Ваша Шкала ХП: " + Math.max(0, Math.floor(hp));
     document.getElementById('hp-fill').style.width = (hp / maxHp) * 100 + "%";
     
-    // ИСПРАВЛЕНО: Показываем правильный интерфейс в зависимости от состояния
+    // В мирном режиме показываем только "Волна: X"
     if (!isGameActive && !bossActive) {
         waveBig.style.display = 'block';
         enemyCounter.style.display = 'none';
         waveBig.innerText = wave + " Волна";
     } else {
+        // В бою показываем счётчик врагов
         waveBig.style.display = 'none';
         enemyCounter.style.display = 'block';
         enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
@@ -360,7 +362,7 @@ function updateUI() {
 }
 
 // --------------------------------------------------------------
-// 2. ЛОГИКА ВОЛН (ИСПРАВЛЕНА)
+// 2. ЛОГИКА ВОЛН (ПОЛНОСТЬЮ ПЕРЕПИСАНА)
 // --------------------------------------------------------------
 function handleStartBattle() {
     if (startCooldown) {
@@ -383,6 +385,7 @@ function startBattle() {
     console.log("Запуск волны " + wave);
     waveInProgress = true;
     isGameActive = true;
+    waveCompleted = false; // Сбрасываем флаг
     
     if (wave === 42 || wave === 70) {
         enemiesLeft = 1;
@@ -394,7 +397,7 @@ function startBattle() {
     
     shootButton.style.display = 'flex';
     
-    // ИСПРАВЛЕНО: Принудительно обновляем интерфейс
+    // Принудительно обновляем интерфейс
     waveBig.style.display = 'none';
     enemyCounter.style.display = 'block';
     enemyCounter.innerText = "Количество Врагов: " + enemiesLeft;
@@ -415,7 +418,6 @@ function startBattle() {
     
     startSpawning();
     
-    // ИСПРАВЛЕНО: Останавливаем старый интервал перед созданием нового
     if (heliInterval) {
         clearInterval(heliInterval);
         heliInterval = null;
@@ -437,13 +439,14 @@ function startSpawning() {
     
     let spawned = 0;
     
+    // Создаём первого врага сразу
     if (spawned < enemiesLeft) {
         createEnemy();
         spawned++;
     }
     
     spawnInterval = setInterval(() => {
-        if (!waveInProgress || !isGameActive) {
+        if (!waveInProgress || !isGameActive || waveCompleted) {
             clearInterval(spawnInterval);
             spawnInterval = null;
             return;
@@ -462,20 +465,32 @@ function startSpawning() {
 }
 
 function checkWaveCompletion() {
+    // Защита от множественного вызова
+    if (waveCompleted) return;
+    
+    // Волна завершается ТОЛЬКО когда:
+    // 1. Нет живых врагов в массиве
+    // 2. Счётчик врагов равен 0
+    // 3. Волна активна
     if (enemiesLeft === 0 && currentEnemies.length === 0 && waveInProgress) {
-        console.log("Волна " + wave + " завершена!");
+        console.log("Волна " + wave + " завершена! Все " + totalEnemiesThisWave + " врагов уничтожены.");
+        waveCompleted = true;
         endWave();
     }
 }
 
 function endWave() {
     if (!waveInProgress && !bossActive) return;
+    if (waveCompleted) return; // Повторная защита
+    
+    console.log("Завершение волны " + wave);
     
     if (spawnInterval) {
         clearInterval(spawnInterval);
         spawnInterval = null;
     }
     
+    // Очищаем всех оставшихся врагов
     currentEnemies.forEach(e => {
         clearInterval(e.moveInterval);
         if (e.el) e.el.remove();
@@ -501,6 +516,7 @@ function endWave() {
         bossBlurInterval = null;
     }
     
+    // Увеличиваем номер волны
     wave++;
     console.log("Новая волна: " + wave);
     
@@ -508,6 +524,7 @@ function endWave() {
     toggleUI(true);
     document.getElementById('main-header').style.top = '15px';
     
+    // Запускаем таймер на кнопку
     startCooldown = true;
     startBtn.classList.add('cooldown');
     startBtn.innerText = '3 ⌛️';
@@ -919,14 +936,12 @@ function castSorcererAbility(type) {
                 }
             }, 16);
             
-            // ИСПРАВЛЕНО: Урон всем врагам, включая боссов
             [...currentEnemies].forEach(e => {
                 e.hp -= 9999999;
                 if (e.hp < 0) e.hp = 0;
             });
             
             setTimeout(() => {
-                // ИСПРАВЛЕНО: Удаляем всех мертвых врагов, включая боссов
                 const deadEnemies = [...currentEnemies];
                 deadEnemies.forEach(e => {
                     if (e.hp <= 0) {
@@ -967,7 +982,7 @@ function castSorcererAbility(type) {
             ball.style.left = '380px';
             ball.style.bottom = '30%';
             ball.style.width = '400px';
-            // ИСПРАВЛЕНО: Анимация полёта, а не улёта вверх
+            // ВОЗВРАЩАЕМ ПРОШЛУЮ АНИМАЦИЮ
             ball.style.animation = 'floatBlueBall 8s infinite alternate ease-in-out';
             document.getElementById('game-container').appendChild(ball);
             
@@ -1021,9 +1036,6 @@ function castSorcererAbility(type) {
         infinityEffect.style.opacity = '0.5';
         infinityEffect.style.zIndex = '10000';
         document.getElementById('game-container').appendChild(infinityEffect);
-        
-        // ИСПРАВЛЕНО: Infinity теперь работает (замедление реализовано в startMoving)
-        console.log("Infinity активирован");
         
         setTimeout(() => {
             window.infinityActive = false;
@@ -1166,13 +1178,12 @@ function startMoving(o) {
     
     let baseSpeed = (window.innerWidth / (o.speed * 60));
     o.moveInterval = setInterval(() => {
-        if (!o || !o.el || (!isGameActive && !bossActive)) {
+        if (!o || !o.el || (!isGameActive && !bossActive) || waveCompleted) {
             clearInterval(o.moveInterval);
             return;
         }
         
         let step = baseSpeed;
-        // ИСПРАВЛЕНО: Infinity теперь работает
         if (window.infinityActive) {
             let dist = window.innerWidth - o.pos - 500;
             if (dist < 600) step *= 0.1;
@@ -1322,6 +1333,7 @@ function hideAbilities() {
 function startPurpBoss() {
     bossActive = true;
     waveInProgress = true;
+    waveCompleted = false;
     toggleUI(false);
     document.getElementById('purp-timer').style.display = 'block';
     shootButton.style.display = 'flex';
@@ -1530,7 +1542,6 @@ document.getElementById('admin-trigger').onclick = () => {
 function addMoneyAdmin() { money += 100000; updateUI(); }
 function toggleCurse() { isCurse = !isCurse; maxHp = isCurse ? 999999999999 : 350; hp = maxHp; updateUI(); }
 
-// ИСПРАВЛЕНО: Пропуск волны теперь работает правильно
 function skipWaveAdmin() {
     if (waveInProgress) {
         currentEnemies.forEach(e => {
@@ -1551,7 +1562,7 @@ function skipWaveAdmin() {
             setTimeout(() => notify.remove(), 2000);
         }, 2000);
         
-        endWave(); // Увеличит wave на 1
+        endWave();
     }
 }
 
